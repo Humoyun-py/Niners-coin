@@ -39,26 +39,32 @@
 
 <body>
     <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
+        <aside id="sidebarContainer" class="sidebar"></aside>
+
         <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-                <div style="flex-grow: 1;">
-                    <h1 id="welcomeMsg" style="font-size: 2.2rem; font-weight: 800; margin-bottom: 8px;">Welcome!</h1>
-                    <p style="color: var(--text-muted); font-size: 1.1rem;" data-i18n="dashboard_subtitle">Ready to
-                        level up your English today?</p>
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button id="mobileMenuToggle" class="menu-toggle-btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div>
+                        <h1 id="welcomeMsg" class="font-lg" style="margin-bottom: 4px;">Welcome!</h1>
+                        <p class="font-xs" style="color: var(--text-muted);" data-i18n="dashboard_subtitle">Ready to
+                            level up your English today?</p>
+                    </div>
                 </div>
 
-                <div class="user-profile" style="display: flex; align-items: center; gap: 12px;">
+                <div class="user-profile">
                     <span class="coin-badge" id="coinBalance">0 🟡</span>
-                    <div style="text-align: right;">
-                        <div style="font-weight: 600;" id="userName">User Name</div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">Student</div>
+                    <div class="user-info-text">
+                        <div id="userName" style="font-weight: 800;">User Name</div>
+                        <div id="userRole" class="user-role-badge">Student</div>
                     </div>
+                    <div id="userAvatar" class="profile-avatar">U</div>
                 </div>
             </header>
 
-            <div class="dashboard-layout"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            <div class="stats-grid">
                 <!-- WORD OF THE DAY (MATCHING UPLOADED IMAGE) -->
                 <div class="card vocab-card"
                     style="background: #FFD200; color: #1A1A1A; position: relative; overflow: hidden; padding: 45px; border-radius: 30px; height: 100%; min-height: 340px; display: flex; flex-direction: column; justify-content: center; border: none; box-shadow: 0 25px 50px -12px rgba(255, 210, 0, 0.3);">
@@ -191,34 +197,35 @@
                 </div>
             </div>
 
+            <!-- Footer -->
+            <footer class="dashboard-footer">
+                <p>&copy; 2024 Niners Coin. Barcha huquqlar himoyalangan.</p>
+                <div class="footer-links">
+                    <a href="#">Yordam</a>
+                    <a href="#">Maxfiylik</a>
+                </div>
+            </footer>
         </main>
     </div>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="../../js/translations.js"></script>
     <script src="../../js/api.js"></script>
     <script src="../../js/student.js"></script>
     <script src="../../js/sidebar-loader.js"></script>
     <script>
-        const userName = localStorage.getItem('user_name') || 'Student';
-        document.getElementById('userName').innerText = userName;
-
-        // Initialize translation (This will render switcher and update all data-i18n elements)
+        const userNameText = localStorage.getItem('user_name') || 'Student';
+        // Initial setup
         LanguageModule.init();
 
-        // Update greeting with name (Manually since it needs a parameter)
         const welcomeEl = document.getElementById('welcomeMsg');
         if (welcomeEl) {
-            welcomeEl.innerHTML = LanguageModule.t('dashboard_welcome', { name: userName });
-        }
-
-        async function submitComplaint() {
-            const title = prompt("Subject:");
-            if (!title) return;
-            const message = prompt("Details:");
-            try {
-                await api.post('/student/complaints', { title, message });
-                alert("Your appeal has been submitted!");
-            } catch (e) { alert("Error submitting appeal!"); }
+            welcomeEl.innerHTML = LanguageModule.t('dashboard_welcome', { name: userNameText });
         }
 
         StudentModule.initDashboard();

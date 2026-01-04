@@ -41,13 +41,14 @@
     </div>
     <script src="../../js/api.js"></script>
     <script src="../../js/sidebar-loader.js"></script>
+    <script>
 
-    async function loadAuditLogs() {
-    try {
-    const logs = await api.get('/admin/audit-logs');
-    const tbody = document.getElementById('auditTableBody');
-    if (logs && logs.length > 0) {
-    tbody.innerHTML = logs.map(l => `
+        async function loadAuditLogs() {
+            try {
+                const logs = await api.get('/admin/audit-logs');
+                const tbody = document.getElementById('auditTableBody');
+                if (logs && logs.length > 0) {
+                    tbody.innerHTML = logs.map(l => `
     <tr style="border-bottom:1px solid #F5F5F5;">
         <td style="padding:12px; font-size:0.85rem; color:#666;">${new Date(l.timestamp).toLocaleString()}</td>
         <td style="padding:12px;">${l.username}</td>
@@ -60,16 +61,16 @@
         </td>
     </tr>
     `).join('');
-    } else {
-    tbody.innerHTML = '<tr>
+                } else {
+                    tbody.innerHTML = `<tr>
         <td colspan="4" style="text-align:center; padding:20px;">Hozircha xavfsizlik loglari mavjud emas.</td>
-    </tr>';
-    }
-    } catch (e) {
-    console.error(e);
-    }
-    }
-    loadAuditLogs();
+    </tr>`;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        loadAuditLogs();
     </script>
 </body>
 

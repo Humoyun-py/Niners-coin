@@ -1,36 +1,36 @@
-<div class="sidebar">
-    <div class="logo" style="margin-bottom: 32px; font-size: 1.8rem; font-weight: 800;">
-        <span style="color:var(--primary);">NINERS</span>.UZ
-    </div>
+<div class="logo"
+    style="margin-bottom: var(--space-m); font-size: var(--font-lg); font-weight: 900; color: var(--secondary);">
+    <span style="color:var(--primary);">NINERS</span>.UZ
+</div>
 
-    <!-- Dynamic User Profile Box -->
-    <div class="profile-box">
-        <div id="sidebarAvatar" class="profile-avatar">U</div>
-        <div class="profile-info">
-            <h4 id="sidebarUserName">Yuklanmoqda...</h4>
-            <p id="sidebarUserRole">...</p>
-        </div>
+<!-- Dynamic User Profile Box -->
+<div class="profile-box">
+    <div id="sidebarAvatar" class="profile-avatar">U</div>
+    <div class="profile-info">
+        <h4 id="sidebarUserName" class="font-sm" style="font-weight: 800;">Yuklanmoqda...</h4>
+        <p id="sidebarUserRole" class="font-xs" style="color: var(--text-muted); font-weight: 600;">...</p>
     </div>
+</div>
 
-    <div class="menu-label"
-        style="text-transform: uppercase; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 16px; font-weight: 800; letter-spacing: 1px;">
-        Main Menu
-    </div>
+<div class="menu-label"
+    style="text-transform: uppercase; font-size: var(--font-xs); color: var(--text-muted); margin-bottom: var(--space-xs); font-weight: 800; letter-spacing: 1px;">
+    Asosiy Menyu
+</div>
 
-    <nav class="nav-menu">
-        <ul id="sidebarMenu" style="list-style: none;">
-            <li>
-                <a href="dashboard.html" class="nav-item">
-                    <span>📊</span> Dashboard
-                </a>
-            </li>
-            <div id="roleSpecificLinks"></div>
-        </ul>
-    </nav>
+<nav class="nav-menu">
+    <ul id="sidebarMenu" style="list-style: none;">
+        <li>
+            <a href="#dashboard" class="nav-item">
+                <i class="fas fa-th-large"></i> <span>Dashboard</span>
+            </a>
+        </li>
+        <div id="roleSpecificLinks"></div>
+    </ul>
+</nav>
 
-    <div class="sidebar-footer">
-        <button onclick="logout()" class="btn logout-btn">
-            <span>🚪</span> Logout
-        </button>
-    </div>
+<div class="sidebar-footer" style="margin-top: auto; padding-top: var(--space-m);">
+    <button onclick="logout()" class="btn logout-btn"
+        style="width: 100%; background: #FFF5F5; color: #FF4D4D; border: 1px solid #FFE0E0;">
+        <i class="fas fa-sign-out-alt"></i> <span>Chiqish</span>
+    </button>
 </div>

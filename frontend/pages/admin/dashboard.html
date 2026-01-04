@@ -8,35 +8,41 @@
 </head>
 
 <body class="dashboard-grid">
-    <div id="sidebarContainer"></div>
+    <aside id="sidebarContainer" class="sidebar"></aside>
+
     <main class="main-content">
-        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
-            <div style="flex-grow: 1;">
-                <h2 id="userNameDisplay" data-i18n="admin_console">Admin Management Console</h2>
-                <p style="color: var(--text-muted);" data-i18n="admin_subtitle">Manage users, classes, and system
-                    integrity.</p>
+        <header class="dashboard-header">
+            <div class="header-left">
+                <button id="mobileMenuToggle" class="menu-toggle-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div>
+                    <h1 id="userNameDisplay" class="font-lg" style="margin-bottom: 4px;">Admin Management</h1>
+                    <p class="font-xs" style="color: var(--text-muted);" data-i18n="admin_subtitle">Manage users,
+                        classes, and system integrity.</p>
+                </div>
             </div>
-            <button onclick="requestDirectorApproval()" class="btn btn-secondary"
-                style="border-color: var(--primary); font-weight: 800;" data-i18n="request_director">
-                📢 Request Director Approval
+
+            <button onclick="requestDirectorApproval()" class="btn btn-primary" data-i18n="request_director">
+                <i class="fas fa-paper-plane"></i> Approval
             </button>
         </header>
 
-        <div
-            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 40px;">
-            <div class="card stat-card">
-                <p style="color: var(--text-muted); font-weight: 600;" data-i18n="total_users">Total Users</p>
-                <h3 id="totalUsers" style="font-size: 2.5rem; margin-top: 8px;">0</h3>
+        <div class="stats-grid">
+            <div class="card">
+                <p class="font-xs" style="color: var(--text-muted); font-weight: 700;" data-i18n="total_users">TOTAL
+                    USERS</p>
+                <h3 id="totalUsers" class="font-xl">0</h3>
             </div>
-            <div class="card stat-card">
-                <p style="color: var(--text-muted); font-weight: 600;" data-i18n="total_classes">Total Groups/Classes
-                </p>
-                <h3 id="totalClasses" style="font-size: 2.5rem; margin-top: 8px;">0</h3>
+            <div class="card">
+                <p class="font-xs" style="color: var(--text-muted); font-weight: 700;" data-i18n="total_classes">TOTAL
+                    GROUPS</p>
+                <h3 id="totalClasses" class="font-xl">0</h3>
             </div>
-            <div class="card stat-card" style="border-left: 5px solid #FFD700;">
-                <p style="color: var(--text-muted); font-weight: 600;" data-i18n="new_appeals">New Appeals/Complaints
-                </p>
-                <h3 id="pendingComplaints" style="font-size: 2.5rem; margin-top: 8px; color: #FFA500;">0</h3>
+            <div class="card" style="border-left: 4px solid var(--primary);">
+                <p class="font-xs" style="color: var(--text-muted); font-weight: 700;" data-i18n="new_appeals">NEW
+                    APPEALS</p>
+                <h3 id="pendingComplaints" class="font-xl" style="color: var(--primary-alt);">0</h3>
             </div>
         </div>
 
@@ -87,8 +93,16 @@
                         data-i18n="check_payments">🚨 Check Payments
                         (Auto-Block)</button>
                 </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="dashboard-footer">
+            <p>&copy; 2024 Niners Coin. Barcha huquqlar himoyalangan.</p>
+        </footer>
     </main>
-    </div>
+
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="../../js/translations.js"></script>
     <script src="../../js/api.js"></script>
     <script src="../../js/admin.js"></script>

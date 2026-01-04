@@ -29,6 +29,7 @@ if DATABASE_URL.startswith("postgresql") or DATABASE_URL.startswith("mysql"):
         pool_pre_ping=True
     )
 else:
+    
     # SQLite doesn't support pool_size/max_overflow
     engine = create_engine(
         DATABASE_URL,

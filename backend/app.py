@@ -25,7 +25,11 @@ def create_app():
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-key-123')
     
     # Database Configuration
-    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'instance', 'niners.db'))
+    instance_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'instance'))
+    if not os.path.exists(instance_path):
+        os.makedirs(instance_path, exist_ok=True)
+    
+    db_path = os.path.join(instance_path, 'niners.db')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL', f'sqlite:///{db_path}')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
@@ -33,6 +37,38 @@ def create_app():
     
     CORS(app)
     db.init_app(app)
+    
+    def seed_data():
+        from models.all_models import User
+        # Seed Admin
+        if not User.query.filter_by(role='admin').first():
+            admin = User(
+                username='admin',
+                email='admin@niners.uz',
+                role='admin',
+                full_name='System Administrator'
+            )
+            admin.set_password('admin123')
+            db.session.add(admin)
+        
+        # Seed Director
+        if not User.query.filter_by(role='director').first():
+            director = User(
+                username='director',
+                email='director@niners.uz',
+                role='director',
+                full_name='Main Director'
+            )
+            director.set_password('director123')
+            db.session.add(director)
+            
+        db.session.commit()
+
+    # Initialize Database if it doesn't exist
+    with app.app_context():
+        db.create_all()
+        seed_data()
+        
     migrate.init_app(app, db)
     jwt.init_app(app)
     
@@ -81,6 +117,7 @@ def create_app():
                 
                 db.session.commit()
                 with open(lock_file, 'w') as f: f.write('executed')
+
 
     return app
 

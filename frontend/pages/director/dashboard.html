@@ -8,28 +8,12 @@
 </head>
 
 <body class="dashboard-grid">
-    <aside id="sidebarContainer" class="sidebar"></aside>
-
+    <div id="sidebarContainer"></div>
     <main class="main-content">
-        <header class="dashboard-header">
-            <div class="header-left">
-                <button id="mobileMenuToggle" class="menu-toggle-btn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div>
-                    <h1 class="font-lg" style="margin-bottom: 4px;" data-i18n="director_title">Executive Dashboard</h1>
-                    <p class="font-xs" style="color: var(--text-muted);" data-i18n="director_subtitle">System
-                        performance and administrative approvals.</p>
-                </div>
-            </div>
-
-            <div class="user-profile">
-                <div class="user-info-text">
-                    <div id="sidebarUserName" style="font-weight: 800;">Director</div>
-                    <div id="sidebarUserRole" class="user-role-badge">Director</div>
-                </div>
-                <div id="sidebarAvatar" class="profile-avatar">D</div>
-            </div>
+        <header style="margin-bottom: 40px;">
+            <h2 data-i18n="director_title">Director Executive Dashboard</h2>
+            <p style="color:var(--text-muted);" data-i18n="director_subtitle">Overview of system performance and
+                administrative approvals.</p>
         </header>
 
         <section id="approvalRequests" style="margin-bottom: 40px;">
@@ -52,17 +36,10 @@
                     data-i18n="adjust_limit">Adjust Limit</button>
             </div>
         </section>
-        <!-- The closing div for the dashboard-grid body class is implicitly handled by the body tag itself,
-             or it was intended to wrap the main content. Assuming it wraps the main content. -->
-        </div>
-        <!-- Footer -->
-        <footer class="dashboard-footer">
-            <p>&copy; 2024 Niners Coin. Barcha huquqlar himoyalangan.</p>
-        </footer>
     </main>
 
-    <div id="sidebarOverlay" class="sidebar-overlay"></div>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    </main>
+    </div>
     <script src="../../js/translations.js"></script>
     <script src="../../js/api.js"></script>
     <script src="../../js/sidebar-loader.js"></script>

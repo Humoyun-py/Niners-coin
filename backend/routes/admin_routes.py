@@ -126,8 +126,11 @@ def get_users():
         return jsonify(result), 200
     except Exception as e:
         import traceback
-        print(traceback.format_exc())
-        return jsonify({"msg": f"Baza bilan bog'lanishda xato: {str(e)}"}), 500
+        error_msg = traceback.format_exc()
+        with open('debug_error.log', 'a', encoding='utf-8') as f:
+            f.write(f"\n--- ERROR IN get_users AT {datetime.utcnow()} ---\n")
+            f.write(error_msg)
+        return jsonify({"msg": f"Server Error in users: {str(e)}"}), 500
 
 @admin_bp.route('/users', methods=['POST'])
 @jwt_required()
@@ -247,23 +250,31 @@ def toggle_block(user_id):
 @jwt_required()
 def get_classes():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
-    classes = Class.query.all()
-    result = []
-    for c in classes:
-        teacher_name = "Belgilanmagan"
-        if c.teacher_id:
-            teacher = Teacher.query.get(c.teacher_id)
-            if teacher and teacher.user:
-                teacher_name = teacher.user.full_name
-        
-        result.append({
-            "id": c.id,
-            "name": c.name,
-            "teacher_id": c.teacher_id,
-            "teacher_name": teacher_name,
-            "student_count": len(c.students)
-        })
-    return jsonify(result), 200
+    try:
+        classes = Class.query.all()
+        result = []
+        for c in classes:
+            teacher_name = "Belgilanmagan"
+            if c.teacher_id:
+                teacher = Teacher.query.get(c.teacher_id)
+                if teacher and teacher.user:
+                    teacher_name = teacher.user.full_name
+            
+            result.append({
+                "id": c.id,
+                "name": c.name,
+                "teacher_id": c.teacher_id,
+                "teacher_name": teacher_name,
+                "student_count": len(c.students)
+            })
+        return jsonify(result), 200
+    except Exception as e:
+        import traceback
+        error_msg = traceback.format_exc()
+        with open('debug_error.log', 'a', encoding='utf-8') as f:
+            f.write(f"\n--- ERROR IN get_classes AT {datetime.utcnow()} ---\n")
+            f.write(error_msg)
+        return jsonify({"msg": f"Server Error in classes: {str(e)}"}), 500
 
 @admin_bp.route('/classes', methods=['POST'])
 @jwt_required()
@@ -323,14 +334,33 @@ def delete_class(class_id):
 @jwt_required()
 def get_audit_logs():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
-    logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(100).all()
-    return jsonify([{
-        "id": l.id,
-        "action": l.action,
-        "user": User.query.get(l.user_id).full_name if l.user_id else "System",
-        "severity": l.severity,
-        "timestamp": l.timestamp.isoformat()
-    } for l in logs]), 200
+    try:
+        logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(100).all()
+        result = []
+        for l in logs:
+            user_name = "System"
+            if l.user_id:
+                u = User.query.get(l.user_id)
+                if u: 
+                    user_name = u.username # Frontend expects 'username' in audit-logs.html
+                else:
+                    user_name = f"User {l.user_id} (Deleted)"
+            
+            result.append({
+                "id": l.id,
+                "action": l.action,
+                "username": user_name, # Renamed for frontend compatibility
+                "severity": l.severity,
+                "timestamp": l.timestamp.isoformat()
+            })
+        return jsonify(result), 200
+    except Exception as e:
+        import traceback
+        error_msg = traceback.format_exc()
+        with open('debug_error.log', 'a', encoding='utf-8') as f:
+            f.write(f"\n--- ERROR IN get_audit_logs AT {datetime.utcnow()} ---\n")
+            f.write(error_msg)
+        return jsonify({"msg": f"Audit logs error: {str(e)}"}), 500
 
 @admin_bp.route('/users/<int:user_id>/adjust-coins', methods=['POST'])
 @jwt_required()
@@ -410,14 +440,25 @@ def manage_shop_item(item_id):
 @jwt_required()
 def get_purchase_history():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
-    purchases = Purchase.query.order_by(Purchase.timestamp.desc()).limit(50).all()
-    return jsonify([{
-        "id": p.id,
-        "student": p.student.user.full_name,
-        "item": p.item.name,
-        "price": p.price_at_purchase,
-        "date": p.timestamp.strftime('%Y-%m-%d %H:%M')
-    } for p in purchases]), 200
+    try:
+        purchases = Purchase.query.order_by(Purchase.timestamp.desc()).limit(50).all()
+        result = []
+        for p in purchases:
+            result.append({
+                "id": p.id,
+                "student": p.student.user.full_name if (p.student and p.student.user) else "Unknown Student",
+                "item": p.item.name if p.item else "Unknown Item",
+                "price": p.price_at_purchase,
+                "date": p.timestamp.strftime('%Y-%m-%d %H:%M')
+            })
+        return jsonify(result), 200
+    except Exception as e:
+        import traceback
+        error_msg = traceback.format_exc()
+        with open('debug_error.log', 'a', encoding='utf-8') as f:
+            f.write(f"\n--- ERROR IN get_purchase_history AT {datetime.utcnow()} ---\n")
+            f.write(error_msg)
+        return jsonify({"msg": f"Purchase history error: {str(e)}"}), 500
 
 # BADGE MANAGEMENT FROM ADMIN PANEL
 from models.all_models import Badge, StudentBadge
@@ -425,16 +466,23 @@ from models.all_models import Badge, StudentBadge
 @admin_bp.route('/badges', methods=['GET'])
 @jwt_required()
 def get_all_badges():
-    # Allow read access for everyone or just admin? Admin for management.
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
-    badges = Badge.query.all()
-    return jsonify([{
-        "id": b.id,
-        "name": b.name,
-        "description": b.description,
-        "requirement_text": b.requirement_text, # New field
-        "icon": b.icon
-    } for b in badges]), 200
+    try:
+        badges = Badge.query.all()
+        return jsonify([{
+            "id": b.id,
+            "name": b.name,
+            "description": b.description,
+            "requirement_text": b.requirement_text,
+            "icon": b.icon
+        } for b in badges]), 200
+    except Exception as e:
+        import traceback
+        error_msg = traceback.format_exc()
+        with open('debug_error.log', 'a', encoding='utf-8') as f:
+            f.write(f"\n--- ERROR IN get_all_badges AT {datetime.utcnow()} ---\n")
+            f.write(error_msg)
+        return jsonify({"msg": f"Badges error: {str(e)}"}), 500
 
 @admin_bp.route('/badges', methods=['POST'])
 @jwt_required()

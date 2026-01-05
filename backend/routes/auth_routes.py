@@ -51,3 +51,16 @@ def update_profile():
     
     db.session.commit()
     return jsonify({"msg": "Profil yangilandi", "user": user.to_dict()}), 200
+@auth_bp.route('/debug/env', methods=['GET'])
+def debug_env():
+    import os
+    try:
+        files = os.listdir('.')
+        cwd = os.getcwd()
+        return jsonify({
+            "cwd": cwd,
+            "files": files,
+            "abs_path": os.path.abspath(__file__)
+        }), 200
+    except Exception as e:
+        return jsonify({"msg": str(e)}), 500

@@ -23,7 +23,8 @@ def login():
             return jsonify({"msg": msg}), 403
             
         access_token = create_access_token(
-            identity={"id": user.id, "role": user.role},
+            identity=str(user.id),
+            additional_claims={"role": user.role},
             expires_delta=timedelta(days=1)
         )
         return jsonify(access_token=access_token, role=user.role, full_name=user.full_name), 200
@@ -33,15 +34,15 @@ def login():
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
 def get_me():
-    current_user_info = get_jwt_identity()
-    user = User.query.get(current_user_info['id'])
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
     return jsonify(user.to_dict()), 200
 
 @auth_bp.route('/profile', methods=['PATCH'])
 @jwt_required()
 def update_profile():
-    current_user_info = get_jwt_identity()
-    user = User.query.get(current_user_info['id'])
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
     if not user: return jsonify({"msg": "User not found"}), 404
     
     data = request.get_json()

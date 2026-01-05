@@ -3,13 +3,31 @@ const API_URL = window.location.hostname === 'localhost' || window.location.host
     ? 'http://localhost:5000/api'
     : '/api';
 
+// Helper function for login URL, assuming it's defined elsewhere or needs to be added.
+// For this edit, we'll define a placeholder if not present.
+function getLoginUrl() {
+    return '/login.html'; // Or whatever the actual login URL is
+}
+
 const api = {
     async handleResponse(response) {
         if (response.status === 401) {
+            // Token expired or invalid
             localStorage.removeItem('token');
-            localStorage.removeItem('role');
-            window.location.href = '/login.html';
-            throw new Error('Session expired');
+            localStorage.removeItem('user_role');
+            window.location.href = getLoginUrl();
+            throw new Error('Unauthorized');
+        }
+
+        if (response.status === 422) {
+            // Token format compatibility issue (Subject must be a string)
+            const errorData = await response.clone().json(); // Clone to not consume body for later
+            if (errorData.msg && errorData.msg.includes("Subject must be a string")) {
+                console.warn("Detected old token format. Forcing Re-login.");
+                localStorage.clear();
+                window.location.href = getLoginUrl();
+                throw new Error('Session invalid (Old Token). Please Login again.');
+            }
         }
         const result = await response.json();
         if (!response.ok) throw new Error(result.msg || 'Request failed');

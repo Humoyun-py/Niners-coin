@@ -213,6 +213,12 @@ body {
     min-height: 100vh;
 }
 
+.main-content {
+    width: 100%;
+    position: relative;
+    padding-bottom: var(--space-xl);
+}
+
 /* Menu Toggle Button - Hidden ONLY on large screens */
 @media (min-width: 993px) {
 

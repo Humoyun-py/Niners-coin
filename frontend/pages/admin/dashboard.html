@@ -127,10 +127,15 @@
         }
 
         async function init() {
-            LanguageModule.init();
-            AdminModule.initDashboard();
-            const complaints = await api.get('/admin/complaints');
-            document.getElementById('pendingComplaints').innerText = complaints.filter(c => c.status === 'open').length;
+            try {
+                LanguageModule.init();
+                await AdminModule.initDashboard();
+                const complaints = await api.get('/admin/complaints');
+                document.getElementById('pendingComplaints').innerText = complaints.filter(c => c.status === 'open').length;
+            } catch (e) {
+                console.error("Dashboard Init Error:", e);
+                document.getElementById('pendingComplaints').innerText = '-';
+            }
         }
         init();
     </script>

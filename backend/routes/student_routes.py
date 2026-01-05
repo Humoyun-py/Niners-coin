@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from models.all_models import db, Student, CoinTransaction, Notification, Complaint, ShopItem, Purchase, Topic
 from services.coin_engine import spend_coins
 
@@ -8,9 +8,10 @@ student_bp = Blueprint('student', __name__)
 @student_bp.route('/dashboard', methods=['GET'])
 @jwt_required()
 def student_dashboard():
-    current_user_info = get_jwt_identity()
-    print(f"DEBUG: student_dashboard call from user_id: {current_user_info.get('id')}, role: {current_user_info.get('role')}")
-    student = Student.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    # print(f"DEBUG: student_dashboard call from user_id: {user_id}, role: {claims.get('role')}")
+    student = Student.query.filter_by(user_id=user_id).first()
     
     if not student:
         return jsonify({"msg": "Student profile not linked to this user account. Please contact Admin if you are a student."}), 400
@@ -57,8 +58,8 @@ def student_dashboard():
 @student_bp.route('/notifications', methods=['GET'])
 @jwt_required()
 def get_notifications():
-    current_user = get_jwt_identity()
-    notifications = Notification.query.filter_by(user_id=current_user['id']).order_by(Notification.created_at.desc()).all()
+    user_id = get_jwt_identity()
+    notifications = Notification.query.filter_by(user_id=user_id).order_by(Notification.created_at.desc()).all()
     return jsonify([{
         "id": n.id,
         "title": n.title,
@@ -70,16 +71,16 @@ def get_notifications():
 @student_bp.route('/test-notification', methods=['POST'])
 @jwt_required()
 def test_notification():
-    current_user = get_jwt_identity()
+    user_id = get_jwt_identity()
     from services.security_service import send_notification
-    send_notification(current_user['id'], "Test Xabar", "Bu test xabarnoma! Tizim ishlayapti.")
+    send_notification(user_id, "Test Xabar", "Bu test xabarnoma! Tizim ishlayapti.")
     return jsonify({"msg": "Xabar yuborildi"}), 200
 
 @student_bp.route('/notifications/<int:id>/read', methods=['POST'])
 @jwt_required()
 def mark_notification_read(id):
-    current_user = get_jwt_identity()
-    notification = Notification.query.filter_by(id=id, user_id=current_user['id']).first()
+    user_id = get_jwt_identity()
+    notification = Notification.query.filter_by(id=id, user_id=user_id).first()
     
     if notification:
         notification.is_read = True
@@ -91,7 +92,7 @@ def mark_notification_read(id):
 @jwt_required()
 def submit_complaint():
     data = request.get_json()
-    user_id = get_jwt_identity()['id']
+    user_id = get_jwt_identity()
     new_complaint = Complaint(
         user_id=user_id,
         title=data.get('title'),
@@ -118,7 +119,7 @@ def get_shop_items():
 def buy_item():
     data = request.get_json()
     item_id = data.get('item_id')
-    student = Student.query.filter_by(user_id=get_jwt_identity()['id']).first()
+    student = Student.query.filter_by(user_id=get_jwt_identity()).first()
     
     if not student: return jsonify({"msg": "Student not found"}), 404
     
@@ -145,9 +146,9 @@ def buy_item():
 @student_bp.route('/my-group/topics', methods=['GET'])
 @jwt_required()
 def get_my_topics():
-    current_user = get_jwt_identity()
-    print(f"DEBUG: get_my_topics call from user_id: {current_user.get('id')}")
-    student = Student.query.filter_by(user_id=current_user['id']).first()
+    user_id = get_jwt_identity()
+    # print(f"DEBUG: get_my_topics call from user_id: {user_id}")
+    student = Student.query.filter_by(user_id=user_id).first()
     if not student or not student.class_id:
         return jsonify({"msg": "Siz guruhga biriktirilmagansiz"}), 404
         
@@ -161,8 +162,9 @@ def get_my_topics():
 @student_bp.route('/my-class', methods=['GET'])
 @jwt_required()
 def get_my_class_details():
-    current_user_info = get_jwt_identity()
-    student = Student.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    
+    student = Student.query.filter_by(user_id=user_id).first()
     if not student or not student.class_id:
         return jsonify({"msg": "Siz guruhga biriktirilmagansiz"}), 404
     
@@ -191,8 +193,8 @@ def get_my_class_details():
 @student_bp.route('/my-badges', methods=['GET'])
 @jwt_required()
 def get_my_badges():
-    current_user_info = get_jwt_identity()
-    student = Student.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    student = Student.query.filter_by(user_id=user_id).first()
     if not student: return jsonify({"msg": "Student not found"}), 404
     
     from models.all_models import Badge, StudentBadge

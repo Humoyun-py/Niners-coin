@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from models.all_models import db, Teacher, Class, Student, CoinTransaction, Topic
 from services.coin_engine import award_coins
 
@@ -8,8 +8,8 @@ teacher_bp = Blueprint('teacher', __name__)
 @teacher_bp.route('/dashboard', methods=['GET'])
 @jwt_required()
 def teacher_dashboard():
-    current_user_info = get_jwt_identity()
-    teacher = Teacher.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
     
     if not teacher:
         return jsonify({"msg": "Teacher profile not found"}), 404
@@ -27,9 +27,9 @@ def teacher_dashboard():
 @jwt_required()
 def teacher_award_coins():
     data = request.get_json()
-    current_user_info = get_jwt_identity()
+    claims = get_jwt()
     
-    if current_user_info['role'] != 'teacher':
+    if claims.get('role') != 'teacher':
         return jsonify({"msg": "Unauthorized"}), 403
         
     student_id = data.get('student_id')
@@ -45,8 +45,8 @@ def teacher_award_coins():
 @teacher_bp.route('/classes/<int:class_id>', methods=['GET'])
 @jwt_required()
 def get_class_details(class_id):
-    current_user_info = get_jwt_identity()
-    teacher = Teacher.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
     if not teacher: return jsonify({"msg": "Unauthorized"}), 403
     
     cls = Class.query.filter_by(id=class_id, teacher_id=teacher.id).first()
@@ -72,8 +72,8 @@ def get_class_details(class_id):
 @jwt_required()
 def mark_attendance():
     data = request.get_json()
-    current_user_info = get_jwt_identity()
-    teacher = Teacher.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
     if not teacher: return jsonify({"msg": "Unauthorized"}), 403
     
     class_id = data.get('class_id')
@@ -132,8 +132,8 @@ def mark_attendance():
 @jwt_required()
 def add_topic(class_id):
     data = request.get_json()
-    current_user_info = get_jwt_identity()
-    teacher = Teacher.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
     if not teacher: return jsonify({"msg": "Unauthorized"}), 403
     
     cls = Class.query.filter_by(id=class_id, teacher_id=teacher.id).first()
@@ -151,8 +151,8 @@ def add_topic(class_id):
 @teacher_bp.route('/classes/<int:class_id>/topics', methods=['GET'])
 @jwt_required()
 def get_class_topics(class_id):
-    current_user_info = get_jwt_identity()
-    teacher = Teacher.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
     if not teacher: return jsonify({"msg": "Unauthorized"}), 403
     
     cls = Class.query.filter_by(id=class_id, teacher_id=teacher.id).first()
@@ -169,8 +169,8 @@ def get_class_topics(class_id):
 @jwt_required()
 def add_homework(class_id):
     data = request.get_json()
-    current_user_info = get_jwt_identity()
-    teacher = Teacher.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
     if not teacher: return jsonify({"msg": "Unauthorized"}), 403
     
     cls = Class.query.filter_by(id=class_id, teacher_id=teacher.id).first()
@@ -190,8 +190,8 @@ def add_homework(class_id):
 @teacher_bp.route('/classes/<int:class_id>/homework', methods=['GET'])
 @jwt_required()
 def get_homeworks(class_id):
-    current_user_info = get_jwt_identity()
-    teacher = Teacher.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
     if not teacher: return jsonify({"msg": "Unauthorized"}), 403
     
     from models.all_models import Homework
@@ -207,8 +207,8 @@ def get_homeworks(class_id):
 @teacher_bp.route('/homework/<int:hw_id>/verify/<int:student_id>', methods=['POST'])
 @jwt_required()
 def verify_homework(hw_id, student_id):
-    current_user_info = get_jwt_identity()
-    teacher = Teacher.query.filter_by(user_id=current_user_info['id']).first()
+    user_id = get_jwt_identity()
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
     if not teacher: return jsonify({"msg": "Unauthorized"}), 403
     
     from models.all_models import Homework, HomeworkSubmission, Student

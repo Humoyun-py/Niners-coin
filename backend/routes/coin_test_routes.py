@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from models.all_models import db, Test, CoinTransaction, Student
 from services.test_engine import submit_test_result
 
@@ -20,8 +20,10 @@ def get_all_tests():
 @jwt_required()
 def submit_test(test_id):
     data = request.get_json()
-    current_user = get_jwt_identity()
-    user_id = current_user['id']
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    # current_user = get_jwt_identity()
+    # user_id = current_user['id']
     student = Student.query.filter_by(user_id=user_id).first()
     
     if not student:
@@ -37,8 +39,8 @@ def submit_test(test_id):
 @coin_test_bp.route('/my-coins', methods=['GET'])
 @jwt_required()
 def get_my_coins():
-    current_user = get_jwt_identity()
-    student = Student.query.filter_by(user_id=current_user['id']).first()
+    user_id = get_jwt_identity()
+    student = Student.query.filter_by(user_id=user_id).first()
     if not student:
         return jsonify({"msg": "No student profile"}), 404
         

@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, Response, send_file
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from models.all_models import db, User, Student, Teacher, Parent, Class, AuditLog, Complaint, ApprovalRequest, ShopItem, Purchase, Badge, StudentBadge
 from services.report_generator import generate_student_report, generate_student_pdf_report, generate_classroom_indicators
 from services.security_service import log_event
@@ -10,8 +10,8 @@ import os
 admin_bp = Blueprint('admin', __name__)
 
 def check_admin():
-    identity = get_jwt_identity()
-    if identity.get('role') not in ['admin', 'director']:
+    claims = get_jwt()
+    if claims.get('role') not in ['admin', 'director']:
         return False
     return True
 
@@ -68,7 +68,7 @@ def create_approval_request():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     data = request.get_json()
     new_req = ApprovalRequest(
-        admin_id=get_jwt_identity()['id'],
+        admin_id=get_jwt_identity(),
         title=data.get('title'),
         description=data.get('description')
     )
@@ -143,7 +143,7 @@ def add_user():
         db.session.add(profile)
         
     db.session.commit() # Commit BEFORE logging to ensure user exists
-    log_event(get_jwt_identity()['id'], f"Yangi foydalanuvchi qo'shildi: {new_user.username} ({new_user.role})")
+    log_event(get_jwt_identity(), f"Yangi foydalanuvchi qo'shildi: {new_user.username} ({new_user.role})")
     return jsonify({"msg": "Muvaffaqiyatli qo'shildi", "id": new_user.id}), 201
 
 @admin_bp.route('/users/<int:user_id>', methods=['PUT'])
@@ -165,7 +165,7 @@ def update_user(user_id):
     elif user.role == 'teacher' and user.teacher_profile:
         user.teacher_profile.subject = data.get('subject', user.teacher_profile.subject)
         
-    log_event(get_jwt_identity()['id'], f"Foydalanuvchi ma'lumotlari yangilandi: {user.username}")
+    log_event(get_jwt_identity(), f"Foydalanuvchi ma'lumotlari yangilandi: {user.username}")
     db.session.commit()
     return jsonify({"msg": "Ma'lumotlar yangilandi"}), 200
 
@@ -191,7 +191,7 @@ def add_student_to_class(class_id):
         
     student.class_id = class_id
     db.session.commit()
-    log_event(get_jwt_identity()['id'], f"Student {student.user.username} {class_id}-sinfga qo'shildi")
+    log_event(get_jwt_identity(), f"Student {student.user.username} {class_id}-sinfga qo'shildi")
     return jsonify({"msg": "Student sinfga biriktirildi"}), 200
 
 @admin_bp.route('/users/<int:user_id>/toggle-block', methods=['POST'])
@@ -211,7 +211,7 @@ def toggle_block(user_id):
         user.debt_amount = 0.0
 
     action = "bloklandi" if not user.is_active else "blokdan chiqarildi"
-    log_event(get_jwt_identity()['id'], f"Foydalanuvchi {user.username} {action}. Sabab: {user.block_reason}, Qarz: {user.debt_amount}", severity='warning')
+    log_event(get_jwt_identity(), f"Foydalanuvchi {user.username} {action}. Sabab: {user.block_reason}, Qarz: {user.debt_amount}", severity='warning')
     db.session.commit()
     return jsonify({"msg": f"Foydalanuvchi {action}", "is_active": user.is_active}), 200
 
@@ -242,7 +242,7 @@ def create_class():
     new_class = Class(name=data.get('name'), teacher_id=teacher.id if teacher else None)
     db.session.add(new_class)
     db.session.commit()
-    log_event(get_jwt_identity()['id'], f"Yangi sinf yaratildi: {new_class.name}")
+    log_event(get_jwt_identity(), f"Yangi sinf yaratildi: {new_class.name}")
     return jsonify({"msg": "Sinf yaratildi"}), 201
 
 @admin_bp.route('/classes/<int:class_id>', methods=['PUT'])
@@ -263,7 +263,7 @@ def update_class(class_id):
             cls.teacher_id = teacher.id
             
     db.session.commit()
-    log_event(get_jwt_identity()['id'], f"Sinf ma'lumotlari yangilandi: {cls.name}")
+    log_event(get_jwt_identity(), f"Sinf ma'lumotlari yangilandi: {cls.name}")
     return jsonify({"msg": "Sinf yangilandi"}), 200
 
 @admin_bp.route('/classes/<int:class_id>', methods=['DELETE'])
@@ -278,7 +278,7 @@ def delete_class(class_id):
         
     db.session.delete(cls)
     db.session.commit()
-    log_event(get_jwt_identity()['id'], f"Sinf o'chirildi: {cls.id}", severity='danger')
+    log_event(get_jwt_identity(), f"Sinf o'chirildi: {cls.id}", severity='danger')
     return jsonify({"msg": "Sinf o'chirildi"}), 200
 
 @admin_bp.route('/audit-logs', methods=['GET'])
@@ -315,7 +315,7 @@ def adjust_coins(user_id):
     success, msg = award_coins(user.student_profile.id, amount, f"Admin: {reason}")
     
     if success:
-        log_event(get_jwt_identity()['id'], f"{user.username} balansi {amount} ga o'zgartirildi ({reason})", severity='warning')
+        log_event(get_jwt_identity(), f"{user.username} balansi {amount} ga o'zgartirildi ({reason})", severity='warning')
         return jsonify({"msg": "Coinlar muvaffaqiyatli o'zgartirildi", "new_balance": user.student_profile.coin_balance}), 200
     else:
         return jsonify({"msg": msg}), 400
@@ -411,7 +411,7 @@ def add_badge():
     )
     db.session.add(new_badge)
     db.session.commit()
-    log_event(get_jwt_identity()['id'], f"Yangi nishon yaratildi: {new_badge.name}")
+    log_event(get_jwt_identity(), f"Yangi nishon yaratildi: {new_badge.name}")
     return jsonify({"msg": "Badge created successfully"}), 201
 
 @admin_bp.route('/badges/<int:badge_id>', methods=['DELETE'])

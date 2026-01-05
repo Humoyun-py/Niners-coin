@@ -10,7 +10,11 @@ const AdminModule = {
             const classes = await api.get('/admin/classes');
             document.getElementById('totalUsers').innerText = users.length;
             document.getElementById('totalClasses').innerText = classes.length;
-        } catch (e) { console.error(e); }
+        } catch (e) {
+            console.error('Stats Error:', e);
+            document.getElementById('totalUsers').innerText = '-';
+            document.getElementById('totalClasses').innerText = '-';
+        }
     },
 
     async loadRecentUsers() {
@@ -19,15 +23,6 @@ const AdminModule = {
             const tbody = document.getElementById('userTableBody');
             if (!tbody) return;
 
-            // Wrap in table-wrapper
-            const table = tbody.closest('table');
-            if (table && !table.parentElement.classList.contains('table-wrapper')) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'table-wrapper';
-                table.parentNode.insertBefore(wrapper, table);
-                wrapper.appendChild(table);
-            }
-
             const recent = users.slice(-5).reverse();
             tbody.innerHTML = recent.map(u => `
                 <tr style="border-bottom: 1px solid var(--border-light);">
@@ -35,20 +30,21 @@ const AdminModule = {
                         ${u.full_name}
                         ${!u.is_active ? `
                             <div style="font-size:0.7rem; color:#C62828; font-weight:400; margin-top:4px;">
-                                ⚠️ Sabab: ${u.block_reason || 'Yo\'q'} | Qarz: ${u.debt_amount || 0}
+                                ⚠️ ${u.block_reason || 'Blocked'}
                             </div>
                         ` : ''}
                     </td>
                     <td style="padding: 12px; color: var(--text-muted);">${u.username}</td>
                     <td style="padding: 12px;"><span class="badge" style="background:${this.getRoleColor(u.role)}; color:white; padding:4px 8px; border-radius:4px; font-size:0.75rem;">${u.role}</span></td>
-                    <td style="padding: 12px;">
-                        <button onclick="AdminModule.toggleUserStatus(${u.id})" class="btn" style="padding:4px 8px; font-size:0.7rem; background:${u.is_active ? '#E8F5E9' : '#FFEBEE'}; color:${u.is_active ? '#2E7D32' : '#C62828'};">
-                            ${u.is_active ? 'Block' : 'Unblock'}
-                        </button>
-                    </td>
                 </tr>
             `).join('');
-        } catch (e) { console.error(e); }
+        } catch (e) {
+            console.error(e);
+            const tbody = document.getElementById('userTableBody');
+            if (tbody) {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px; color:red;">Error: ${e.message}</td></tr>`;
+            }
+        }
     },
 
     getRoleColor(role) {

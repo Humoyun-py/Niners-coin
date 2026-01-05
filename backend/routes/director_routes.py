@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from models.all_models import db, User, Teacher, Student, ApprovalRequest, AuditLog
 from services.security_service import log_event
 
@@ -19,8 +19,8 @@ def get_analytics():
 @director_bp.route('/approval-requests', methods=['GET'])
 @jwt_required()
 def get_approval_requests():
-    identity = get_jwt_identity()
-    if identity.get('role') != 'director': return jsonify({"msg": "Forbidden"}), 403
+    claims = get_jwt()
+    if claims.get('role') != 'director': return jsonify({"msg": "Forbidden"}), 403
     reqs = ApprovalRequest.query.filter_by(status='pending').all()
     return jsonify([{
         "id": r.id,
@@ -33,13 +33,13 @@ def get_approval_requests():
 @director_bp.route('/approval-requests/<int:req_id>/action', methods=['POST'])
 @jwt_required()
 def action_approval_request(req_id):
-    identity = get_jwt_identity()
-    if identity.get('role') != 'director': return jsonify({"msg": "Forbidden"}), 403
+    claims = get_jwt()
+    if claims.get('role') != 'director': return jsonify({"msg": "Forbidden"}), 403
     data = request.get_json()
     status = data.get('status') # approved, rejected
     
     req = ApprovalRequest.query.get_or_404(req_id)
     req.status = status
-    log_event(identity['id'], f"So'rov {status}: {req.title}")
+    log_event(get_jwt_identity(), f"So'rov {status}: {req.title}")
     db.session.commit()
     return jsonify({"msg": f"So'rov {status} qilindi"}), 200

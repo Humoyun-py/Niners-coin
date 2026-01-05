@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Management | Niners.uz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <script src="../../js/translations.js"></script>
+</head>
+
+<body class="dashboard-grid">
+    .item-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 15px;
+    }
+
+    .item-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    }
+
+    .item-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #f0f0f0;
+    }
+    </style>
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
+            <div>
+                <h2>🛍️ Shop Management</h2>
+                <p style="color: var(--text-muted);">Manage inventory and view purchase history.</p>
+            </div>
+            <button onclick="AdminModule.addShopItem()" class="btn btn-primary">+ Add New Item</button>
+        </header>
+
+        <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px;">
+            <div>
+                <h3 style="margin-bottom: 20px;">Inventory Items</h3>
+                <div id="inventoryContainer" class="mobile-stack">
+                    <p class="text-muted">Loading items...</p>
+                </div>
+            </div>
+
+            <div>
+                <h3 style="margin-bottom: 20px;">Purchase History</h3>
+                <div id="historyContainer" class="card" style="padding: 20px; font-size: 0.9rem;">
+                    <p class="text-muted">Loading history...</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/admin.js"></script>
+    <script src="../../js/sidebar-loader.js"></script>
+    <script>
+        async function loadShopData() {
+            try {
+                const items = await api.get('/admin/shop/items');
+                const history = await api.get('/admin/shop/history');
+
+                const invContainer = document.getElementById('inventoryContainer');
+                invContainer.innerHTML = items.map(i => `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <img src="${i.image_url || 'https://via.placeholder.com/60'}" class="item-img" alt="${i.name}">
+                            <div>
+                                <h4 style="margin:0;">${i.name}</h4>
+                                <div style="color:var(--primary); font-weight:700;">${parseFloat(i.price).toFixed(2)} 🟡</div>
+                                <div style="font-size:0.8rem; color:#888;">Stock: ${i.stock === -1 ? '∞' : i.stock}</div>
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="AdminModule.editShopItem(${i.id})" class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;">Edit</button>
+                            <button onclick="AdminModule.deleteShopItem(${i.id})" class="btn" style="padding:6px 12px; font-size:0.8rem; background:#FFE0E0; color:#DC3545; border:none;">Delete</button>
+                        </div>
+                    </div>
+                `).join('') || '<p>No items in inventory.</p>';
+
+                const histContainer = document.getElementById('historyContainer');
+                histContainer.innerHTML = history.map(h => `
+                    <div style="border-bottom:1px solid #eee; padding:10px 0;">
+                        <div style="font-weight:600;">${h.student} bought ${h.item}</div>
+                        <div style="font-size:0.75rem; color:#999;">${h.date} • ${parseFloat(h.price).toFixed(2)} 🟡</div>
+                    </div>
+                `).join('') || '<p>No purchases yet.</p>';
+
+            } catch (e) { console.error(e); }
+        }
+
+        // Custom reload for standalone page
+        AdminModule.reloadShopItems = loadShopData;
+
+        // Override the default alert-then-reload to use our internal reload
+        const originalAdd = AdminModule.addShopItem;
+        AdminModule.addShopItem = function () {
+            AdminModule.createModal('Add Shop Item', `
+                <div class="input-group"><label class="input-label">Product Name (Nomi)</label><input type="text" id="itemName" class="form-control"></div>
+                <div class="input-group"><label class="input-label">Price (Coin)</label><input type="number" id="itemPrice" class="form-control"></div>
+                <div class="input-group"><label class="input-label">Stock (-1 for infinite)</label><input type="number" id="itemStock" class="form-control" value="-1"></div>
+                <div class="input-group"><label class="input-label">Product Photo (Maxsulot rasmi)</label><input type="file" id="itemImageFile" class="form-control" accept="image/*"></div>
+            `, async () => {
+                const name = document.getElementById('itemName').value;
+                const price = document.getElementById('itemPrice').value;
+                const stock = document.getElementById('itemStock').value;
+                const imageFile = document.getElementById('itemImageFile').files[0];
+
+                if (!name || !price) return alert("Name and Price required");
+
+                let imageUrl = '';
+                if (imageFile) {
+                    const formData = new FormData();
+                    formData.append('image', imageFile);
+                    try {
+                        const uploadRes = await api.upload('/admin/upload-image', formData);
+                        imageUrl = uploadRes.url;
+                    } catch (e) {
+                        return alert("Image upload failed: " + e.message);
+                    }
+                }
+
+                try {
+                    await api.post('/admin/shop/items', {
+                        name,
+                        price: parseFloat(price),
+                        stock: parseInt(stock),
+                        image_url: imageUrl
+                    });
+                    loadShopData();
+                } catch (e) { alert("Error: " + e.message); }
+            }, 'Add Product');
+        };
+
+        AdminModule.editShopItem = async (itemId) => {
+            try {
+                const items = await api.get('/admin/shop/items');
+                const item = items.find(i => i.id === itemId);
+                if (!item) return;
+
+                AdminModule.createModal('Edit Shop Item', `
+                    <div class="input-group"><label class="input-label">Product Name (Nomi)</label><input type="text" id="editItemName" class="form-control" value="${item.name}"></div>
+                    <div class="input-group"><label class="input-label">Price (Coin)</label><input type="number" id="editItemPrice" class="form-control" value="${item.price}"></div>
+                    <div class="input-group"><label class="input-label">Stock</label><input type="number" id="editItemStock" class="form-control" value="${item.stock}"></div>
+                    <div class="input-group"><label class="input-label">Replace Photo (Optional)</label><input type="file" id="editItemImageFile" class="form-control" accept="image/*"></div>
+                `, async () => {
+                    const name = document.getElementById('editItemName').value;
+                    const price = document.getElementById('editItemPrice').value;
+                    const stock = document.getElementById('editItemStock').value;
+                    const imageFile = document.getElementById('editItemImageFile').files[0];
+
+                    let imageUrl = item.image_url;
+                    if (imageFile) {
+                        const formData = new FormData();
+                        formData.append('image', imageFile);
+                        const uploadRes = await api.upload('/admin/upload-image', formData);
+                        imageUrl = uploadRes.url;
+                    }
+
+                    try {
+                        await api.put(`/admin/shop/items/${itemId}`, {
+                            name,
+                            price: parseFloat(price),
+                            stock: parseInt(stock),
+                            image_url: imageUrl
+                        });
+                        loadShopData();
+                    } catch (e) { alert("Error: " + e.message); }
+                }, 'Update Product');
+            } catch (e) { alert("Error: " + e.message); }
+        };
+
+        const originalDelete = AdminModule.deleteShopItem;
+        AdminModule.deleteShopItem = async (id) => {
+            if (!confirm("Delete this item?")) return;
+            try {
+                await api.delete(`/admin/shop/items/${id}`);
+                loadShopData();
+            } catch (e) { alert("Error: " + e.message); }
+        };
+
+        loadShopData();
+    </script>
+</body>
+
+</html>

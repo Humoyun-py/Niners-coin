@@ -108,7 +108,8 @@ def get_users():
         "full_name": u.full_name,
         "is_active": u.is_active,
         "block_reason": u.block_reason,
-        "debt_amount": u.debt_amount
+        "debt_amount": u.debt_amount,
+        "daily_limit": u.teacher_profile.daily_limit if u.role == 'teacher' and u.teacher_profile else None
     } for u in users]), 200
 
 @admin_bp.route('/users', methods=['POST'])
@@ -135,7 +136,11 @@ def add_user():
     if new_user.role == 'student':
         profile = Student(user_id=new_user.id, class_id=data.get('class_id'))
     elif new_user.role == 'teacher':
-        profile = Teacher(user_id=new_user.id, subject=data.get('subject'))
+        profile = Teacher(
+            user_id=new_user.id, 
+            subject=data.get('subject'),
+            daily_limit=float(data.get('daily_limit', 500))
+        )
     elif new_user.role == 'parent':
         profile = Parent(user_id=new_user.id)
     
@@ -164,6 +169,8 @@ def update_user(user_id):
         user.student_profile.class_id = data.get('class_id', user.student_profile.class_id)
     elif user.role == 'teacher' and user.teacher_profile:
         user.teacher_profile.subject = data.get('subject', user.teacher_profile.subject)
+        if 'daily_limit' in data:
+            user.teacher_profile.daily_limit = float(data['daily_limit'])
         
     log_event(get_jwt_identity(), f"Foydalanuvchi ma'lumotlari yangilandi: {user.username}")
     db.session.commit()
@@ -201,6 +208,10 @@ def toggle_block(user_id):
     user = User.query.get_or_404(user_id)
     data = request.get_json() or {}
     
+    # Check if we are trying to block an admin or director
+    if user.is_active and user.role in ['admin', 'director']:
+        return jsonify({"msg": "Administrator yoki Direktorni bloklash taqiqlangan"}), 400
+
     user.is_active = not user.is_active
     if not user.is_active:
         user.block_reason = data.get('reason', 'Sabab ko\'rsatilmadi')
@@ -220,12 +231,22 @@ def toggle_block(user_id):
 def get_classes():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     classes = Class.query.all()
-    return jsonify([{
-        "id": c.id,
-        "name": c.name,
-        "teacher_id": c.teacher_id,
-        "student_count": len(c.students)
-    } for c in classes]), 200
+    result = []
+    for c in classes:
+        teacher_name = "Belgilanmagan"
+        if c.teacher_id:
+            teacher = Teacher.query.get(c.teacher_id)
+            if teacher and teacher.user:
+                teacher_name = teacher.user.full_name
+        
+        result.append({
+            "id": c.id,
+            "name": c.name,
+            "teacher_id": c.teacher_id,
+            "teacher_name": teacher_name,
+            "student_count": len(c.students)
+        })
+    return jsonify(result), 200
 
 @admin_bp.route('/classes', methods=['POST'])
 @jwt_required()

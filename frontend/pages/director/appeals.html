@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appeals & Complaints | Niners.uz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <script src="../../js/translations.js"></script>
+</head>
+
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <h2>Shikoyat va Arizalar</h2>
+        <p style="color:var(--text-muted); margin-bottom:30px;">Student va ota-onalar tomonidan yuborilgan murojaatlar.
+        </p>
+
+        <div id="complaintsList" style="display: grid; gap: 20px;">
+            <!-- DYNAMIC -->
+            <p>Yuklanmoqda...</p>
+        </div>
+    </main>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/sidebar-loader.js"></script>
+    <script>
+        async function loadComplaints() {
+            try {
+                const list = await api.get('/admin/complaints');
+                const div = document.getElementById('complaintsList');
+                if (list.length === 0) {
+                    div.innerHTML = '<div class="card" style="text-align:center;">Hozircha shikoyatlar yo\'q.</div>';
+                    return;
+                }
+                div.innerHTML = list.map(c => `
+                    <div class="card" style="border-left: 5px solid ${c.status === 'open' ? '#FFD700' : '#2E7D32'};">
+                        <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap: wrap; gap: 15px;">
+                            <div>
+                                <h3 style="margin-bottom:5px;">${c.title}</h3>
+                                <p style="font-size:0.9rem; color:#444;">${c.message}</p>
+                                <div style="margin-top:10px; font-size:0.8rem; color:#999;">Kimdan: @${c.username} | ${new Date(c.timestamp).toLocaleString()}</div>
+                            </div>
+                            <div style="text-align:right;">
+                                <span class="badge" style="background:${c.status === 'open' ? '#FFF9E6' : '#E8F5E9'}; color:${c.status === 'open' ? '#FFA500' : '#2E7D32'}; padding:4px 12px; border-radius:20px; font-weight:800; font-size:0.75rem;">
+                                    ${c.status.toUpperCase()}
+                                </span>
+                                ${c.status === 'open' ? `
+                                    <div style="margin-top:10px;">
+                                        <button onclick="resolveComplaint(${c.id})" class="btn btn-primary" style="padding:6px 12px; font-size:0.8rem;">Hal qilish</button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function resolveComplaint(id) {
+            if (!confirm("Bu shikoyatni hal qilingan deb belgilaysizmi?")) return;
+            try {
+                await api.post(`/admin/complaints/${id}/resolve`, {});
+                alert("Shikoyat ijobiy hal qilindi!");
+                loadComplaints();
+            } catch (e) { alert("Xatolik"); }
+        }
+
+        loadComplaints();
+    </script>
+</body>
+
+</html>

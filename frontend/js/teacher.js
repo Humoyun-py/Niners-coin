@@ -12,6 +12,13 @@ const TeacherModule = {
                 if (nameEl) nameEl.innerText = data.teacher_name || 'Ustoz';
                 document.getElementById('classCount').innerText = data.class_count;
                 document.getElementById('rating').innerText = `${data.rating} ⭐`;
+
+                const limitEl = document.getElementById('coinLimit');
+                if (limitEl) {
+                    limitEl.innerText = `${data.issued_today} / ${data.daily_limit} 🟡`;
+                }
+
+                this.renderRecentRewards(data.recent_rewards || []);
                 this._cachedClasses = data.classes;
                 this.renderClasses(data.classes);
                 this.initMyStudentsSection(data.classes);
@@ -20,6 +27,29 @@ const TeacherModule = {
             console.error("Dashboard init error:", e);
             if (nameEl) nameEl.innerText = 'Xatolik!';
         }
+    },
+
+    renderRecentRewards(rewards) {
+        const container = document.getElementById('recentRewardsContainer');
+        if (!container) return;
+
+        if (rewards.length === 0) {
+            container.innerHTML = '<p class="text-muted">Hali koinlar berilmadi.</p>';
+            return;
+        }
+
+        container.innerHTML = rewards.map(r => `
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f0f0f0;">
+                <div>
+                    <span style="font-weight: 700;">${r.student_name}</span>
+                    <span style="font-size: 0.8rem; color: #888; margin-left: 10px;">${r.source}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="color: var(--secondary); font-weight: 700;">+${r.amount} 🟡</span>
+                    <span style="font-size: 0.75rem; color: #aaa;">${r.date}</span>
+                </div>
+            </div>
+        `).join('');
     },
 
     renderClasses(classes) {
@@ -135,7 +165,16 @@ const TeacherModule = {
         }
     },
 
-    awardCoinsToStudent() {
+    async awardCoinsToStudent() {
+        if (!this._cachedClasses || this._cachedClasses.length === 0) {
+            try {
+                const data = await api.get('/teacher/dashboard');
+                this._cachedClasses = data.classes || [];
+            } catch (e) {
+                console.error("Failed to fetch classes for modal:", e);
+            }
+        }
+
         const classes = this._cachedClasses || [];
         const options = classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
 
@@ -183,7 +222,9 @@ const TeacherModule = {
                     source: source || 'Activity'
                 });
                 alert(res.msg);
-                this.initDashboard();
+                if (typeof this.initDashboard === 'function' && window.location.pathname.includes('dashboard.html')) {
+                    this.initDashboard();
+                }
             } catch (e) { alert("Xatolik: " + e.message); }
         }, 'Yuborish');
     },
@@ -239,7 +280,9 @@ const TeacherModule = {
                     source: reason
                 });
                 alert(res.msg);
-                this.initDashboard();
+                if (typeof this.initDashboard === 'function' && window.location.pathname.includes('dashboard.html')) {
+                    this.initDashboard();
+                }
             } catch (e) { alert("Xatolik: " + e.message); }
         }, 'Yuborish');
     },
@@ -531,3 +574,5 @@ const TeacherModule = {
         } catch (e) { area.innerHTML = '<p>Xatolik!</p>'; }
     }
 };
+
+window.TeacherModule = TeacherModule;

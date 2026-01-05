@@ -19,7 +19,14 @@ const SidebarLoader = {
             { href: 'analytics.html', label: '📈 Analytics' },
             { href: 'teachers-rating.html', label: '👨‍🏫 Teacher Ratings' },
             { href: 'coin-policy.html', label: '🟡 Coin Policy' },
-            { href: 'system-logs.html', label: '🛡️ System Logs' }
+            { href: 'users.html', label: '👥 User Management' },
+            { href: 'classes.html', label: '🏫 Groups/Classes' },
+            { href: 'coin-control.html', label: '🟡 Coin Control' },
+            { href: 'reports.html', label: '📊 Learning Reports' },
+            { href: 'appeals.html', label: '📩 Appeals & complaints' },
+            { href: 'audit-logs.html', label: '🛡️ Security Logs' },
+            { href: 'shop-management.html', label: '🛍️ Shop Management' },
+            { href: 'badges.html', label: '🏆 Badge Management' }
         ],
         teacher: [
             { href: 'attendance.html', label: '📝 Attendance' },
@@ -98,12 +105,20 @@ const SidebarLoader = {
                     { href: 'analytics.html', label: `📈 ${t('analytics')}` },
                     { href: 'teachers-rating.html', label: `👨‍🏫 ${t('rating')}` },
                     { href: 'coin-policy.html', label: `🟡 ${t('coin_policy')}` },
-                    { href: 'system-logs.html', label: `🛡️ ${t('security_logs')}` }
+                    { href: 'users.html', label: `👥 ${t('users')}` },
+                    { href: 'classes.html', label: `🏫 ${t('groups')}` },
+                    { href: 'coin-control.html', label: `🟡 ${t('coin_control')}` },
+                    { href: 'reports.html', label: `📊 ${t('learning_reports')}` },
+                    { href: 'appeals.html', label: `📩 ${t('appeals')}` },
+                    { href: 'audit-logs.html', label: `🛡️ ${t('security_logs')}` },
+                    { href: 'shop-management.html', label: `🛍️ ${t('shop_management')}` },
+                    { href: 'badges.html', label: `🏆 ${t('badge_management')}` }
                 ],
                 teacher: [
                     { href: 'attendance.html', label: `📝 ${t('attendance')}` },
                     { href: 'homework.html', label: `📚 ${t('homework')}` },
                     { href: 'students.html', label: `👨‍🎓 ${t('students')}` },
+                    { href: 'javascript:TeacherModule.awardCoinsToStudent()', label: `🟡 ${t('award_student') || 'Coin berish'}` },
                     { href: 'activity.html', label: `📈 ${t('activity_log')}` }
                 ],
                 student: [
@@ -135,7 +150,8 @@ const SidebarLoader = {
                 // Append role-specific links
                 const linksHtml = roleLinks.map(link => {
                     const isActive = currentPath === link.href ? 'active' : '';
-                    return `<li><a href="${link.href}" class="nav-item ${isActive}">${link.label}</a></li>`;
+                    const href = link.href.startsWith('javascript:') ? link.href : link.href;
+                    return `<li><a href="${href}" class="nav-item ${isActive}">${link.label}</a></li>`;
                 }).join('');
 
                 menuContainer.insertAdjacentHTML('beforeend', linksHtml);

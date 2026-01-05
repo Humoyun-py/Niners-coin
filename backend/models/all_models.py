@@ -72,6 +72,7 @@ class Teacher(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     subject = db.Column(db.String(100), nullable=True)
     rating = db.Column(db.Float, default=5.0)
+    daily_limit = db.Column(db.Float, default=500.0) # Default limit per teacher
     user = db.relationship('User', backref=db.backref('teacher_profile', uselist=False))
 
 class Parent(db.Model):
@@ -91,11 +92,13 @@ class CoinTransaction(db.Model):
     __tablename__ = 'coin_transactions'
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=True) # Who issued it
     amount = db.Column(db.Float, nullable=False)
     type = db.Column(db.String(20), nullable=False) 
     source = db.Column(db.String(100), nullable=False) 
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     student = db.relationship('Student', backref=db.backref('coin_transactions', lazy=True))
+    teacher = db.relationship('Teacher', backref=db.backref('issued_transactions', lazy=True))
 
 class Badge(db.Model):
     __tablename__ = 'badges'
@@ -234,3 +237,27 @@ class HomeworkSubmission(db.Model):
     
     student = db.relationship('Student', backref='homework_submissions')
     homework = db.relationship('Homework', backref='submissions')
+
+class SystemSetting(db.Model):
+    __tablename__ = 'system_settings'
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(50), unique=True, nullable=False)
+    value = db.Column(db.String(500), nullable=False)
+    description = db.Column(db.String(255), nullable=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    @staticmethod
+    def get_val(key, default=None):
+        s = SystemSetting.query.filter_by(key=key).first()
+        return s.value if s else default
+    
+    @staticmethod
+    def set_val(key, value, description=None):
+        s = SystemSetting.query.filter_by(key=key).first()
+        if s:
+            s.value = str(value)
+            if description: s.description = description
+        else:
+            s = SystemSetting(key=key, value=str(value), description=description)
+            db.session.add(s)
+        db.session.commit()

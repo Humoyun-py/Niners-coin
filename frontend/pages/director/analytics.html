@@ -25,23 +25,52 @@
             </div>
         </main>
     </div>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/sidebar-loader.js"></script>
     <script>
-        fetch('../../components/sidebar.html').then(res => res.text()).then(html => document.getElementById('sidebarContainer').innerHTML = html);
+        async function loadCharts() {
+            try {
+                const data = await api.get('/director/analytics');
 
-        new Chart(document.getElementById('classActivityChart'), {
-            type: 'polarArea',
-            data: {
-                labels: ['9-B', '10-A', '7-A', '8-C'],
-                datasets: [{ data: [85, 92, 70, 65], backgroundColor: ['#FFD700', '#FFA500', '#FFBD33', '#FF5733'] }]
-            }
-        });
+                // 1. Class Activity Chart
+                const classCtx = document.getElementById('classActivityChart');
+                new Chart(classCtx, {
+                    type: 'polarArea',
+                    data: {
+                        labels: data.class_activity.map(a => a.name),
+                        datasets: [{
+                            data: data.class_activity.map(a => a.value),
+                            backgroundColor: ['#6C5CE7', '#00B894', '#FDCB6E', '#FF7675', '#0984E3']
+                        }]
+                    },
+                    options: { responsive: true }
+                });
 
-        new Chart(document.getElementById('coinCirkulationChart'), {
-            type: 'line',
-            data: {
-                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-                datasets: [{ label: 'Coins', data: [5000, 7500, 6800, 9200], borderColor: '#FFD700', backgroundColor: 'rgba(255,215,0,0.1)', fill: true }]
+                // 2. Coin Circulation Chart
+                const coinCtx = document.getElementById('coinCirkulationChart');
+                new Chart(coinCtx, {
+                    type: 'line',
+                    data: {
+                        labels: data.circulation.map(c => c.date),
+                        datasets: [{
+                            label: 'Coins Issued',
+                            data: data.circulation.map(c => c.value),
+                            borderColor: '#FDCB6E',
+                            backgroundColor: 'rgba(253, 203, 110, 0.2)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: { responsive: true }
+                });
+
+            } catch (e) {
+                console.error("Analitika yuklashda xatolik:", e);
             }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCharts();
         });
     </script>
 </body>

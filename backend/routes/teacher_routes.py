@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 from models.all_models import db, Teacher, Class, Student, CoinTransaction, Topic
 from services.coin_engine import award_coins
+from sqlalchemy import func
+from datetime import datetime
 
 teacher_bp = Blueprint('teacher', __name__)
 
@@ -15,12 +17,30 @@ def teacher_dashboard():
         return jsonify({"msg": "Teacher profile not found"}), 404
         
     classes = Class.query.filter_by(teacher_id=teacher.id).all()
-    
+        
+    today = datetime.utcnow().date()
+    issued_today = db.session.query(func.sum(CoinTransaction.amount))\
+        .filter(CoinTransaction.teacher_id == teacher.id)\
+        .filter(func.date(CoinTransaction.timestamp) == today)\
+        .filter(CoinTransaction.type == 'earn').scalar() or 0
+
+    # Get recent transactions issued by this teacher
+    recent_txs = CoinTransaction.query.filter_by(teacher_id=teacher.id, type='earn')\
+        .order_by(CoinTransaction.timestamp.desc()).limit(10).all()
+
     return jsonify({
         "teacher_name": teacher.user.full_name,
         "class_count": len(classes),
         "rating": teacher.rating,
-        "classes": [{"id": c.id, "name": c.name, "student_count": len(c.students)} for c in classes]
+        "daily_limit": teacher.daily_limit,
+        "issued_today": float(issued_today),
+        "classes": [{"id": c.id, "name": c.name, "student_count": len(c.students)} for c in classes],
+        "recent_rewards": [{
+            "student_name": tx.student.user.full_name,
+            "amount": tx.amount,
+            "source": tx.source,
+            "date": tx.timestamp.strftime('%H:%M')
+        } for tx in recent_txs]
     }), 200
 
 @teacher_bp.route('/award-coins', methods=['POST'])
@@ -28,18 +48,36 @@ def teacher_dashboard():
 def teacher_award_coins():
     data = request.get_json()
     claims = get_jwt()
+    user_id = get_jwt_identity()
     
     if claims.get('role') != 'teacher':
         return jsonify({"msg": "Unauthorized"}), 403
+    
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
+    if not teacher:
+        return jsonify({"msg": "Teacher profile not found"}), 404
         
     student_id = data.get('student_id')
-    amount = data.get('amount')
-    source = data.get('source', 'activity')
+    amount = float(data.get('amount', 0))
+    source = data.get('source', 'standalone_reward')
     
-    success, msg = award_coins(student_id, amount, source)
+    # 1. Check daily limit
+    today = datetime.utcnow().date()
+    issued_today = db.session.query(func.sum(CoinTransaction.amount))\
+        .filter(CoinTransaction.teacher_id == teacher.id)\
+        .filter(func.date(CoinTransaction.timestamp) == today)\
+        .filter(CoinTransaction.type == 'earn').scalar() or 0
+    
+    # Get global limit from SystemSetting as fallback if teacher data is missing or use teacher.daily_limit
+    max_limit = teacher.daily_limit
+    
+    if issued_today + amount > max_limit:
+        return jsonify({"msg": f"Kunlik limitdan oshib ketdingiz. Bugun berilgan: {issued_today}, Maksimal: {max_limit}"}), 400
+
+    success, msg = award_coins(student_id, amount, source, teacher_id=teacher.id)
     
     if success:
-        return jsonify({"msg": msg}), 200
+        return jsonify({"msg": msg, "issued_today": issued_today + amount}), 200
     return jsonify({"msg": msg}), 400
 
 @teacher_bp.route('/classes/<int:class_id>', methods=['GET'])
@@ -94,16 +132,26 @@ def mark_attendance():
     count = 0
     from services.coin_engine import award_coins
     
+    # Calculate total coins to be awarded in this batch
+    total_planned = sum([float(rec.get('coins', 0)) for rec in records if rec.get('status') == 'present'])
+    
+    # Check daily limit
+    today = datetime.utcnow().date()
+    issued_today = db.session.query(func.sum(CoinTransaction.amount))\
+        .filter(CoinTransaction.teacher_id == teacher.id)\
+        .filter(func.date(CoinTransaction.timestamp) == today)\
+        .filter(CoinTransaction.type == 'earn').scalar() or 0
+    
+    if issued_today + total_planned > teacher.daily_limit:
+        return jsonify({"msg": f"Kunlik limitdan oshib ketyapsiz. Bugun berilgan: {issued_today}, Maksimal: {teacher.daily_limit}. Hozirgi urinish: {total_planned}"}), 400
+
     for rec in records:
         sid = rec.get('student_id')
         status = rec.get('status')
         
-        # Check if exists to update
-        existing = Attendance.query.filter_by(student_id=sid, class_id=class_id, date=date_obj).first()
-        
         # If new or status changed to present, award coin
         coin_amount = float(rec.get('coins', 0))
-        reason = "Davomat uchun"
+        reason = f"Davomat ({cls.name})"
         
         # If no custom amount specified, use default logic
         if 'coins' not in rec:
@@ -114,6 +162,7 @@ def mark_attendance():
             else:
                 coin_amount = 0.0
 
+        existing = Attendance.query.filter_by(student_id=sid, class_id=class_id, date=date_obj).first()
         if existing:
             existing.status = status
         else:
@@ -121,12 +170,12 @@ def mark_attendance():
             db.session.add(new_att)
         
         if coin_amount > 0:
-            award_coins(sid, coin_amount, reason, f"O'qituvchi tomonidan darsda {status} deb belgilandi")
+            award_coins(sid, coin_amount, reason, teacher_id=teacher.id)
             
         count += 1
         
     db.session.commit()
-    return jsonify({"msg": f"Davomat saqlandi ({count} o'quvchi)"}), 200
+    return jsonify({"msg": f"Davomat saqlandi ({count} o'quvchi), Jami {total_planned} coin berildi."}), 200
 
 @teacher_bp.route('/classes/<int:class_id>/topics', methods=['POST'])
 @jwt_required()

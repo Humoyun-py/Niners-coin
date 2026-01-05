@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs | Niners.uz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <script src="../../js/translations.js"></script>
+</head>
+
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
+            <h2>Xavfsizlik Loglari (Anti-Cheat)</h2>
+            <button class="btn btn-secondary" style="border-color:#DC3545; color:#DC3545;">Hammasini
+                tozalash</button>
+        </header>
+        <div class="card" style="background:white; padding: 0; border-radius:12px; margin-top:20px; overflow: hidden;">
+            <div class="table-wrapper">
+                <table class="responsive-table" style="width:100%; border-collapse:collapse;">
+                    <thead>
+                        <tr
+                            style="background: #FAFAFA; border-bottom:2px solid #EEE; text-align:left; font-size:0.9rem; color:var(--text-muted);">
+                            <th>Sana</th>
+                            <th>Foydalanuvchi</th>
+                            <th>Harakat</th>
+                            <th>Daraja</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTableBody">
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding:20px;">Ma'lumotlar yuklanmoqda...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/sidebar-loader.js"></script>
+    <script>
+
+        async function loadAuditLogs() {
+            try {
+                const logs = await api.get('/admin/audit-logs');
+                const tbody = document.getElementById('auditTableBody');
+                if (logs && logs.length > 0) {
+                    tbody.innerHTML = logs.map(l => `
+    <tr style="border-bottom:1px solid #F5F5F5;">
+        <td data-label="Sana" style="padding:12px; font-size:0.85rem; color:#666;">${new Date(l.timestamp).toLocaleString()}</td>
+        <td data-label="Foydalanuvchi" style="padding:12px;">${l.username}</td>
+        <td data-label="Harakat" style="padding:12px;">${l.action}</td>
+        <td data-label="Daraja" style="padding:12px;">
+            <span
+                style="background:${l.severity === 'danger' ? '#FFDADA' : '#EEE'}; color:${l.severity === 'danger' ? '#DC3545' : '#666'}; padding:4px 10px; border-radius:4px; font-size:0.8rem; font-weight:700;">
+                ${l.severity.toUpperCase()}
+            </span>
+        </td>
+    </tr>
+    `).join('');
+                } else {
+                    tbody.innerHTML = `<tr>
+        <td colspan="4" style="text-align:center; padding:20px;">Hozircha xavfsizlik loglari mavjud emas.</td>
+    </tr>`;
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        loadAuditLogs();
+    </script>
+</body>
+
+</html>

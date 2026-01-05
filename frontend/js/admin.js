@@ -136,6 +136,10 @@ const AdminModule = {
                 <div class="input-group">
                     <label class="input-label">Subject</label>
                     <input type="text" id="newSubject" class="form-control" placeholder="e.g. IELTS, Math">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Daily Coin Limit</label>
+                    <input type="number" id="newDailyLimit" class="form-control" value="500" placeholder="e.g. 500">
                 </div>`;
         }
 
@@ -167,7 +171,9 @@ const AdminModule = {
                 if (cid) extraData.class_id = parseInt(cid);
             } else if (role === 'teacher') {
                 const subj = document.getElementById('newSubject').value;
+                const limit = document.getElementById('newDailyLimit').value;
                 if (subj) extraData.subject = subj;
+                if (limit) extraData.daily_limit = parseFloat(limit);
             }
 
             try {
@@ -184,6 +190,16 @@ const AdminModule = {
             const user = users.find(u => u.id === userId);
             if (!user) return;
 
+            let teacherFields = '';
+            if (user.role === 'teacher') {
+                teacherFields = `
+                    <div class="input-group">
+                        <label class="input-label">Daily Coin Limit</label>
+                        <input type="number" id="editDailyLimit" class="form-control" value="${user.daily_limit || 500}">
+                    </div>
+                `;
+            }
+
             const formContent = `
                 <div class="input-group">
                     <label class="input-label">Full Name</label>
@@ -197,14 +213,21 @@ const AdminModule = {
                     <label class="input-label">New Password (leave empty to keep)</label>
                     <input type="password" id="editPassword" class="form-control" placeholder="••••••">
                 </div>
+                ${teacherFields}
             `;
 
             this.createModal('Edit User Profile', formContent, async () => {
                 const fullName = document.getElementById('editFullName').value;
                 const email = document.getElementById('editEmail').value;
                 const password = document.getElementById('editPassword').value;
+
+                let updateData = { full_name: fullName, email, password: password || undefined };
+                if (user.role === 'teacher') {
+                    updateData.daily_limit = parseFloat(document.getElementById('editDailyLimit').value);
+                }
+
                 try {
-                    await api.put(`/admin/users/${userId}`, { full_name: fullName, email, password: password || undefined });
+                    await api.put(`/admin/users/${userId}`, updateData);
                     alert("User updated successfully!");
                     this.initDashboard();
                 } catch (e) { alert("Error: " + e.message); }

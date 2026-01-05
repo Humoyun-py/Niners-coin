@@ -14,32 +14,52 @@
             <h2>Ustozlar Reytingi</h2>
             <div class="card" style="background:white; padding:24px; border-radius:12px; margin-top:24px;">
                 <table style="width:100%; border-collapse:collapse;">
-                    <tr style="border-bottom:2px solid #EEE; text-align:left; color:var(--text-muted);">
-                        <th style="padding:12px;">№</th>
-                        <th style="padding:12px;">Ismi</th>
-                        <th style="padding:12px;">Fan</th>
-                        <th style="padding:12px;">Rating</th>
-                        <th style="padding:12px;">Coinlar (Berilgan)</th>
-                    </tr>
-                    <tr>
-                        <td style="padding:12px;">1</td>
-                        <td style="padding:12px; font-weight:600;">M. Ergashev</td>
-                        <td style="padding:12px;">Matematika</td>
-                        <td style="padding:12px; color:#F1C40F;">★★★★★ (4.9)</td>
-                        <td style="padding:12px;">1,250 🟡</td>
-                    </tr>
-                    <tr>
-                        <td style="padding:12px;">2</td>
-                        <td style="padding:12px; font-weight:600;">L. Karimov</td>
-                        <td style="padding:12px;">Fizika</td>
-                        <td style="padding:12px; color:#F1C40F;">★★★★☆ (4.7)</td>
-                        <td style="padding:12px;">890 🟡</td>
-                    </tr>
+                    <thead>
+                        <tr style="border-bottom:2px solid #EEE; text-align:left; color:var(--text-muted);">
+                            <th style="padding:12px;">№</th>
+                            <th style="padding:12px;">Ismi</th>
+                            <th style="padding:12px;">Fan</th>
+                            <th style="padding:12px;">Rating</th>
+                            <th style="padding:12px;">Coinlar (Berilgan)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ratingsTableBody">
+                        <tr>
+                            <td colspan="5" style="text-align:center; padding:20px;">Yuklanmoqda...</td>
+                        </tr>
+                    </tbody>
                 </table>
             </div>
         </main>
-    </div>
-    <script>fetch('../../components/sidebar.html').then(res => res.text()).then(html => document.getElementById('sidebarContainer').innerHTML = html);</script>
+        <script src="../../js/api.js"></script>
+        <script src="../../js/sidebar-loader.js"></script>
+        <script>
+            async function loadRatings() {
+                try {
+                    const teachers = await api.get('/director/teachers-rating');
+                    const tbody = document.getElementById('ratingsTableBody');
+                    if (!teachers || teachers.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:20px;">Ma\'lumot topilmadi</td></tr>';
+                        return;
+                    }
+
+                    tbody.innerHTML = teachers.map((t, idx) => `
+                    <tr style="border-bottom: 1px solid #F5F5F5;">
+                        <td style="padding:12px;">${idx + 1}</td>
+                        <td style="padding:12px; font-weight:600;">${t.name}</td>
+                        <td style="padding:12px;">${t.subject || 'Fanda emas'}</td>
+                        <td style="padding:12px; color:#F1C40F;">
+                            ${"★".repeat(Math.round(t.rating))}${"☆".repeat(5 - Math.round(t.rating))} (${t.rating.toFixed(1)})
+                        </td>
+                        <td style="padding:12px;">${t.coins_given.toLocaleString()} 🟡</td>
+                    </tr>
+                `).join('');
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+            document.addEventListener('DOMContentLoaded', loadRatings);
+        </script>
 </body>
 
 </html>

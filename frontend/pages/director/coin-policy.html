@@ -18,24 +18,118 @@
                     <div style="display:grid; gap:10px; margin-top:10px;">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span>Matematika (STEM)</span>
-                            <input type="number" value="1.2" class="form-control" style="width:80px;">
+                            <input type="number" id="math_multiplier" step="0.1" class="form-control"
+                                style="width:100px;">
                         </div>
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <span>Chet tili</span>
-                            <input type="number" value="1.1" class="form-control" style="width:80px;">
+                            <input type="number" id="english_multiplier" step="0.1" class="form-control"
+                                style="width:100px;">
                         </div>
                     </div>
                 </div>
                 <hr style="margin:24px 0; border:0; border-top:1px solid #EEE;">
                 <div class="form-group">
                     <label>Ijtimoiy faollik koeffitsienti</label>
-                    <input type="number" value="1.5" class="form-control" style="width:80px;">
+                    <input type="number" id="social_multiplier" step="0.1" class="form-control" style="width:100px;">
                 </div>
-                <button class="btn btn-primary">Strategiyani tasdiqlash</button>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>Kunlik Coin Limiti (Maksimal)</label>
+                    <input type="number" id="daily_limit" class="form-control" style="width:100px;">
+                </div>
+                <button onclick="savePolicy()" class="btn btn-primary" style="margin-top: 24px; width: 100%;">Saqlash va
+                    Tasdiqlash</button>
+            </div>
+            <div class="card" style="background:white; padding:24px; border-radius:12px; margin-top:30px;">
+                <h3>Ustozlarga Coin (Limit) Ajratish</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">Har bir ustoz uchun kunlik
+                    koin berish limitini belgilang.</p>
+
+                <div class="form-group">
+                    <label>Ustozni tanlang</label>
+                    <select id="teacherSelect" class="form-control" style="margin-top:8px;">
+                        <option value="">-- Tanlang --</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Yangi kunlik limit (Coin)</label>
+                    <input type="number" id="teacher_daily_limit" class="form-control" placeholder="Masalan: 500"
+                        style="margin-top:8px;">
+                </div>
+
+                <button onclick="allocateCoins()" class="btn btn-secondary"
+                    style="margin-top: 20px; width: 100%; background: var(--warning); color: #000; border: none; font-weight: 700;">
+                    Limitni Yangilash
+                </button>
             </div>
         </main>
     </div>
-    <script>fetch('../../components/sidebar.html').then(res => res.text()).then(html => document.getElementById('sidebarContainer').innerHTML = html);</script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/sidebar-loader.js"></script>
+    <script>
+        async function loadData() {
+            try {
+                // Load global policy
+                const p = await api.get('/director/policy');
+                if (document.getElementById('math_multiplier')) {
+                    document.getElementById('math_multiplier').value = p.math_multiplier;
+                    document.getElementById('english_multiplier').value = p.english_multiplier;
+                    document.getElementById('social_multiplier').value = p.social_multiplier;
+                    document.getElementById('daily_limit').value = p.daily_limit;
+                }
+
+                // Load teachers for allocation
+                const teachers = await api.get('/director/teachers');
+                const select = document.getElementById('teacherSelect');
+                select.innerHTML = '<option value="">-- Tanlang --</option>' +
+                    teachers.map(t => `<option value="${t.id}" data-limit="${t.daily_limit}">${t.full_name} (${t.subject}) - Hozir: ${t.daily_limit}</option>`).join('');
+
+                select.onchange = (e) => {
+                    const opt = e.target.selectedOptions[0];
+                    if (opt && opt.value) {
+                        document.getElementById('teacher_daily_limit').value = opt.getAttribute('data-limit');
+                    }
+                };
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        async function allocateCoins() {
+            const teacherId = document.getElementById('teacherSelect').value;
+            const newLimit = document.getElementById('teacher_daily_limit').value;
+
+            if (!teacherId || !newLimit) return alert("Iltimos, ustozni tanlang va limitni kiriting!");
+
+            try {
+                const res = await api.post('/director/teachers/limit', {
+                    teacher_id: parseInt(teacherId),
+                    daily_limit: parseFloat(newLimit)
+                });
+                alert(res.msg);
+                loadData(); // Refresh list
+            } catch (e) {
+                alert("Xatolik: " + e.message);
+            }
+        }
+
+        async function savePolicy() {
+            const data = {
+                math_multiplier: document.getElementById('math_multiplier').value,
+                english_multiplier: document.getElementById('english_multiplier').value,
+                social_multiplier: document.getElementById('social_multiplier').value,
+                daily_limit: document.getElementById('daily_limit').value
+            };
+            try {
+                const res = await api.post('/director/policy', data);
+                alert(res.msg);
+            } catch (e) {
+                alert("Xatolik: " + e.message);
+            }
+        }
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
 </body>
 
 </html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coin Control | Niners.uz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <script src="../../js/translations.js"></script>
+</head>
+
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <h2>Coin Control (Tuzatish)</h2>
+        <p style="color:var(--text-muted); margin-bottom:24px;">Xatolarni tuzatish uchun o'quvchilar balansini qo'lda
+            o'zgartirish.</p>
+
+        <div class="card">
+            <div class="form-group">
+                <label>O'quvchini qidirish</label>
+                <input type="text" id="studentSearch" class="form-control" placeholder="Ism yoki username..."
+                    oninput="searchStudents()">
+            </div>
+            <div id="searchResults" class="mobile-stack" style="margin-top:20px; max-height: 400px; overflow-y: auto;">
+                <!-- Result list -->
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/api.js"></script>
+    <script src="../../js/sidebar-loader.js"></script>
+    <script>
+        let allStudents = [];
+
+        async function init() {
+            const users = await api.get('/admin/users');
+            allStudents = users.filter(u => u.role === 'student');
+        }
+
+        function searchStudents() {
+            const query = document.getElementById('studentSearch').value.toLowerCase();
+            const results = allStudents.filter(s => s.full_name.toLowerCase().includes(query) || s.username.toLowerCase().includes(query));
+
+            const div = document.getElementById('searchResults');
+            if (!query) { div.innerHTML = ''; return; }
+
+            div.innerHTML = results.map(s => `
+                <div style="padding:15px; border-bottom:1px solid #EEE; display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <div style="font-weight:700;">${s.full_name}</div>
+                        <div style="font-size:0.8rem; color:#666;">@${s.username}</div>
+                    </div>
+                    <button onclick="adjustCoinsPrompt(${s.id}, '${s.full_name}')" class="btn btn-secondary">Sozlash</button>
+                </div>
+            `).join('');
+        }
+
+        async function adjustCoinsPrompt(id, name) {
+            const amount = prompt(`${name} uchun coin miqdorini kiriting (ayirish uchun minus: -10):`);
+            if (!amount || isNaN(amount)) return;
+            const reason = prompt("Nima uchun o'zgarish qilinmoqda?");
+
+            try {
+                const res = await api.post(`/admin/users/${id}/adjust-coins`, {
+                    amount: parseInt(amount),
+                    reason: reason
+                });
+                alert(res.msg);
+                location.reload();
+            } catch (e) { alert("Xatolik!"); }
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

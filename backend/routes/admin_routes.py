@@ -136,40 +136,55 @@ def get_users():
 @jwt_required()
 def add_user():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
-    data = request.get_json()
-    
-    if User.query.filter_by(username=data.get('username')).first():
-        return jsonify({"msg": "Username band"}), 400
-    
-    new_user = User(
-        username=data.get('username'),
-        email=data.get('email', f"{data.get('username')}@niners.uz"),
-        role=data.get('role', 'student'),
-        full_name=data.get('full_name')
-    )
-    new_user.set_password(data.get('password', '123456')) # Default password
-    
-    db.session.add(new_user)
-    db.session.flush()
-    
-    profile = None
-    if new_user.role == 'student':
-        profile = Student(user_id=new_user.id, class_id=data.get('class_id'))
-    elif new_user.role == 'teacher':
-        profile = Teacher(
-            user_id=new_user.id, 
-            subject=data.get('subject'),
-            daily_limit=float(data.get('daily_limit', 500))
-        )
-    elif new_user.role == 'parent':
-        profile = Parent(user_id=new_user.id)
-    
-    if profile:
-        db.session.add(profile)
+    try:
+        data = request.get_json()
         
-    db.session.commit() # Commit BEFORE logging to ensure user exists
-    log_event(get_jwt_identity(), f"Yangi foydalanuvchi qo'shildi: {new_user.username} ({new_user.role})")
-    return jsonify({"msg": "Muvaffaqiyatli qo'shildi", "id": new_user.id}), 201
+        if User.query.filter_by(username=data.get('username')).first():
+            return jsonify({"msg": "Username band"}), 400
+        
+        new_user = User(
+            username=data.get('username'),
+            email=data.get('email', f"{data.get('username')}@niners.uz"),
+            role=data.get('role', 'student'),
+            full_name=data.get('full_name')
+        )
+        new_user.set_password(data.get('password', '123456')) # Default password
+        
+        db.session.add(new_user)
+        db.session.flush()
+        
+        profile = None
+        if new_user.role == 'student':
+            profile = Student(user_id=new_user.id, class_id=data.get('class_id'))
+        elif new_user.role == 'teacher':
+            try:
+                limit_val = data.get('daily_limit', 500)
+                if not limit_val: limit_val = 500
+                daily_limit = float(limit_val)
+            except:
+                daily_limit = 500.0
+                
+            profile = Teacher(
+                user_id=new_user.id, 
+                subject=data.get('subject'),
+                daily_limit=daily_limit
+            )
+        elif new_user.role == 'parent':
+            profile = Parent(user_id=new_user.id)
+        
+        if profile:
+            db.session.add(profile)
+            
+        db.session.commit()
+        log_event(get_jwt_identity(), f"Yangi foydalanuvchi qo'shildi: {new_user.username} ({new_user.role})")
+        return jsonify({"msg": "Muvaffaqiyatli qo'shildi", "id": new_user.id}), 201
+    except Exception as e:
+        import traceback
+        error_msg = traceback.format_exc()
+        with open('debug_error.log', 'a', encoding='utf-8') as f:
+            f.write(f"\n--- ERROR IN add_user AT {datetime.utcnow()} ---\n")
+            f.write(error_msg)
+        return jsonify({"msg": f"User creation error: {str(e)}"}), 500
 
 @admin_bp.route('/users/<int:user_id>', methods=['PUT'])
 @jwt_required()

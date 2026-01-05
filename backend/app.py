@@ -68,9 +68,33 @@ def create_app():
             
         db.session.commit()
 
+    def sync_schema():
+        from sqlalchemy import text
+        # Add missing columns for PostgreSQL safely
+        tables_columns = {
+            "teachers": [("daily_limit", "FLOAT DEFAULT 500.0")],
+            "badges": [("requirement_text", "VARCHAR(255)")],
+            "users": [
+                ("block_reason", "VARCHAR(255)"),
+                ("debt_amount", "FLOAT DEFAULT 0.0")
+            ],
+            "coin_transactions": [("teacher_id", "INTEGER REFERENCES teachers(id)")]
+        }
+        
+        for table, cols in tables_columns.items():
+            for col_name, col_type in cols:
+                try:
+                    db.session.execute(text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {col_name} {col_type}"))
+                    print(f"Schema Sync: Added column {col_name} to {table} (if not exists)")
+                except Exception as e:
+                    print(f"Schema Sync Warning for {table}.{col_name}: {e}")
+        
+        db.session.commit()
+
     # Initialize Database if it doesn't exist
     with app.app_context():
         db.create_all()
+        sync_schema() # Ensure existing tables have new columns
         seed_data()
         
     migrate.init_app(app, db)

@@ -6,6 +6,7 @@ from services.security_service import log_event
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
 import os
+from datetime import datetime
 
 admin_bp = Blueprint('admin', __name__)
 
@@ -103,21 +104,30 @@ def get_users():
         users = User.query.all()
         result = []
         for u in users:
-            d = {
-                "id": u.id,
-                "username": u.username,
-                "email": u.email,
-                "role": u.role,
-                "full_name": u.full_name,
-                "is_active": u.is_active,
-                "block_reason": u.block_reason,
-                "debt_amount": u.debt_amount,
-                "daily_limit": u.teacher_profile.daily_limit if (u.role == 'teacher' and u.teacher_profile) else None
-            }
-            result.append(d)
+            try:
+                # Safe access to teacher_profile
+                limit = None
+                if u.role == 'teacher' and u.teacher_profile:
+                    limit = u.teacher_profile.daily_limit
+                
+                result.append({
+                    "id": u.id,
+                    "username": u.username,
+                    "email": u.email,
+                    "role": u.role,
+                    "full_name": u.full_name,
+                    "is_active": u.is_active,
+                    "block_reason": u.block_reason,
+                    "debt_amount": u.debt_amount,
+                    "daily_limit": limit
+                })
+            except Exception as e:
+                print(f"Skipping user {u.id} due to serialization error: {e}")
         return jsonify(result), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        import traceback
+        print(traceback.format_exc())
+        return jsonify({"msg": f"Baza bilan bog'lanishda xato: {str(e)}"}), 500
 
 @admin_bp.route('/users', methods=['POST'])
 @jwt_required()

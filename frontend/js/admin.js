@@ -9,11 +9,11 @@ const AdminModule = {
             const users = await api.get('/admin/users');
             const classes = await api.get('/admin/classes');
             document.getElementById('totalUsers').innerText = users.length;
-            document.getElementById('totalClasses').innerText = classes.length;
+            document.getElementById('totalGroups').innerText = classes.length;
         } catch (e) {
             console.error('Stats Error:', e);
             document.getElementById('totalUsers').innerText = '-';
-            document.getElementById('totalClasses').innerText = '-';
+            document.getElementById('totalGroups').innerText = '-';
         }
     },
 

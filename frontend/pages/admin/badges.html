@@ -5,61 +5,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Badge Management | Niners.uz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../styles/main.css">
+    <script src="../../js/translations.js"></script>
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <header style="margin-bottom: 30px;">
-                <h2>Badge Management</h2>
-                <p style="color: var(--text-muted);">Configure achievements and badges for the system.</p>
-            </header>
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header style="margin-bottom: 30px;">
+            <h2>Badge Management</h2>
+            <p style="color: var(--text-muted);">Configure achievements and badges for the system.</p>
+        </header>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
-                <!-- Add Badge Form -->
-                <div class="card"
-                    style="background: white; padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); height: fit-content;">
-                    <h3 style="margin-bottom: 20px;">Add New Badge</h3>
-                    <form id="addBadgeForm">
-                        <div class="form-group">
-                            <label>Name</label>
-                            <input type="text" id="badgeName" class="form-control" placeholder="e.g., Bookworm"
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label>Icon (Emoji)</label>
-                            <input type="text" id="badgeIcon" class="form-control" placeholder="e.g., 📚" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Description</label>
-                            <textarea id="badgeDesc" class="form-control" rows="2"
-                                placeholder="Short description of the badge..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Requirement (Condition)</label>
-                            <textarea id="badgeReq" class="form-control" rows="2"
-                                placeholder="What must the student do to earn this?" required></textarea>
-                            <small style="color: var(--text-muted);">This text will be visible to students.</small>
-                        </div>
-                        <button type="submit" class="btn btn-primary" style="width: 100%;">Add Badge</button>
-                    </form>
-                </div>
-
-                <!-- Badge List -->
-                <div class="card"
-                    style="background: white; padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);">
-                    <h3 style="margin-bottom: 20px;">Existing Badges</h3>
-                    <div id="badgeList"
-                        style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
-                        <p>Loading...</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+            <!-- Add Badge Form -->
+            <div class="card"
+                style="background: white; padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft); height: fit-content;">
+                <h3 style="margin-bottom: 20px;">Add New Badge</h3>
+                <form id="addBadgeForm">
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="badgeName" class="form-control" placeholder="e.g., Bookworm" required>
                     </div>
+                    <div class="form-group">
+                        <label>Icon (Emoji)</label>
+                        <input type="text" id="badgeIcon" class="form-control" placeholder="e.g., 📚" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="badgeDesc" class="form-control" rows="2"
+                            placeholder="Short description of the badge..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Requirement (Condition)</label>
+                        <textarea id="badgeReq" class="form-control" rows="2"
+                            placeholder="What must the student do to earn this?" required></textarea>
+                        <small style="color: var(--text-muted);">This text will be visible to students.</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Add Badge</button>
+                </form>
+            </div>
+
+            <!-- Badge List -->
+            <div class="card"
+                style="background: white; padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);">
+                <h3 style="margin-bottom: 20px;">Existing Badges</h3>
+                <div id="badgeList"
+                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;">
+                    <p>Loading...</p>
                 </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </main>
 
     <script src="../../js/api.js"></script>
     <script src="../../js/translations.js"></script>

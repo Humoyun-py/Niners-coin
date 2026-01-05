@@ -8,12 +8,28 @@ const AdminModule = {
         try {
             const users = await api.get('/admin/users');
             const classes = await api.get('/admin/classes');
-            document.getElementById('totalUsers').innerText = users.length;
-            document.getElementById('totalGroups').innerText = classes.length;
+            const complaints = await api.get('/admin/complaints');
+
+            const totalUsersEl = document.getElementById('totalUsers');
+            if (totalUsersEl) totalUsersEl.innerText = users.length;
+
+            const totalClassesEl = document.getElementById('totalClasses');
+            if (totalClassesEl) totalClassesEl.innerText = classes.length;
+
+            const openComplaints = complaints.filter(c => c.status === 'open').length;
+            const cEl = document.getElementById('pendingComplaints');
+            if (cEl) cEl.innerText = openComplaints;
+
         } catch (e) {
             console.error('Stats Error:', e);
-            document.getElementById('totalUsers').innerText = '-';
-            document.getElementById('totalGroups').innerText = '-';
+            const totalUsersEl = document.getElementById('totalUsers');
+            if (totalUsersEl) totalUsersEl.innerText = '-';
+
+            const totalClassesEl = document.getElementById('totalClasses');
+            if (totalClassesEl) totalClassesEl.innerText = '-';
+
+            const cEl = document.getElementById('pendingComplaints');
+            if (cEl) cEl.innerText = '-';
         }
     },
 

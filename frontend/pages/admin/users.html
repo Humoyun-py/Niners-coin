@@ -3,7 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management | Niners.uz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../styles/main.css">
     <script src="../../js/translations.js"></script>
 </head>
@@ -24,15 +26,15 @@
 
         <div class="card" style="padding: 0; overflow: hidden;">
             <div class="table-wrapper">
-                <table style="width: 100%; border-collapse: collapse;">
+                <table class="responsive-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr
                             style="background: #FAFAFA; border-bottom: 2px solid var(--border-light); text-align: left;">
-                            <th style="padding: 16px;">Full Name</th>
-                            <th style="padding: 16px;">Username</th>
-                            <th style="padding: 16px;">Role</th>
-                            <th style="padding: 16px;">Status</th>
-                            <th style="padding: 16px;">Actions</th>
+                            <th>Full Name</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="fullUserTableBody">
@@ -44,7 +46,6 @@
             </div>
         </div>
     </main>
-    </div>
     <script src="../../js/api.js"></script>
     <script src="../../js/admin.js"></script>
     <script src="../../js/sidebar-loader.js"></script>
@@ -56,7 +57,7 @@
                 const tbody = document.getElementById('fullUserTableBody');
                 tbody.innerHTML = users.map(u => `
                     <tr style="border-bottom: 1px solid var(--border-light); transition: 0.2s;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
-                        <td style="padding: 16px; font-weight: 700;">
+                        <td data-label="Full Name" style="padding: 16px; font-weight: 700;">
                             ${u.full_name}
                             ${!u.is_active ? `
                                 <div style="font-size:0.75rem; color:#C62828; font-weight:400; margin-top:4px; background: #FFF0F0; padding: 4px 8px; border-radius: 4px; display: inline-block;">
@@ -64,18 +65,18 @@
                                 </div>
                             ` : ''}
                         </td>
-                        <td style="padding: 16px; color: var(--text-muted);">${u.username}</td>
-                        <td style="padding: 16px;">
+                        <td data-label="Username" style="padding: 16px; color: var(--text-muted);">${u.username}</td>
+                        <td data-label="Role" style="padding: 16px;">
                             <span style="background:${AdminModule.getRoleColor(u.role)}; color:white; padding:4px 10px; border-radius:6px; font-size:0.8rem; font-weight:700; text-transform:uppercase;">
                                 ${u.role}
                             </span>
                         </td>
-                        <td style="padding: 16px;">
+                        <td data-label="Status" style="padding: 16px;">
                             <span style="color:${u.is_active ? '#2E7D32' : '#C62828'}; font-weight:700;">
                                 ${u.is_active ? '● Active' : '● Blocked'}
                             </span>
                         </td>
-                        <td style="padding: 16px; display: flex; gap: 8px;">
+                        <td data-label="Actions" style="padding: 16px; display: flex; gap: 8px;">
                             <button onclick="AdminModule.toggleUserStatus(${u.id})" class="btn" style="padding: 6px 12px; font-size: 0.8rem; background: ${u.is_active ? '#FFF0F0' : '#E8F5E9'}; color: ${u.is_active ? '#C62828' : '#2E7D32'}; border: none;">
                                 ${u.is_active ? 'Block' : 'Unblock'}
                             </button>

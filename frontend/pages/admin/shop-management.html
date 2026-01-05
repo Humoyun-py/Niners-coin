@@ -3,39 +3,41 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shop Management | Niners.uz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../styles/main.css">
-    <style>
-        .item-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            box-shadow: var(--shadow-soft);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .item-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .item-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
-            object-fit: cover;
-            background: #f0f0f0;
-        }
-    </style>
+    <script src="../../js/translations.js"></script>
 </head>
 
 <body class="dashboard-grid">
+    .item-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 15px;
+    }
+
+    .item-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    }
+
+    .item-img {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: #f0f0f0;
+    }
+    </style>
     <div id="sidebarContainer"></div>
     <main class="main-content">
         <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
@@ -49,7 +51,7 @@
         <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px;">
             <div>
                 <h3 style="margin-bottom: 20px;">Inventory Items</h3>
-                <div id="inventoryContainer">
+                <div id="inventoryContainer" class="mobile-stack">
                     <p class="text-muted">Loading items...</p>
                 </div>
             </div>

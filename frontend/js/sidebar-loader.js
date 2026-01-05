@@ -44,6 +44,11 @@ const SidebarLoader = {
         const container = document.getElementById('sidebarContainer');
         if (!container) return;
 
+        // Ensure container has critical layout class
+        if (!container.classList.contains('sidebar')) {
+            container.classList.add('sidebar');
+        }
+
         try {
             // 0. Mobile Toggle Logic (Initialize UI first)
             this.addMobileToggle();
@@ -102,7 +107,6 @@ const SidebarLoader = {
                     { href: 'activity.html', label: `📈 ${t('activity_log')}` }
                 ],
                 student: [
-
                     { href: 'shop.html', label: `🛍️ ${t('shop')}` },
                     { href: 'coins.html', label: `🟡 ${t('coins')}` },
                     { href: 'my-group.html', label: `👥 ${t('my_group')}` },
@@ -118,14 +122,23 @@ const SidebarLoader = {
             const roleLinks = this.links[role] || [];
 
             // 3. Inject role links
-            const roleContainer = document.getElementById('roleSpecificLinks');
-            if (roleContainer) {
+            const menuContainer = document.getElementById('sidebarMenu');
+            if (menuContainer) {
                 const currentPath = window.location.pathname.split('/').pop();
 
-                roleContainer.innerHTML = roleLinks.map(link => {
+                // Dashboard is already static in HTML, but we want to mark it active if needed
+                const dashboardLink = menuContainer.querySelector('a[href="dashboard.html"]');
+                if (dashboardLink && currentPath === 'dashboard.html') {
+                    dashboardLink.classList.add('active');
+                }
+
+                // Append role-specific links
+                const linksHtml = roleLinks.map(link => {
                     const isActive = currentPath === link.href ? 'active' : '';
                     return `<li><a href="${link.href}" class="nav-item ${isActive}">${link.label}</a></li>`;
                 }).join('');
+
+                menuContainer.insertAdjacentHTML('beforeend', linksHtml);
             }
 
             // 3.1 Highlight Dashboard link if on dashboard.html

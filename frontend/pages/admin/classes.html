@@ -3,7 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class Management | Niners.uz</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../styles/main.css">
     <script src="../../js/translations.js"></script>
 </head>
@@ -19,7 +21,7 @@
             <button onclick="AdminModule.createClass()" class="btn btn-primary">+ New Group</button>
         </header>
 
-        <div id="classesGrid"
+        <div id="classesGrid" class="mobile-stack"
             style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">
             <!-- DYNAMIC -->
             <p>Loading...</p>
@@ -67,8 +69,6 @@
         }
         init();
     </script>
-    </main>
-    </div>
 </body>
 
 </html>

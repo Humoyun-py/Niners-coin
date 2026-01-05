@@ -7,12 +7,11 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # 1. Get Database URL from environment variable
-# Use PostgreSQL/MySQL for production, fallback to SQLite for local development
 DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 if not DATABASE_URL:
-    # Default to local SQLite if no URL is provided
-    # Note: For professional setup, always ensure DATABASE_URL is set in .env
     instance_path = os.path.join(os.path.dirname(__file__), 'instance')
     if not os.path.exists(instance_path):
         os.makedirs(instance_path)

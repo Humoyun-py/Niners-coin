@@ -1,61 +1,58 @@
-from models.all_models import db, Student, Badge, StudentBadge, TestResult, Test
+from models.all_models import db, Student, Badge, StudentBadge, Notification, Attendance, HomeworkSubmission
+from datetime import datetime
 
 def check_and_award_badges(student_id):
     """
     Checks if a student qualifies for new badges based on their activity.
+    Returns a list of names of newly awarded badges.
     """
     student = Student.query.get(student_id)
-    if not student:
-        return []
+    if not student: return []
 
-    new_badges_awarded = []
-    
-    def award_if_not_exists(name, desc):
-        badge = Badge.query.filter_by(name=name).first()
-        if not badge:
-            badge = Badge(name=name, description=desc)
-            db.session.add(badge)
-            db.session.flush()
-        
-        # Check if student already has it
-        existing = StudentBadge.query.filter_by(student_id=student_id, badge_id=badge.id).first()
-        if not existing:
-            sb = StudentBadge(student_id=student_id, badge_id=badge.id)
-            db.session.add(sb)
-            new_badges_awarded.append(name)
-            return True
-        return False
+    new_badges_names = []
 
-    # 1. Centurion: 100+ coins total earned
-    if student.total_earned >= 100:
-        award_if_not_exists("Centurion", "Earned 100+ coins in total.")
+    # 1. Wealth Badges (Boyvachcha Lvl 1-25)
+    balance = student.coin_balance
+    lvl_wealth = int(balance // 20)
+    for i in range(1, min(lvl_wealth + 1, 26)):
+        if award_badge_if_needed(student_id, f"Boyvachcha Lvl {i}"):
+            new_badges_names.append(f"Boyvachcha Lvl {i}")
 
-    # 2. Vocab Pro: 3+ vocabulary tests with 90%+ score
-    vocab_passes = TestResult.query.join(Test).filter(
-        TestResult.student_id == student_id,
-        Test.title.ilike('%vocab%'),
-        TestResult.score >= 90
-    ).count()
-    if vocab_passes >= 3:
-        award_if_not_exists("Vocab Pro", "Mastered 3+ Vocabulary quizzes with 90% score.")
+    # 2. Discipline Badges (Intizom Ustasi Lvl 1-25)
+    present_count = Attendance.query.filter_by(student_id=student_id, status='present').count()
+    lvl_disc = int(present_count // 5)
+    for i in range(1, min(lvl_disc + 1, 26)):
+        if award_badge_if_needed(student_id, f"Intizom Ustasi Lvl {i}"):
+            new_badges_names.append(f"Intizom Ustasi Lvl {i}")
 
-    # 3. IELTS Hero: 1+ IELTS test with 80%+ score
-    ielts_passes = TestResult.query.join(Test).filter(
-        TestResult.student_id == student_id,
-        Test.title.ilike('%ielts%'),
-        TestResult.score >= 80
-    ).count()
-    if ielts_passes >= 1:
-        award_if_not_exists("IELTS Hero", "Passed an IELTS Mock test with 80% score.")
-
-    # 4. Grammar King: Score 95%+ on any Grammar test
-    grammar_passes = TestResult.query.join(Test).filter(
-        TestResult.student_id == student_id,
-        Test.title.ilike('%grammar%'),
-        TestResult.score >= 95
-    ).count()
-    if grammar_passes >= 1:
-        award_if_not_exists("Grammar King", "Perfected a Grammar test with 95%+ score.")
+    # 3. Scholar Badges (Bilimdon Lvl 1-25)
+    # Using HomeworkSubmission if available, or fallback to earned coins from tests
+    hw_count = HomeworkSubmission.query.filter_by(student_id=student_id, status='checked').count()
+    lvl_scholar = int(hw_count // 4)
+    for i in range(1, min(lvl_scholar + 1, 26)):
+        if award_badge_if_needed(student_id, f"Bilimdon Lvl {i}"):
+            new_badges_names.append(f"Bilimdon Lvl {i}")
 
     db.session.commit()
-    return new_badges_awarded
+    return new_badges_names
+
+def award_badge_if_needed(student_id, badge_name):
+    badge = Badge.query.filter_by(name=badge_name).first()
+    if not badge: return False
+
+    # Check if already earned
+    exists = StudentBadge.query.filter_by(student_id=student_id, badge_id=badge.id).first()
+    if not exists:
+        sb = StudentBadge(student_id=student_id, badge_id=badge.id)
+        db.session.add(sb)
+        
+        # Add notification record as well
+        student = Student.query.get(student_id)
+        notif = Notification(
+            user_id=student.user_id,
+            title="Yangi Nishon! 🎉",
+            message=f"Tabriklaymiz! Siz '{badge.icon} {badge.name}' nishonini qo'lga kiritdingiz!"
+        )
+        db.session.add(notif)
+        return True
+    return False

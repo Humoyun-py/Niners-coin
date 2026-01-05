@@ -99,18 +99,11 @@ def run_payment_check():
 @jwt_required()
 def get_users():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
-    users = User.query.all()
-    return jsonify([{
-        "id": u.id,
-        "username": u.username,
-        "email": u.email,
-        "role": u.role,
-        "full_name": u.full_name,
-        "is_active": u.is_active,
-        "block_reason": u.block_reason,
-        "debt_amount": u.debt_amount,
-        "daily_limit": u.teacher_profile.daily_limit if u.role == 'teacher' and u.teacher_profile else None
-    } for u in users]), 200
+    try:
+        users = User.query.all()
+        return jsonify([{"id": u.id, "username": u.username} for u in users]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @admin_bp.route('/users', methods=['POST'])
 @jwt_required()

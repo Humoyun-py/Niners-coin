@@ -171,6 +171,10 @@ def mark_attendance():
         
         if coin_amount > 0:
             award_coins(sid, coin_amount, reason, teacher_id=teacher.id)
+        else:
+            # Still check for attendance-based badges even if no coins were given
+            from services.badge_engine import check_and_award_badges
+            check_and_award_badges(sid)
             
         count += 1
         

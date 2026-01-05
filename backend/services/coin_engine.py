@@ -2,7 +2,7 @@ from models.all_models import db, Student, CoinTransaction
 from services.security_service import send_notification
 from services.badge_engine import check_and_award_badges
 
-def award_coins(student_id, amount, source, teacher_id=None):
+def award_coins(student_id, amount, source, description=None):
     """
     Business logic for awarding coins to a student.
     Ensures balance is updated and transaction is logged.
@@ -19,7 +19,6 @@ def award_coins(student_id, amount, source, teacher_id=None):
         # Log transaction
         transaction = CoinTransaction(
             student_id=student_id,
-            teacher_id=teacher_id,
             amount=amount,
             type='earn',
             source=source

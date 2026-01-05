@@ -103,7 +103,7 @@ class CoinTransaction(db.Model):
 class Badge(db.Model):
     __tablename__ = 'badges'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.String(255), nullable=True)
     requirement_text = db.Column(db.String(255), nullable=True)
     icon = db.Column(db.String(255), nullable=True)
@@ -114,6 +114,9 @@ class StudentBadge(db.Model):
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     badge_id = db.Column(db.Integer, db.ForeignKey('badges.id'), nullable=False)
     earned_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    __table_args__ = (db.UniqueConstraint('student_id', 'badge_id', name='_student_badge_uc'),)
+
     student = db.relationship('Student', backref=db.backref('badges', lazy=True))
     badge = db.relationship('Badge')
 

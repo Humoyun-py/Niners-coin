@@ -15,15 +15,19 @@ document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
             localStorage.setItem('user_name', response.full_name);
 
             // Redirect based on role
-            window.location.href = `pages/${response.role}/dashboard.html`;
+            const dashboardPath = `/pages/${response.role}/dashboard.html`;
+            console.log('Redirecting to:', dashboardPath);
+            window.location.href = dashboardPath;
+        } else {
+            throw new Error('Login muvaffaqiyatsiz: token topilmadi');
         }
     } catch (error) {
         console.error('Error logging in:', error);
         if (errorEl) {
-            errorEl.innerText = error.message;
+            errorEl.innerText = error.message || 'Login xatosi yuz berdi';
             errorEl.style.display = 'block';
         } else {
-            alert(error.message);
+            alert(error.message || 'Login xatosi yuz berdi');
         }
     }
 });

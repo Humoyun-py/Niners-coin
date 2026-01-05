@@ -115,7 +115,6 @@ const SidebarLoader = {
                     { href: 'notifications.html', label: `🔔 ${t('notifications')}` }
                 ]
             };
-
             const roleLinks = this.links[role] || [];
 
             // 3. Inject role links
@@ -127,6 +126,13 @@ const SidebarLoader = {
                     const isActive = currentPath === link.href ? 'active' : '';
                     return `<li><a href="${link.href}" class="nav-item ${isActive}">${link.label}</a></li>`;
                 }).join('');
+            }
+
+            // 3.1 Highlight Dashboard link if on dashboard.html
+            const currentPath = window.location.pathname.split('/').pop();
+            const dashboardLink = document.querySelector('a[href="dashboard.html"]');
+            if (dashboardLink && currentPath === 'dashboard.html') {
+                dashboardLink.classList.add('active');
             }
 
             // 4. Initialize dynamic data and highlighting
@@ -196,12 +202,13 @@ const SidebarLoader = {
         if (!toggleBtn) {
             toggleBtn = document.createElement('button');
             toggleBtn.className = 'menu-toggle';
-            toggleBtn.innerHTML = '☰';
-            // Failsafe styles to ensure visibility on mobile
-            toggleBtn.style.zIndex = '9999';
+            toggleBtn.innerHTML = '<i class="fas fa-bars"></i> '; // FontAwesome icon
+            // Inline styles as backup
+            toggleBtn.style.zIndex = '999999';
             toggleBtn.style.position = 'fixed';
             toggleBtn.style.bottom = '24px';
             toggleBtn.style.right = '24px';
+            toggleBtn.style.display = 'flex';
             document.body.appendChild(toggleBtn);
         }
 

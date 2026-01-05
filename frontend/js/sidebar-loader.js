@@ -197,18 +197,19 @@ const SidebarLoader = {
     },
 
     addMobileToggle() {
-        // 1. Create/Get Toggle Button
+        // 1. Create/Get Toggle Button (Idempotent)
         let toggleBtn = document.querySelector('.menu-toggle');
         if (!toggleBtn) {
             toggleBtn = document.createElement('button');
             toggleBtn.className = 'menu-toggle';
-            toggleBtn.innerHTML = '<i class="fas fa-bars"></i> '; // FontAwesome icon
-            // Inline styles as backup
+            toggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            // Inline critical styles
             toggleBtn.style.zIndex = '999999';
             toggleBtn.style.position = 'fixed';
             toggleBtn.style.bottom = '24px';
             toggleBtn.style.right = '24px';
             toggleBtn.style.display = 'flex';
+            toggleBtn.style.cursor = 'pointer';
             document.body.appendChild(toggleBtn);
         }
 
@@ -220,22 +221,58 @@ const SidebarLoader = {
             document.body.appendChild(overlay);
         }
 
-        // 3. Bind Events (only if sidebar exists and not already bound)
-        const sidebar = document.querySelector('.sidebar');
-        if (sidebar && !toggleBtn.hasAttribute('data-bound')) {
-            toggleBtn.addEventListener('click', () => {
-                sidebar.classList.toggle('active');
-                overlay.classList.toggle('active');
-                toggleBtn.innerHTML = sidebar.classList.contains('active') ? '✕' : '☰';
-            });
+        // 3. Global Event Delegation (The "Nuclear" Option)
+        // Checks clicks on the DOCUMENT level, impossible to miss
+        if (!window.sidebarToggleBound) {
+            document.addEventListener('click', (e) => {
+                const sidebar = document.querySelector('.sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                const btn = document.querySelector('.menu-toggle');
 
-            overlay.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-                toggleBtn.innerHTML = '☰';
-            });
+                if (!sidebar || !overlay || !btn) return;
 
-            toggleBtn.setAttribute('data-bound', 'true');
+                // Case A: Clicked on Toggle Button (or icon inside)
+                if (e.target.closest('.menu-toggle')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Toggle clicked via delegation');
+
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+
+                    // Icon/Text update
+                    const icon = btn.querySelector('i');
+                    const isActive = sidebar.classList.contains('active');
+
+                    if (icon) {
+                        icon.className = isActive ? 'fas fa-times' : 'fas fa-bars';
+                    } else {
+                        btn.innerHTML = isActive ? '✕' : '☰';
+                    }
+                    return;
+                }
+
+                // Case B: Clicked on Overlay
+                if (e.target.closest('.sidebar-overlay')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Overlay clicked via delegation');
+
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+
+                    // Reset icon
+                    const icon = btn.querySelector('i');
+                    if (icon) {
+                        icon.className = 'fas fa-bars';
+                    } else {
+                        btn.innerHTML = '☰';
+                    }
+                }
+            }, true); // Use capture phase for maximum priority
+
+            window.sidebarToggleBound = true;
+            console.log('Global Sidebar Delegation Bound');
         }
     }
 };

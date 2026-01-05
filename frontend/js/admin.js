@@ -101,8 +101,16 @@ const AdminModule = {
     async addUser(role) {
         let extraFields = '';
         if (role === 'student') {
-            const classes = await api.get('/admin/classes');
-            const options = classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            let options = '<option value="">Failed to load classes</option>';
+            try {
+                const classes = await api.get('/admin/classes');
+                options = classes.length
+                    ? classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('')
+                    : '<option value="">No classes available</option>';
+            } catch (e) {
+                console.error("Error loading classes:", e);
+            }
+
             extraFields = `
                 <div class="input-group">
                     <label class="input-label">Assign Group (Optional)</label>

@@ -230,12 +230,16 @@ body {
     }
 
     .sidebar {
-        left: calc(-1 * var(--sidebar-width) - var(--space-l));
+        left: 0;
+        transform: translateX(-110%);
+        /* Use transform for hiding */
         /* Hidden by default */
         box-shadow: var(--shadow-premium);
     }
 
     .sidebar.active {
+        transform: translateX(0);
+        /* Slide in */
         left: 0;
         /* Show when active */
     }
@@ -256,10 +260,13 @@ body {
         position: fixed;
         bottom: var(--space-l);
         right: var(--space-l);
-        z-index: 9999;
+        z-index: 999999 !important;
+        /* Force top layer */
         align-items: center;
         justify-content: center;
         transition: var(--transition);
+        pointer-events: auto !important;
+        /* Force clickable */
     }
 
     .menu-toggle:hover {

@@ -4,30 +4,48 @@ const API_URL = window.location.hostname === 'localhost' || window.location.host
     : '/api';
 
 const api = {
-    async post(endpoint, data) {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify(data)
-        });
+    async handleResponse(response) {
+        if (response.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+            throw new Error('Session expired');
+        }
         const result = await response.json();
         if (!response.ok) throw new Error(result.msg || 'Request failed');
         return result;
     },
 
+    async post(endpoint, data) {
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(data)
+            });
+            return this.handleResponse(response);
+        } catch (error) {
+            console.error('API POST Error:', error);
+            throw error;
+        }
+    },
+
     async get(endpoint) {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
-        });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.msg || 'Request failed');
-        return result;
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            return this.handleResponse(response);
+        } catch (error) {
+            console.error('API GET Error:', error);
+            throw error;
+        }
     },
 
     async put(endpoint, data) {

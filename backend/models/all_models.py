@@ -75,6 +75,15 @@ class Teacher(db.Model):
     daily_limit = db.Column(db.Float, default=500.0) # Default limit per teacher
     user = db.relationship('User', backref=db.backref('teacher_profile', uselist=False))
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "full_name": self.user.full_name if self.user else "N/A",
+            "subject": self.subject or "N/A",
+            "rating": self.rating,
+            "daily_limit": self.daily_limit
+        }
+
 class Parent(db.Model):
     __tablename__ = 'parents'
     id = db.Column(db.Integer, primary_key=True)
@@ -87,6 +96,20 @@ class Class(db.Model):
     name = db.Column(db.String(50), nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=True)
     students = db.relationship('Student', backref='student_class', lazy=True)
+
+    def to_dict(self):
+        teacher_name = "N/A"
+        if self.teacher_id:
+            teacher = Teacher.query.get(self.teacher_id)
+            if teacher and teacher.user:
+                teacher_name = teacher.user.full_name
+        
+        return {
+            "id": self.id,
+            "name": self.name,
+            "teacher_name": teacher_name,
+            "student_count": len(self.students) if self.students else 0
+        }
 
 class CoinTransaction(db.Model):
     __tablename__ = 'coin_transactions'

@@ -92,27 +92,69 @@ const SidebarLoader = {
 
             this.links = {
                 admin: [
-                    { href: 'users.html', label: `👥 ${t('users')}` },
-                    { href: 'classes.html', label: `🏫 ${t('groups')}` },
-                    { href: 'coin-control.html', label: `🟡 ${t('coin_control')}` },
-                    { href: 'reports.html', label: `📊 ${t('learning_reports')}` },
-                    { href: 'appeals.html', label: `📩 ${t('appeals')}` },
-                    { href: 'audit-logs.html', label: `🛡️ ${t('security_logs')}` },
-                    { href: 'shop-management.html', label: `🛍️ ${t('shop_management')}` },
-                    { href: 'badges.html', label: `🏆 ${t('badge_management')}` }
+                    {
+                        category: t('management') || 'Management',
+                        icon: 'fas fa-tasks',
+                        items: [
+                            { href: 'users.html', label: t('users'), icon: 'fas fa-users' },
+                            { href: 'classes.html', label: t('groups'), icon: 'fas fa-chalkboard' },
+                            { href: 'badges.html', label: t('badge_management'), icon: 'fas fa-medal' }
+                        ]
+                    },
+                    {
+                        category: t('finance_shop') || 'Finance & Shop',
+                        icon: 'fas fa-shopping-cart',
+                        items: [
+                            { href: 'coin-control.html', label: t('coin_control'), icon: 'fas fa-coins' },
+                            { href: 'shop-management.html', label: t('shop_management'), icon: 'fas fa-store' }
+                        ]
+                    },
+                    {
+                        category: t('reports_security') || 'Data & Security',
+                        icon: 'fas fa-shield-alt',
+                        items: [
+                            { href: 'reports.html', label: t('learning_reports'), icon: 'fas fa-chart-bar' },
+                            { href: 'appeals.html', label: t('appeals'), icon: 'fas fa-envelope-open-text' },
+                            { href: 'audit-logs.html', label: t('security_logs'), icon: 'fas fa-user-shield' }
+                        ]
+                    }
                 ],
                 director: [
-                    { href: 'analytics.html', label: `📈 ${t('analytics')}` },
-                    { href: 'teachers-rating.html', label: `👨‍🏫 ${t('rating')}` },
-                    { href: 'coin-policy.html', label: `🟡 ${t('coin_policy')}` },
-                    { href: 'users.html', label: `👥 ${t('users')}` },
-                    { href: 'classes.html', label: `🏫 ${t('groups')}` },
-                    { href: 'coin-control.html', label: `🟡 ${t('coin_control')}` },
-                    { href: 'reports.html', label: `📊 ${t('learning_reports')}` },
-                    { href: 'appeals.html', label: `📩 ${t('appeals')}` },
-                    { href: 'audit-logs.html', label: `🛡️ ${t('security_logs')}` },
-                    { href: 'shop-management.html', label: `🛍️ ${t('shop_management')}` },
-                    { href: 'badges.html', label: `🏆 ${t('badge_management')}` }
+                    {
+                        category: t('analytics_policy') || 'Analytics & Policy',
+                        icon: 'fas fa-chart-line',
+                        items: [
+                            { href: 'analytics.html', label: t('analytics'), icon: 'fas fa-chart-pie' },
+                            { href: 'teachers-rating.html', label: t('rating'), icon: 'fas fa-star' },
+                            { href: 'coin-policy.html', label: t('coin_policy'), icon: 'fas fa-file-invoice-dollar' }
+                        ]
+                    },
+                    {
+                        category: t('management') || 'Management',
+                        icon: 'fas fa-tasks',
+                        items: [
+                            { href: 'users.html', label: t('users'), icon: 'fas fa-users' },
+                            { href: 'classes.html', label: t('groups'), icon: 'fas fa-chalkboard' },
+                            { href: 'badges.html', label: t('badge_management'), icon: 'fas fa-medal' }
+                        ]
+                    },
+                    {
+                        category: t('finance_shop') || 'Finance & Shop',
+                        icon: 'fas fa-shopping-cart',
+                        items: [
+                            { href: 'coin-control.html', label: t('coin_control'), icon: 'fas fa-coins' },
+                            { href: 'shop-management.html', label: t('shop_management'), icon: 'fas fa-store' }
+                        ]
+                    },
+                    {
+                        category: t('reports_security') || 'Data & Security',
+                        icon: 'fas fa-shield-alt',
+                        items: [
+                            { href: 'reports.html', label: t('learning_reports'), icon: 'fas fa-chart-bar' },
+                            { href: 'appeals.html', label: t('appeals'), icon: 'fas fa-envelope-open-text' },
+                            { href: 'audit-logs.html', label: t('security_logs'), icon: 'fas fa-user-shield' }
+                        ]
+                    }
                 ],
                 teacher: [
                     { href: 'attendance.html', label: `📝 ${t('attendance')}` },
@@ -141,20 +183,36 @@ const SidebarLoader = {
             if (menuContainer) {
                 const currentPath = window.location.pathname.split('/').pop();
 
-                // Dashboard is already static in HTML, but we want to mark it active if needed
-                const dashboardLink = menuContainer.querySelector('a[href="dashboard.html"]');
-                if (dashboardLink && currentPath === 'dashboard.html') {
-                    dashboardLink.classList.add('active');
-                }
+                // Dashboard link should always be visible
+                let finalHtml = `<li><a href="dashboard.html" class="nav-item ${currentPath === 'dashboard.html' ? 'active' : ''}">🏠 ${t('dashboard')}</a></li>`;
 
-                // Append role-specific links
-                const linksHtml = roleLinks.map(link => {
-                    const isActive = currentPath === link.href ? 'active' : '';
-                    const href = link.href.startsWith('javascript:') ? link.href : link.href;
-                    return `<li><a href="${href}" class="nav-item ${isActive}">${link.label}</a></li>`;
-                }).join('');
+                roleLinks.forEach(item => {
+                    if (item.category) {
+                        // Check if any sub-item is active
+                        const isAnyActive = item.items.some(sub => currentPath === sub.href);
+                        const subLinks = item.items.map(sub => {
+                            const isActive = currentPath === sub.href ? 'active' : '';
+                            return `<li><a href="${sub.href}" class="nav-sub-item ${isActive}">${sub.label}</a></li>`;
+                        }).join('');
 
-                menuContainer.insertAdjacentHTML('beforeend', linksHtml);
+                        finalHtml += `
+                            <li class="nav-dropdown ${isAnyActive ? 'open' : ''}">
+                                <div class="nav-dropdown-toggle" onclick="this.parentElement.classList.toggle('open')">
+                                    <span><i class="${item.icon}"></i> ${item.category}</span>
+                                    <i class="fas fa-chevron-right arrow"></i>
+                                </div>
+                                <ul class="nav-dropdown-menu">
+                                    ${subLinks}
+                                </ul>
+                            </li>
+                        `;
+                    } else {
+                        const isActive = currentPath === item.href ? 'active' : '';
+                        finalHtml += `<li><a href="${item.href}" class="nav-item ${isActive}">${item.label}</a></li>`;
+                    }
+                });
+
+                menuContainer.innerHTML = finalHtml;
             }
 
             // 3.1 Highlight Dashboard link if on dashboard.html

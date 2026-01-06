@@ -7,8 +7,10 @@
     --secondary: #1A1A1A;
     --bg-white: #FFFFFF;
     --bg-body: #FDFEFE;
-    --text-dark: #1A1A1A;
-    --text-muted: #666666;
+    --text-dark: #111111;
+    /* Deeper black for high contrast */
+    --text-muted: #555555;
+    /* Darker grey for better readability */
     --border-light: #EEEEEE;
 
     /* Semantic Colors */
@@ -369,6 +371,95 @@ body {
 
 .nav-item i {
     font-size: var(--icon-md);
+}
+
+/* === Nav Dropdown Styles === */
+.nav-dropdown {
+    list-style: none;
+    margin-bottom: var(--space-xs);
+}
+
+.nav-dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-s) var(--space-m);
+    border-radius: var(--radius-md);
+    color: var(--text-dark);
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    font-size: var(--font-sm);
+    min-height: var(--touch-min);
+}
+
+.nav-dropdown-toggle:hover {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.nav-dropdown-toggle span {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+}
+
+.nav-dropdown-toggle .arrow {
+    font-size: 0.75rem;
+    transition: transform 0.3s ease;
+}
+
+.nav-dropdown.open .arrow {
+    transform: rotate(90deg);
+}
+
+.nav-dropdown-menu {
+    list-style: none;
+    padding-left: var(--space-l);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, opacity 0.3s ease;
+    opacity: 0;
+}
+
+.nav-dropdown.open .nav-dropdown-menu {
+    max-height: 500px;
+    opacity: 1;
+    margin-top: var(--space-3xs);
+}
+
+.nav-sub-item {
+    display: flex;
+    align-items: center;
+    padding: var(--space-2xs) var(--space-s);
+    border-radius: var(--radius-sm);
+    color: #444;
+    /* Darker than text-muted for better visibility */
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin-bottom: var(--space-3xs);
+    transition: var(--transition);
+    min-height: 2rem;
+}
+
+.nav-sub-item i {
+    width: 20px;
+    margin-right: var(--space-xs);
+    font-size: 0.9rem;
+    color: var(--primary-dark);
+    /* Accent color for icons */
+}
+
+.nav-sub-item:hover {
+    color: var(--text-dark);
+    background: rgba(0, 0, 0, 0.02);
+    transform: translateX(var(--space-3xs));
+}
+
+.nav-sub-item.active {
+    color: var(--primary-dark);
+    background: rgba(255, 215, 0, 0.05);
+    font-weight: 700;
 }
 
 .sidebar-footer {

@@ -285,16 +285,66 @@ def delete_user(user_id):
     if user.role in ['admin', 'director']:
         return jsonify({"msg": "Admin yoki Direktorni o'chirish mumkin emas!"}), 400
         
-    # Manual cleanup if cascade is not set up perfectly
-    if user.student_profile:
-        db.session.delete(user.student_profile)
-    if user.teacher_profile:
-        db.session.delete(user.teacher_profile)
+    try:
+        # Cascade Delete Manually
+        # 1. Linked logs / complaints / requests where user_id is FK
+        Complaint.query.filter_by(user_id=user.id).delete()
+        Notification.query.filter_by(user_id=user.id).delete()
+        AuditLog.query.filter_by(user_id=user.id).delete()
+        ApprovalRequest.query.filter_by(admin_id=user.id).delete()
         
-    db.session.delete(user)
-    db.session.commit()
-    log_event(get_jwt_identity(), f"Foydalanuvchi o'chirildi: {user.username}", severity='danger')
-    return jsonify({"msg": "Foydalanuvchi o'chirildi"}), 200
+        # 2. Student Specific
+        if user.role == 'student' and user.student_profile:
+            student = user.student_profile
+            # Delete related student data
+            StudentBadge.query.filter_by(student_id=student.id).delete()
+            Purchase.query.filter_by(student_id=student.id).delete()
+            CoinTransaction.query.filter_by(student_id=student.id).delete()
+            from models.all_models import Attendance, HomeworkSubmission, TestResult
+            Attendance.query.filter_by(student_id=student.id).delete()
+            HomeworkSubmission.query.filter_by(student_id=student.id).delete()
+            TestResult.query.filter_by(student_id=student.id).delete()
+            
+            db.session.delete(student)
+
+        # 3. Teacher Specific
+        if user.role == 'teacher' and user.teacher_profile:
+            teacher = user.teacher_profile
+            # Unlink classes
+            classes = Class.query.filter_by(teacher_id=teacher.id).all()
+            for c in classes:
+                c.teacher_id = None
+            
+            # Delete tests created by teacher
+            from models.all_models import Test
+            # Also their results? Cascade usually handles test results if test is deleted, 
+            # but we kept tests. If we delete teacher, we might want to keep tests or delete them.
+            # Let's keep tests but unlink? Or delete? Teacher deletion implies removing their stuff usually.
+            # Safe bet: Unlink or Delete. Let's delete Tests manually.
+            tests = Test.query.filter_by(teacher_id=teacher.id).all()
+            for t in tests:
+                TestResult.query.filter_by(test_id=t.id).delete()
+                db.session.delete(t)
+
+            CoinTransaction.query.filter_by(teacher_id=teacher.id).delete() # Issued by teacher
+            db.session.delete(teacher)
+
+        # 4. Parent Specific
+        if user.role == 'parent' and user.parent_profile:
+            db.session.delete(user.parent_profile)
+
+        db.session.delete(user)
+        db.session.commit()
+        log_event(get_jwt_identity(), f"Foydalanuvchi o'chirildi: {user.username}", severity='danger')
+        return jsonify({"msg": "Foydalanuvchi muvaffaqiyatli o'chirildi"}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        import traceback
+        error_msg = traceback.format_exc()
+        with open('debug_error.log', 'a', encoding='utf-8') as f:
+            f.write(f"\n--- DELETE ERROR {user_id} --- {datetime.utcnow()}\n{error_msg}\n")
+        return jsonify({"msg": f"O'chirishda xatolik: {str(e)}"}), 500
 
 @admin_bp.route('/classes', methods=['GET'])
 @jwt_required()
@@ -417,7 +467,11 @@ def get_audit_logs():
 def adjust_coins(user_id):
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     data = request.get_json()
-    amount = data.get('amount', 0)
+    try:
+        amount = int(data.get('amount', 0)) # Ensure int
+    except:
+        return jsonify({"msg": "Noto'g'ri miqdor"}), 400
+        
     reason = data.get('reason', 'Admin tuzatish')
     
     user = User.query.get_or_404(user_id)
@@ -426,10 +480,7 @@ def adjust_coins(user_id):
         
     from services.coin_engine import award_coins
     
-    # We use award_coins even for deduction (negative amount) effectively, 
-    # but the engine is designed for positive usually. 
-    # However, for simplicity and notification consistency:
-    
+    # Passing negative amount works fine in award_coins as it just adds
     success, msg = award_coins(user.student_profile.id, amount, f"Admin: {reason}")
     
     if success:

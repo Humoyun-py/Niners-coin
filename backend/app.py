@@ -113,6 +113,7 @@ def create_app():
                     print(f"Schema Sync: Added column {col_name} to {table} (if not exists)")
                 except Exception as e:
                     print(f"Schema Sync Warning for {table}.{col_name}: {e}")
+                    db.session.rollback() # Critical: Rollback to keep session valid
         
         db.session.commit()
 

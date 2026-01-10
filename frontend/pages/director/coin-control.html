@@ -37,39 +37,55 @@
         async function init() {
             const users = await api.get('/admin/users');
             allStudents = users.filter(u => u.role === 'student');
+            renderStudents(allStudents);
         }
 
-        function searchStudents() {
-            const query = document.getElementById('studentSearch').value.toLowerCase();
-            const results = allStudents.filter(s => s.full_name.toLowerCase().includes(query) || s.username.toLowerCase().includes(query));
-
+        function renderStudents(list) {
             const div = document.getElementById('searchResults');
-            if (!query) { div.innerHTML = ''; return; }
-
-            div.innerHTML = results.map(s => `
+            div.innerHTML = list.map(s => `
                 <div style="padding:15px; border-bottom:1px solid #EEE; display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 10px;">
                     <div>
                         <div style="font-weight:700;">${s.full_name}</div>
-                        <div style="font-size:0.8rem; color:#666;">@${s.username}</div>
+                        <div style="font-size:0.8rem; color:#666;">@${s.username} • Balance: ${s.debt_amount ? 'Blocked' : 'Active'}</div>
                     </div>
                     <button onclick="adjustCoinsPrompt(${s.id}, '${s.full_name}')" class="btn btn-secondary">Sozlash</button>
                 </div>
             `).join('');
         }
 
-        async function adjustCoinsPrompt(id, name) {
-            const amount = prompt(`${name} uchun coin miqdorini kiriting (ayirish uchun minus: -10):`);
-            if (!amount || isNaN(amount)) return;
-            const reason = prompt("Nima uchun o'zgarish qilinmoqda?");
+        function searchStudents() {
+            const query = document.getElementById('studentSearch').value.toLowerCase();
+            const results = allStudents.filter(s => s.full_name.toLowerCase().includes(query) || s.username.toLowerCase().includes(query));
+            renderStudents(results);
+        }
 
-            try {
-                const res = await api.post(`/admin/users/${id}/adjust-coins`, {
-                    amount: parseInt(amount),
-                    reason: reason
-                });
-                alert(res.msg);
-                location.reload();
-            } catch (e) { alert("Xatolik!"); }
+        function adjustCoinsPrompt(id, name) {
+            const content = `
+                <div class="input-group">
+                    <label class="input-label">Coin Miqdori (Ayirish uchun minus, masalan -10)</label>
+                    <input type="number" id="coinAmount" class="form-control" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Sabab (Majburiy)</label>
+                    <input type="text" id="coinReason" class="form-control" placeholder="Masalan: Uyga vazifa, jarima...">
+                </div>
+            `;
+
+            AdminModule.createModal(`Coin Sozlash: ${name}`, content, async () => {
+                const amount = document.getElementById('coinAmount').value;
+                const reason = document.getElementById('coinReason').value;
+
+                if (!amount || !reason) return alert("Iltimos, miqdor va sababni kiriting!");
+
+                try {
+                    const res = await api.post(`/admin/users/${id}/adjust-coins`, {
+                        amount: parseInt(amount),
+                        reason: reason
+                    });
+                    alert(res.msg);
+                    location.reload();
+                } catch (e) { alert("Xatolik: " + e.message); }
+            }, 'Tasdiqlash');
         }
 
         init();

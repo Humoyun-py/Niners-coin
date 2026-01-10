@@ -373,6 +373,21 @@ const AdminModule = {
         } catch (e) { alert("Error: " + e.message); }
     },
 
+    async deleteUser(userId, userName) {
+        this.createConfirm('Delete User', `Are you sure you want to permanently delete <b>${userName}</b>? This cannot be undone.`, async () => {
+            try {
+                await api.delete(`/admin/users/${userId}`);
+                alert("User deleted successfully!");
+                if (window.location.href.includes('users.html')) {
+                    if (typeof loadAllUsers === 'function') loadAllUsers();
+                    else location.reload();
+                } else {
+                    location.reload();
+                }
+            } catch (e) { alert("Error: " + e.message); }
+        });
+    },
+
     openShopManager() {
         window.location.href = 'shop-management.html';
     },

@@ -125,6 +125,9 @@
                                 <button onclick="AdminModule.toggleUserStatus(${u.id})" class="btn" style="padding: 6px 12px; font-size: 0.8rem; background: ${u.is_active ? '#FFF0F0' : '#E8F5E9'}; color: ${u.is_active ? '#C62828' : '#2E7D32'}; border: none;">
                                     ${u.is_active ? 'Block' : 'Unblock'}
                                 </button>
+                                <button onclick="AdminModule.deleteUser(${u.id}, '${u.username}')" class="btn" style="padding: 6px 12px; font-size: 0.8rem; background: #FFEBEE; color: #D32F2F; border: none;">
+                                    Delete
+                                </button>
                             `}
                             <button onclick="AdminModule.editUser(${u.id})" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; border-color: #EEE;">Edit</button>
                         </td>

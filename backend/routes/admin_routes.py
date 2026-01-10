@@ -30,11 +30,19 @@ def upload_image():
         
     if file:
         filename = secure_filename(file.filename)
-        # Unique filename using timestamp to avoid collisions
+        # Unique filename using timestamp
         import time
         filename = f"{int(time.time())}_{filename}"
         
-        upload_path = os.path.join('frontend', 'uploads', 'shop', filename)
+        # Absolute path relative to backend/routes/../.. -> root
+        # We assume root is where app.py is, and frontend is in root/frontend
+        base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+        upload_dir = os.path.join(base_dir, 'frontend', 'uploads', 'shop')
+        
+        if not os.path.exists(upload_dir):
+            os.makedirs(upload_dir)
+            
+        upload_path = os.path.join(upload_dir, filename)
         file.save(upload_path)
         
         # Return the public URL path
@@ -266,6 +274,27 @@ def toggle_block(user_id):
     log_event(get_jwt_identity(), f"Foydalanuvchi {user.username} {action}. Sabab: {user.block_reason}, Qarz: {user.debt_amount}", severity='warning')
     db.session.commit()
     return jsonify({"msg": f"Foydalanuvchi {action}", "is_active": user.is_active}), 200
+
+@admin_bp.route('/users/<int:user_id>', methods=['DELETE'])
+@jwt_required()
+def delete_user(user_id):
+    if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
+    user = User.query.get_or_404(user_id)
+    
+    # Prevent deleting Admins or Directors
+    if user.role in ['admin', 'director']:
+        return jsonify({"msg": "Admin yoki Direktorni o'chirish mumkin emas!"}), 400
+        
+    # Manual cleanup if cascade is not set up perfectly
+    if user.student_profile:
+        db.session.delete(user.student_profile)
+    if user.teacher_profile:
+        db.session.delete(user.teacher_profile)
+        
+    db.session.delete(user)
+    db.session.commit()
+    log_event(get_jwt_identity(), f"Foydalanuvchi o'chirildi: {user.username}", severity='danger')
+    return jsonify({"msg": "Foydalanuvchi o'chirildi"}), 200
 
 @admin_bp.route('/classes', methods=['GET'])
 @jwt_required()

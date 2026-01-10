@@ -101,7 +101,13 @@ def run_payment_check():
 def get_users():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     try:
-        users = User.query.all()
+        role_filter = request.args.get('role', 'all')
+        
+        query = User.query
+        if role_filter != 'all':
+            query = query.filter_by(role=role_filter)
+            
+        users = query.all()
         result = []
         for u in users:
             try:

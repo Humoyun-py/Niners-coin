@@ -65,7 +65,32 @@ def create_app():
             )
             director.set_password('director123')
             db.session.add(director)
-            
+        
+        # Seed Specific Teachers (Komron, Maruf, Mavlon, Madina, Muslima)
+        initial_teachers = ["Komron", "Maruf", "Mavlon", "Madina", "Muslima"]
+        from models.all_models import Teacher
+        
+        for name in initial_teachers:
+            if not User.query.filter_by(username=name).first():
+                new_teacher = User(
+                    username=name,
+                    email=f"{name.lower()}@niners.uz",
+                    role='teacher',
+                    full_name=name
+                )
+                new_teacher.set_password(name) # Password same as name/username
+                db.session.add(new_teacher)
+                db.session.flush() # flush to get ID
+                
+                # Create Teacher Profile
+                teacher_profile = Teacher(
+                    user_id=new_teacher.id,
+                    subject="General", # Default subject
+                    daily_limit=500.0
+                )
+                db.session.add(teacher_profile)
+                print(f"Seeded Teacher: {name}")
+        
         db.session.commit()
 
     def sync_schema():

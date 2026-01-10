@@ -18,22 +18,50 @@
             </p>
         </header>
 
-        <div class="stats-grid" style="margin-bottom: 30px;">
-            <div class="card">
-                <p class="font-xs" style="color: var(--text-muted); font-weight: 700;">UMUMIY KOINLAR</p>
-                <h3 id="totalCoins" class="font-xl">0</h3>
+        <style>
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+
+            .stat-card {
+                padding: 16px;
+                border: 1px solid var(--border-light);
+                border-radius: 12px;
+                background: white;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                box-shadow: var(--shadow-soft);
+            }
+        </style>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <p class="font-xs"
+                    style="color: var(--text-muted); font-weight: 700; margin-bottom: 4px; font-size: 0.75rem;">UMUMIY
+                    KOINLAR</p>
+                <h3 id="totalCoins" style="font-size: 1.5rem; color: var(--text-dark);">0</h3>
             </div>
-            <div class="card">
-                <p class="font-xs" style="color: var(--text-muted); font-weight: 700;">O'QUVCHILAR</p>
-                <h3 id="totalStudents" class="font-xl">0</h3>
+            <div class="stat-card">
+                <p class="font-xs"
+                    style="color: var(--text-muted); font-weight: 700; margin-bottom: 4px; font-size: 0.75rem;">
+                    O'QUVCHILAR</p>
+                <h3 id="totalStudents" style="font-size: 1.5rem; color: var(--text-dark);">0</h3>
             </div>
-            <div class="card">
-                <p class="font-xs" style="color: var(--text-muted); font-weight: 700;">USTOZLAR</p>
-                <h3 id="totalTeachers" class="font-xl">0</h3>
+            <div class="stat-card">
+                <p class="font-xs"
+                    style="color: var(--text-muted); font-weight: 700; margin-bottom: 4px; font-size: 0.75rem;">USTOZLAR
+                </p>
+                <h3 id="totalTeachers" style="font-size: 1.5rem; color: var(--text-dark);">0</h3>
             </div>
-            <div class="card" style="border-left: 4px solid var(--primary);">
-                <p class="font-xs" style="color: var(--text-muted); font-weight: 700;">GURUHLAR</p>
-                <h3 id="totalGroups" class="font-xl">0</h3>
+            <div class="stat-card" style="border-left: 4px solid var(--primary);">
+                <p class="font-xs"
+                    style="color: var(--text-muted); font-weight: 700; margin-bottom: 4px; font-size: 0.75rem;">GURUHLAR
+                </p>
+                <h3 id="totalGroups" style="font-size: 1.5rem; color: var(--primary-alt);">0</h3>
             </div>
         </div>
 

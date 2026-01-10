@@ -27,27 +27,50 @@
             </button>
         </header>
 
+        <style>
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+                margin-bottom: 24px;
+            }
+
+            .stat-card {
+                padding: 16px;
+                border: 1px solid var(--border-light);
+                border-radius: 12px;
+                background: white;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                box-shadow: var(--shadow-soft);
+            }
+        </style>
+
         <div class="stats-grid">
-            <div class="card">
-                <p class="font-xs" style="color: var(--text-muted); font-weight: 700;" data-i18n="total_users">TOTAL
-                    USERS</p>
-                <h3 id="totalUsers" class="font-xl">0</h3>
+            <div class="stat-card">
+                <p class="font-xs"
+                    style="color: var(--text-muted); font-weight: 700; margin-bottom: 4px; font-size: 0.75rem;"
+                    data-i18n="total_users">TOTAL USERS</p>
+                <h3 id="totalUsers" style="font-size: 1.5rem; color: var(--text-dark);">0</h3>
             </div>
-            <div class="card">
-                <p class="font-xs" style="color: var(--text-muted); font-weight: 700;" data-i18n="total_classes">TOTAL
-                    GROUPS</p>
-                <h3 id="totalClasses" class="font-xl">0</h3>
+            <div class="stat-card">
+                <p class="font-xs"
+                    style="color: var(--text-muted); font-weight: 700; margin-bottom: 4px; font-size: 0.75rem;"
+                    data-i18n="total_classes">TOTAL GROUPS</p>
+                <h3 id="totalClasses" style="font-size: 1.5rem; color: var(--text-dark);">0</h3>
             </div>
-            <div class="card" style="border-left: 4px solid var(--primary);">
-                <p class="font-xs" style="color: var(--text-muted); font-weight: 700;" data-i18n="new_appeals">NEW
-                    APPEALS</p>
-                <h3 id="pendingComplaints" class="font-xl" style="color: var(--primary-alt);">0</h3>
+            <div class="stat-card" style="border-left: 4px solid var(--primary);">
+                <p class="font-xs"
+                    style="color: var(--text-muted); font-weight: 700; margin-bottom: 4px; font-size: 0.75rem;"
+                    data-i18n="new_appeals">NEW APPEALS</p>
+                <h3 id="pendingComplaints" style="font-size: 1.5rem; color: var(--primary-alt);">0</h3>
             </div>
         </div>
 
         <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
             <div class="card" style="padding: 24px;">
-                <h3 style="margin-bottom: 20px;" data-i18n="recently_added_users">Recently Added Users</h3>
+                <h3 style="margin-bottom: 20px;" data-i18n="users">Recently Added Users</h3>
                 <div class="table-wrapper">
                     <table class="responsive-table">
                         <thead>

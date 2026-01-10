@@ -13,12 +13,44 @@
 <body class="dashboard-grid">
     <div id="sidebarContainer"></div>
     <main class="main-content">
+        <style>
+            .filter-btn {
+                padding: 8px 16px;
+                border: 1px solid var(--border-light);
+                background: white;
+                border-radius: 8px;
+                cursor: pointer;
+                font-weight: 600;
+                font-size: 0.9rem;
+                color: var(--text-muted);
+                transition: 0.2s;
+            }
+
+            .filter-btn:hover {
+                background: #F5F5F5;
+            }
+
+            .filter-btn.active {
+                background: var(--primary-gradient);
+                color: var(--text-dark);
+                border-color: transparent;
+                box-shadow: var(--shadow-soft);
+            }
+        </style>
+
         <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <div>
                 <h2>User Management</h2>
-                <p style="color: var(--text-muted);">List of all students, teachers, and other users.</p>
+                <p style="color: var(--text-muted);">List of all users based on roles.</p>
+                <div style="display: flex; gap: 8px; margin-top: 12px;">
+                    <button class="filter-btn active" onclick="loadAllUsers('all', this)">All</button>
+                    <button class="filter-btn" onclick="loadAllUsers('student', this)">Students</button>
+                    <button class="filter-btn" onclick="loadAllUsers('teacher', this)">Teachers</button>
+                    <button class="filter-btn" onclick="loadAllUsers('admin', this)">Admins</button>
+                    <button class="filter-btn" onclick="loadAllUsers('director', this)">Directors</button>
+                </div>
             </div>
-            <div style="display: flex; gap: 12px;">
+            <div style="display: flex; gap: 12px; align-items: center;">
                 <button onclick="AdminModule.addUser('student')" class="btn btn-primary">+ New Student</button>
                 <button onclick="AdminModule.addUser('teacher')" class="btn btn-secondary">+ New Teacher</button>
             </div>
@@ -51,10 +83,16 @@
     <script src="../../js/admin.js"></script>
     <script src="../../js/sidebar-loader.js"></script>
     <script>
-        async function loadAllUsers() {
+        async function loadAllUsers(role = 'all', btn = null) {
             LanguageModule.init();
+
+            // Handle active button state
+            if (btn) {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
             try {
-                const users = await api.get('/admin/users');
+                const users = await api.get(`/admin/users?role=${role}`);
                 const tbody = document.getElementById('fullUserTableBody');
                 tbody.innerHTML = users.map(u => `
                     <tr style="border-bottom: 1px solid var(--border-light); transition: 0.2s;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">

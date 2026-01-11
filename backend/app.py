@@ -67,31 +67,123 @@ def create_app():
             db.session.add(director)
         
         # Seed Specific Teachers (Komron, Maruf, Mavlon, Madina, Muslima)
+        from models.all_models import Teacher, Student, Class, SystemSetting
+        
+        # 1. Check if already seeded
+        if SystemSetting.get_val('sample_data_seeded') == 'true':
+            return
+
+        print("\n" + "="*50)
+        print("🚀 INITIALIZING SAMPLE DATA SEEDING...")
+        print("="*50)
+
+        teacher_map = {} # To keep track of teacher IDs
         initial_teachers = ["Komron", "Maruf", "Mavlon", "Madina", "Muslima"]
-        from models.all_models import Teacher
         
         for name in initial_teachers:
-            if not User.query.filter_by(username=name).first():
-                new_teacher = User(
+            user = User.query.filter_by(username=name).first()
+            if not user:
+                user = User(
                     username=name,
                     email=f"{name.lower()}@niners.uz",
                     role='teacher',
                     full_name=name
                 )
-                new_teacher.set_password(name) # Password same as name/username
-                db.session.add(new_teacher)
-                db.session.flush() # flush to get ID
+                user.set_password(name)
+                db.session.add(user)
+                db.session.flush()
                 
-                # Create Teacher Profile
                 teacher_profile = Teacher(
-                    user_id=new_teacher.id,
-                    subject="General", # Default subject
+                    user_id=user.id,
+                    subject="General",
                     daily_limit=500.0
                 )
                 db.session.add(teacher_profile)
-                print(f"Seeded Teacher: {name}")
-        
+                db.session.flush()
+                print(f"✅ Created Teacher: {name}")
+                teacher_map[name] = teacher_profile.id
+            else:
+                if user.teacher_profile:
+                    teacher_map[name] = user.teacher_profile.id
+
+        # Full Sample Data for KOMRON and MAVLON
+        KOMRON_GROUPS_DCJ = [
+            {"name": "Komron - DCJ - 08:30 - Guruh 1", "schedule_days": "Dushanba|Chorshanba|Juma", "schedule_time": "08:30", "students": ["Bilol", "Nurmuhammad"]},
+            {"name": "Komron - DCJ - 10:30 - Guruh 2", "schedule_days": "Dushanba|Chorshanba|Juma", "schedule_time": "10:30", "students": ["Mubina", "Sulaymon", "Iymona", "Hilola", "Asolat", "Asalxon", "Ezoza", "Ziyoda", "Munisa"]},
+            {"name": "Komron - DCJ - 12:30 - Guruh 3", "schedule_days": "Dushanba|Chorshanba|Juma", "schedule_time": "12:30", "students": ["Abdulloh"]},
+            {"name": "Komron - DCJ - 14:00 - Guruh 4", "schedule_days": "Dushanba|Chorshanba|Juma", "schedule_time": "14:00", "students": ["Madina", "Xadicha", "Gulnoza", "Robiya"]},
+            {"name": "Komron - DCJ - 15:30 - Guruh 5", "schedule_days": "Dushanba|Chorshanba|Juma", "schedule_time": "15:30", "students": ["Shaxina", "Baxtinisso", "Gulbaxor", "Firdavs"]},
+            {"name": "Komron - DCJ - 17:00 - Guruh 6", "schedule_days": "Dushanba|Chorshanba|Juma", "schedule_time": "17:00", "students": ["Mardon", "Odil", "Asadbek", "Rushana", "Abdulloh"]},
+            {"name": "Komron - DCJ - 18:30 - Guruh 7", "schedule_days": "Dushanba|Chorshanba|Juma", "schedule_time": "18:30", "students": ["Bexruz", "Shaxina"]}
+        ]
+        KOMRON_GROUPS_SPS = [
+            {"name": "Komron - SPS - 10:00 - Guruh 1", "schedule_days": "Seshanba|Payshanba|Shanba", "schedule_time": "10:00", "students": ["Anasbek", "Xurshid", "Abdurahmon", "Shamshod", "Muhammadamin", "Momin", "Zebo", "Tamila", "Dilsora"]},
+            {"name": "Komron - SPS - 14:00 - Guruh 2", "schedule_days": "Seshanba|Payshanba|Shanba", "schedule_time": "14:00", "students": ["Nigora"]},
+            {"name": "Komron - SPS - 15:30 - Guruh 3", "schedule_days": "Seshanba|Payshanba|Shanba", "schedule_time": "15:30", "students": ["Dilshoda", "Abduvali", "Husan"]},
+            {"name": "Komron - SPS - 17:00 - Guruh 4", "schedule_days": "Seshanba|Payshanba|Shanba", "schedule_time": "17:00", "students": ["Yerdana", "Artyom"]},
+            {"name": "Komron - SPS - 18:30 - Guruh 5", "schedule_days": "Seshanba|Payshanba|Shanba", "schedule_time": "18:30", "students": ["Ilhom", "Davron", "Amir"]},
+            {"name": "Komron - SPS - 20:00 - Guruh 6", "schedule_days": "Seshanba|Payshanba|Shanba", "schedule_time": "20:00", "students": ["Bilol"]}
+        ]
+        MAVLON_GROUPS = [
+            {"name": "Mavlon - DCJ - 14:30 - Guruh 1", "schedule_days": "Dushanba|Chorshanba|Juma", "schedule_time": "14:30", "students": ["Kamron", "Afruza", "Zilola", "Muslima"]},
+            {"name": "Mavlon - DCJ - 16:00 - Guruh 2", "schedule_days": "Dushanba|Chorshanba|Juma", "schedule_time": "16:00", "students": ["Mubina", "Usmon1", "Usmon2", "Shaxzoda"]}
+        ]
+
+        all_seed_data = [
+            {"teacher": "Komron", "groups": KOMRON_GROUPS_DCJ + KOMRON_GROUPS_SPS},
+            {"teacher": "Mavlon", "groups": MAVLON_GROUPS}
+        ]
+
+        for teacher_entry in all_seed_data:
+            t_id = teacher_map.get(teacher_entry["teacher"])
+            if not t_id: 
+                print(f"⚠️ Skipping data for {teacher_entry['teacher']} - profile not found")
+                continue
+
+            for group in teacher_entry["groups"]:
+                # 1. Create Class
+                existing_class = Class.query.filter_by(name=group["name"]).first()
+                if not existing_class:
+                    existing_class = Class(
+                        name=group["name"], 
+                        teacher_id=t_id,
+                        schedule_days=group["schedule_days"],
+                        schedule_time=group["schedule_time"]
+                    )
+                    db.session.add(existing_class)
+                    db.session.flush()
+                    print(f"🏫 Created Class: {group['name']}")
+
+                # 2. Create Students
+                for s_name in group["students"]:
+                    base_username = s_name.lower().replace(" ", "_").replace("'", "")
+                    username = base_username
+                    counter = 1
+                    while User.query.filter_by(username=username).first():
+                        username = f"{base_username}{counter}"
+                        counter += 1
+                    
+                    if not User.query.filter_by(full_name=s_name, role='student').join(Student).filter(Student.class_id==existing_class.id).first():
+                        s_user = User(
+                            username=username,
+                            email=f"{username}@student.uz",
+                            role='student',
+                            full_name=s_name
+                        )
+                        s_user.set_password(f"{base_username}09") 
+                        db.session.add(s_user)
+                        db.session.flush()
+
+                        s_profile = Student(user_id=s_user.id, class_id=existing_class.id)
+                        db.session.add(s_profile)
+                        print(f"👤 Created Student: {s_name} in {group['name']}")
+
+        # Mark as seeded
+        SystemSetting.set_val('sample_data_seeded', 'true', 'Flag to prevent duplicate sample seeding')
         db.session.commit()
+        print("="*50)
+        print("🎉 SAMPLE DATA SEEDING COMPLETE!")
+        print("="*50 + "\n")
 
     def sync_schema():
         from sqlalchemy import text

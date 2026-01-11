@@ -133,6 +133,7 @@ def get_users():
                     "is_active": u.is_active,
                     "block_reason": u.block_reason,
                     "debt_amount": u.debt_amount,
+                    "coin_balance": u.student_profile.coin_balance if u.student_profile else 0.0,
                     "daily_limit": limit
                 })
             except Exception as e:
@@ -388,7 +389,12 @@ def create_class():
         # Maybe it IS a Teacher.id
         teacher = Teacher.query.get(teacher_user_id)
         
-    new_class = Class(name=data.get('name'), teacher_id=teacher.id if teacher else None)
+    new_class = Class(
+        name=data.get('name'), 
+        teacher_id=teacher.id if teacher else None,
+        schedule_days=data.get('schedule_days'),
+        schedule_time=data.get('schedule_time')
+    )
     db.session.add(new_class)
     db.session.commit()
     log_event(get_jwt_identity(), f"Yangi sinf yaratildi: {new_class.name}")
@@ -402,6 +408,8 @@ def update_class(class_id):
     cls = Class.query.get_or_404(class_id)
     
     cls.name = data.get('name', cls.name)
+    cls.schedule_days = data.get('schedule_days', cls.schedule_days)
+    cls.schedule_time = data.get('schedule_time', cls.schedule_time)
     
     teacher_user_id = data.get('teacher_id')
     if teacher_user_id:

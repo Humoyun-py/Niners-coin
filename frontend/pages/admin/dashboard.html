@@ -13,16 +13,15 @@
     <aside id="sidebarContainer" class="sidebar"></aside>
 
     <main class="main-content">
-        <header class="dashboard-header">
+        <header class="dashboard-header flex-wrap-mobile">
             <div class="header-left">
                 <div>
-                    <h1 id="userNameDisplay" class="font-lg" style="margin-bottom: 4px;">Admin Management</h1>
-                    <p class="font-xs" style="color: var(--text-muted);" data-i18n="admin_subtitle">Manage users,
-                        classes, and system integrity.</p>
+                    <h1 id="userNameDisplay">Admin Management</h1>
+                    <p class="user-role-badge">System Overiew</p>
                 </div>
             </div>
 
-            <button onclick="requestDirectorApproval()" class="btn btn-primary" data-i18n="request_director">
+            <button onclick="requestDirectorApproval()" class="btn btn-primary">
                 <i class="fas fa-paper-plane"></i> Approval
             </button>
         </header>

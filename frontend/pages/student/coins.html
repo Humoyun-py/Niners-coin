@@ -8,23 +8,29 @@
     <link rel="stylesheet" href="../../styles/main.css">
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <h2>My Coins</h2>
-            <div class="card"
-                style="margin-top:20px; background:white; padding:24px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
-                <div style="font-size: 3rem; font-weight: 700;"><span id="balance">0</span> <span
-                        style="color:var(--primary);">🟡</span></div>
-                <p style="color:var(--text-muted);">Current balance</p>
-                <hr style="margin:20px 0; border:0; border-top:1px solid #EEE;">
-                <h3>Transaction History</h3>
-                <div id="history" style="margin-top:15px;">
-                    <p style="text-align:center; color:#999;">Loading...</p>
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>My Coins</h2>
+                    <p class="user-role-badge">Student Panel</p>
                 </div>
             </div>
-        </main>
+        </header>
+        <div class="card"
+            style="margin-top:20px; background:white; padding:24px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.05);">
+            <div style="font-size: clamp(2rem, 10vw, 3rem); font-weight: 700;"><span id="balance">0</span> <span
+                    style="color:var(--primary);">🟡</span></div>
+            <p style="color:var(--text-muted);">Current balance</p>
+            <hr style="margin:20px 0; border:0; border-top:1px solid #EEE;">
+            <h3>Transaction History</h3>
+            <div id="history" style="margin-top:15px;">
+                <p style="text-align:center; color:#999;">Loading...</p>
+            </div>
+        </div>
+    </main>
     </div>
     <script src="../../js/translations.js"></script>
     <script src="../../js/api.js"></script>
@@ -39,7 +45,7 @@
                     const history = document.getElementById('history');
                     if (data.recent_activity.length > 0) {
                         history.innerHTML = data.recent_activity.map(a => `
-                            <div style="padding:10px; border-bottom:1px solid #F5F5F5; display:flex; justify-content:space-between;">
+                            <div class="flex-wrap-mobile" style="padding:10px; border-bottom:1px solid #F5F5F5; display:flex; justify-content:space-between; align-items: center; gap: 10px;">
                                 <span>${a.source}</span> 
                                 <b style="color:${a.type === 'earn' ? '#2ECC71' : '#E74C3C'}">${a.amount > 0 ? '+' : ''}${a.amount} 🟡</b>
                             </div>

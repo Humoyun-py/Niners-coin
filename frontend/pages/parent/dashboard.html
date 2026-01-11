@@ -10,43 +10,45 @@
     <link rel="stylesheet" href="../../styles/main.css">
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
                 <div>
                     <h2 data-i18n="parent_title">My Child's Progress</h2>
-                    <p style="color: var(--text-muted);" data-i18n="parent_subtitle">Your child's educational
-                        achievements.</p>
-                </div>
-            </header>
-
-            <div id="childCards"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
-                <p style="color:#999;" data-i18n="loading_data">Loading...</p>
-            </div>
-
-            <div class="card"
-                style="margin-top: 32px; background: linear-gradient(135deg, #6C5CE7, #a29bfe); color: white; padding: 30px; border-radius: 16px; position: relative; overflow: hidden; border: none;">
-                <div style="position: relative; z-index: 2;">
-                    <h3 style="margin-bottom: 12px; color:white;" data-i18n="ai_analysis">🤖 AI Progress Analysis</h3>
-                    <p id="aiInsight" style="font-style: italic; opacity: 0.95; font-size: 1.1rem;">
-                        "Lobar Azizova's activity in Mathematics increased by 15% last week. The coin earning rate is
-                        higher than projected."
-                    </p>
-                </div>
-                <div style="position: absolute; right: -10px; bottom: -20px; font-size: 10rem; opacity: 0.15;">🧠</div>
-            </div>
-
-            <div style="margin-top: 32px;" class="card">
-                <h3 style="margin-bottom: 20px;" data-i18n="recent_achievements">Recent Achievements</h3>
-                <div id="recentAchievements" style="display: flex; gap: 12px; flex-wrap: wrap;">
-                    <span class="coin-badge" style="background: #E8F5E9; color: #2E7D32;">Top Student</span>
-                    <span class="coin-badge" style="background: #E3F2FD; color: #1565C0;">Mathematics Master</span>
+                    <p class="user-role-badge" data-i18n="parent_subtitle">Parent Panel</p>
                 </div>
             </div>
-        </main>
+        </header>
+
+        <div id="childCards"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+            <p style="color:#999;" data-i18n="loading_data">Loading...</p>
+        </div>
+
+        <div class="card"
+            style="margin-top: 32px; background: linear-gradient(135deg, #6C5CE7, #a29bfe); color: white; padding: clamp(20px, 5vw, 30px); border-radius: 16px; position: relative; overflow: hidden; border: none;">
+            <div style="position: relative; z-index: 2;">
+                <h3 style="margin-bottom: 12px; color:white;" data-i18n="ai_analysis">🤖 AI Progress Analysis</h3>
+                <p id="aiInsight" style="font-style: italic; opacity: 0.95; font-size: clamp(0.9rem, 3vw, 1.1rem);">
+                    "Lobar Azizova's activity in Mathematics increased by 15% last week. The coin earning rate is
+                    higher than projected."
+                </p>
+            </div>
+            <div class="hide-mobile"
+                style="position: absolute; right: -10px; bottom: -20px; font-size: 10rem; opacity: 0.15;">🧠</div>
+        </div>
+        </div>
+
+        <div style="margin-top: 32px;" class="card">
+            <h3 style="margin-bottom: 20px;" data-i18n="recent_achievements">Recent Achievements</h3>
+            <div id="recentAchievements" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                <span class="coin-badge" style="background: #E8F5E9; color: #2E7D32;">Top Student</span>
+                <span class="coin-badge" style="background: #E3F2FD; color: #1565C0;">Mathematics Master</span>
+            </div>
+        </div>
+    </main>
     </div>
 
     <script src="../../js/translations.js"></script>

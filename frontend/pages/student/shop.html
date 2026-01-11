@@ -47,27 +47,26 @@
     </style>
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
                 <div>
                     <h2>Coin Shop 🛍️</h2>
-                    <p style="color: var(--text-muted);">Spend your hard-earned coins!</p>
+                    <p class="user-role-badge">Student Panel</p>
                 </div>
-                <div class="user-profile">
-                    <div style="text-align: right;">
-                        <span style="font-size: 1.2rem; font-weight: 700;" id="userBalance">0 🟡</span>
-                    </div>
-                </div>
-            </header>
-
-            <div class="shop-grid" id="shopContainer">
-                <!-- Items will be loaded here -->
-                <p>Loading items...</p>
             </div>
-        </main>
+            <div class="user-profile">
+                <span class="coin-badge" id="userBalance">0 🟡</span>
+            </div>
+        </header>
+
+        <div class="shop-grid" id="shopContainer">
+            <!-- Items will be loaded here -->
+            <p>Loading items...</p>
+        </div>
+    </main>
     </div>
     <script src="../../js/api.js"></script>
     <script src="../../js/student.js"></script>

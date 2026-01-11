@@ -7,14 +7,27 @@
     <link rel="stylesheet" href="../../styles/main.css">
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <div id="homeworkContainer">
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Uyga Vazifalar</h2>
+                    <p class="user-role-badge">Teacher Panel</p>
+                </div>
+            </div>
+            <button onclick="TeacherModule.showCreateHomeworkModal()" class="btn btn-primary">+ Vazifa Qo'shish</button>
+        </header>
+
+        <div id="homeworkContent">
+            <!-- Homework List will be rendered here -->
+            <div id="homeworkList"
+                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
                 <p>Yuklanmoqda...</p>
             </div>
-        </main>
+        </div>
+    </main>
     </div>
 
     <script src="../../js/api.js"></script>

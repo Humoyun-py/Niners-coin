@@ -11,39 +11,41 @@
 </head>
 
 <body class="dashboard-grid">
-    .item-card {
-    background: white;
-    border-radius: var(--radius-lg);
-    padding: 20px;
-    box-shadow: var(--shadow-soft);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 15px;
-    }
+    <style>
+        .item-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-soft);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            gap: 15px;
+        }
 
-    .item-info {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    }
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
 
-    .item-img {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    object-fit: cover;
-    background: #f0f0f0;
-    }
+        .item-img {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #f0f0f0;
+        }
     </style>
     <div id="sidebarContainer"></div>
     <main class="main-content">
-        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-            <div>
-                <h2>🛍️ Shop Management</h2>
-                <p style="color: var(--text-muted);">Manage inventory and view purchase history.</p>
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>🛍️ Shop Management</h2>
+                    <p class="user-role-badge">Director Panel</p>
+                </div>
             </div>
             <button onclick="AdminModule.addShopItem()" class="btn btn-primary">+ Add New Item</button>
         </header>

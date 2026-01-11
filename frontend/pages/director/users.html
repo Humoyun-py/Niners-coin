@@ -14,35 +14,47 @@
     <div id="sidebarContainer"></div>
     <main class="main-content">
         <style>
-            .filter-btn {
-                padding: 8px 16px;
-                border: 1px solid var(--border-light);
-                background: white;
-                border-radius: 8px;
-                cursor: pointer;
-                font-weight: 600;
-                font-size: 0.9rem;
-                color: var(--text-muted);
-                transition: 0.2s;
-            }
+            @media (min-width: 769px) {
 
-            .filter-btn:hover {
-                background: #F5F5F5;
-            }
+                .responsive-table th:nth-child(1),
+                .responsive-table td:nth-child(1) {
+                    width: 25%;
+                }
 
-            .filter-btn.active {
-                background: var(--primary-gradient);
-                color: var(--text-dark);
-                border-color: transparent;
-                box-shadow: var(--shadow-soft);
+                .responsive-table th:nth-child(2),
+                .responsive-table td:nth-child(2) {
+                    width: 15%;
+                }
+
+                .responsive-table th:nth-child(3),
+                .responsive-table td:nth-child(3) {
+                    width: 12%;
+                }
+
+                .responsive-table th:nth-child(4),
+                .responsive-table td:nth-child(4) {
+                    width: 12%;
+                }
+
+                .responsive-table th:nth-child(5),
+                .responsive-table td:nth-child(5) {
+                    width: 12%;
+                }
+
+                .responsive-table th:nth-child(6),
+                .responsive-table td:nth-child(6) {
+                    width: 24%;
+                }
             }
         </style>
 
-        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <div>
-                <h2>User Management</h2>
-                <p style="color: var(--text-muted);">List of all users based on roles.</p>
-                <div style="display: flex; gap: 8px; margin-top: 12px;">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left flex-wrap-mobile">
+                <div>
+                    <h2>User Management</h2>
+                    <p class="user-role-badge">Director Panel</p>
+                </div>
+                <div class="filter-group flex-wrap-mobile" style="display: flex; gap: 8px;">
                     <button class="filter-btn active" onclick="loadAllUsers('all', this)">All</button>
                     <button class="filter-btn" onclick="loadAllUsers('student', this)">Students</button>
                     <button class="filter-btn" onclick="loadAllUsers('teacher', this)">Teachers</button>
@@ -50,7 +62,7 @@
                     <button class="filter-btn" onclick="loadAllUsers('director', this)">Directors</button>
                 </div>
             </div>
-            <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="flex-wrap-mobile" style="display: flex; gap: 12px; align-items: center;">
                 <button onclick="AdminModule.addUser('student')" class="btn btn-primary">+ New Student</button>
                 <button onclick="AdminModule.addUser('teacher')" class="btn btn-secondary">+ New Teacher</button>
             </div>
@@ -96,25 +108,25 @@
                 const tbody = document.getElementById('fullUserTableBody');
                 tbody.innerHTML = users.map(u => `
                     <tr style="border-bottom: 1px solid var(--border-light); transition: 0.2s;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
-                        <td data-label="Full Name" style="padding: 16px; font-weight: 700;">
+                        <td data-label="Full Name" style="padding: 10px; font-weight: 700;">
                             ${u.full_name}
                             ${!u.is_active ? `
-                                <div style="font-size:0.75rem; color:#C62828; font-weight:400; margin-top:4px; background: #FFF0F0; padding: 4px 8px; border-radius: 4px; display: inline-block;">
-                                    ⚠️ Reason: ${u.block_reason || 'None'} | Debt: ${u.debt_amount ? u.debt_amount.toLocaleString() : 0} sum
+                                <div style="font-size:0.7rem; color:#C62828; font-weight:400; margin-top:3px; background: #FFF0F0; padding: 3px 6px; border-radius: 4px; display: inline-block;">
+                                    ⚠️ ${u.block_reason || 'Blocked'} ${u.debt_amount ? '| ' + u.debt_amount.toLocaleString() + ' sum' : ''}
                                 </div>
                             ` : ''}
                         </td>
-                        <td data-label="Username" style="padding: 16px; color: var(--text-muted);">${u.username}</td>
-                        <td data-label="Role" style="padding: 16px;">
-                            <span style="background:${AdminModule.getRoleColor(u.role)}; color:white; padding:4px 10px; border-radius:6px; font-size:0.8rem; font-weight:700; text-transform:uppercase;">
+                        <td data-label="Username" style="padding: 10px; color: var(--text-muted);">${u.username}</td>
+                        <td data-label="Role" style="padding: 10px;">
+                            <span style="background:${AdminModule.getRoleColor(u.role)}; color:white; padding:3px 8px; border-radius:5px; font-size:0.75rem; font-weight:700; text-transform:uppercase;">
                                 ${u.role}
                             </span>
                         </td>
-                        <td data-label="Limit" style="padding: 16px; font-weight: 600; color: var(--primary);">
+                        <td data-label="Limit" style="padding: 10px; font-weight: 600; color: var(--primary);">
                             ${u.role === 'teacher' ? (u.daily_limit || 500) + ' 🟡' : '-'}
                         </td>
-                        <td data-label="Status" style="padding: 16px;">
-                            <span style="color:${u.is_active ? '#2E7D32' : '#C62828'}; font-weight:700;">
+                        <td data-label="Status" style="padding: 10px;">
+                            <span style="color:${u.is_active ? '#2E7D32' : '#C62828'}; font-weight:700; font-size:0.8rem;">
                                 ${u.is_active ? '● Active' : '● Blocked'}
                             </span>
                         </td>

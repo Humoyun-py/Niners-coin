@@ -8,19 +8,22 @@
     <script src="../../js/translations.js"></script>
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <header style="margin-bottom: 30px;">
-                <h2>Available Tests and Quizzes</h2>
-                <p style="color: var(--text-muted);">Test your knowledge and earn coins!</p>
-            </header>
-            <div id="testList"
-                style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin-top:20px;">
-                <p>Loading...</p>
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Available Tests and Quizzes</h2>
+                    <p class="user-role-badge">Student Panel</p>
+                </div>
             </div>
-        </main>
+        </header>
+        <div id="testList"
+            style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin-top:20px;">
+            <p>Loading...</p>
+        </div>
+    </main>
     </div>
     <script src="../../js/api.js"></script>
     <script src="../../js/student.js"></script>

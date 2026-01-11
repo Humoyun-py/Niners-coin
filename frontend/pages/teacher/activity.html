@@ -7,27 +7,34 @@
     <link rel="stylesheet" href="../../styles/main.css">
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <h2>Mening Faolligim (Log)</h2>
-            <div class="card" style="background:white; padding:24px; border-radius:12px; margin-top:24px;">
-                <div style="border-left:3px solid var(--primary); padding-left:16px; margin-bottom:20px;">
-                    <div style="font-weight:600;">Aziz Karimovga 10 coin berdingiz</div>
-                    <div style="font-size:0.85rem; color:var(--text-muted);">Izoh: Matematika fanidan faollik uchun
-                    </div>
-                    <div style="font-size:0.75rem; color:#CCC;">Bugun, 14:20</div>
-                </div>
-                <div style="border-left:3px solid var(--primary); padding-left:16px; margin-bottom:20px;">
-                    <div style="font-weight:600;">9-B sinf uchun yangi uy vazifasi qo'shildi</div>
-                    <div style="font-size:0.85rem; color:var(--text-muted);">Mavzu: Nyuton qonunlari</div>
-                    <div style="font-size:0.75rem; color:#CCC;">Kecha, 18:05</div>
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Mening Faolligim (Log)</h2>
+                    <p class="user-role-badge">Teacher Panel</p>
                 </div>
             </div>
-        </main>
+        </header>
+        <div class="card" style="background:white; padding:24px; border-radius:12px; margin-top:24px;">
+            <div style="border-left:3px solid var(--primary); padding-left:16px; margin-bottom:20px;">
+                <div style="font-weight:600;">Aziz Karimovga 10 coin berdingiz</div>
+                <div style="font-size:0.85rem; color:var(--text-muted);">Izoh: Matematika fanidan faollik uchun
+                </div>
+                <div style="font-size:0.75rem; color:#CCC;">Bugun, 14:20</div>
+            </div>
+            <div style="border-left:3px solid var(--primary); padding-left:16px; margin-bottom:20px;">
+                <div style="font-weight:600;">9-B sinf uchun yangi uy vazifasi qo'shildi</div>
+                <div style="font-size:0.85rem; color:var(--text-muted);">Mavzu: Nyuton qonunlari</div>
+                <div style="font-size:0.75rem; color:#CCC;">Kecha, 18:05</div>
+            </div>
+        </div>
+    </main>
     </div>
-    <script>fetch('../../components/sidebar.html').then(res => res.text()).then(html => document.getElementById('sidebarContainer').innerHTML = html);</script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/sidebar-loader.js"></script>
 </body>
 
 </html>

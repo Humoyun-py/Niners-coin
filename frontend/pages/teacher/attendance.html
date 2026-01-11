@@ -8,19 +8,22 @@
     <link rel="stylesheet" href="../../styles/main.css">
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <header style="margin-bottom: 30px;">
-                <h2>Mark Attendance</h2>
-                <p style="color: var(--text-muted);">Select a group and record today's attendance.</p>
-            </header>
-
-            <div id="attendanceContainer">
-                <p>Loading...</p>
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Mark Attendance</h2>
+                    <p class="user-role-badge">Teacher Panel</p>
+                </div>
             </div>
-        </main>
+        </header>
+
+        <div id="attendanceContainer">
+            <p>Loading...</p>
+        </div>
+    </main>
     </div>
 
     <script src="../../js/translations.js"></script>

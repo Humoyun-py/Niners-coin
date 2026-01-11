@@ -1,0 +1,171 @@
+
+--- ERROR IN get_classes AT 2026-01-11 14:36:12.976900 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: classes.schedule_days
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 355, in get_classes
+    classes = Class.query.all()
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\query.py", line 2693, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\query.py", line 2847, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 2308, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 2190, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\context.py", line 293, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: classes.schedule_days
+[SQL: SELECT classes.id AS classes_id, classes.name AS classes_name, classes.teacher_id AS classes_teacher_id, classes.schedule_days AS classes_schedule_days, classes.schedule_time AS classes_schedule_time 
+FROM classes]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+--- ERROR IN get_classes AT 2026-01-11 14:39:56.821100 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: no such column: classes.schedule_days
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 355, in get_classes
+    classes = Class.query.all()
+              ^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\query.py", line 2693, in all
+    return self._iter().all()  # type: ignore
+           ^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\query.py", line 2847, in _iter
+    result: Union[ScalarResult[_T], Result[_T]] = self.session.execute(
+                                                  ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 2308, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 2190, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\context.py", line 293, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1416, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 516, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1639, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1848, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1988, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2343, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1969, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\humoyun\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 922, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) no such column: classes.schedule_days
+[SQL: SELECT classes.id AS classes_id, classes.name AS classes_name, classes.teacher_id AS classes_teacher_id, classes.schedule_days AS classes_schedule_days, classes.schedule_time AS classes_schedule_time 
+FROM classes]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+
+--- ERROR IN get_classes AT 2026-01-11 14:41:20.946696 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 369, in get_classes
+    "student_count": len(c.students)
+                         ^^^^^^^^^^
+AttributeError: 'Class' object has no attribute 'students'
+
+--- ERROR IN get_classes AT 2026-01-11 14:41:30.966964 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 369, in get_classes
+    "student_count": len(c.students)
+                         ^^^^^^^^^^
+AttributeError: 'Class' object has no attribute 'students'
+
+--- ERROR IN get_classes AT 2026-01-11 14:42:30.368181 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 369, in get_classes
+    "student_count": len(c.students)
+                         ^^^^^^^^^^
+AttributeError: 'Class' object has no attribute 'students'
+
+--- ERROR IN get_classes AT 2026-01-11 14:46:28.408067 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 369, in get_classes
+    "student_count": len(c.students)
+                         ^^^^^^^^^^
+AttributeError: 'Class' object has no attribute 'students'
+
+--- ERROR IN get_classes AT 2026-01-11 14:48:38.652614 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 369, in get_classes
+    "student_count": len(c.students)
+                         ^^^^^^^^^^
+AttributeError: 'Class' object has no attribute 'students'
+
+--- ERROR IN get_classes AT 2026-01-11 14:48:39.437496 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 369, in get_classes
+    "student_count": len(c.students)
+                         ^^^^^^^^^^
+AttributeError: 'Class' object has no attribute 'students'
+
+--- ERROR IN get_classes AT 2026-01-11 14:48:40.704688 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 369, in get_classes
+    "student_count": len(c.students)
+                         ^^^^^^^^^^
+AttributeError: 'Class' object has no attribute 'students'
+
+--- ERROR IN get_classes AT 2026-01-11 14:51:20.959380 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 369, in get_classes
+    "student_count": len(c.students)
+                         ^^^^^^^^^^
+AttributeError: 'Class' object has no attribute 'students'
+
+--- ERROR IN get_classes AT 2026-01-11 14:51:21.496389 ---
+Traceback (most recent call last):
+  File "C:\Users\humoyun\OneDrive\Desktop\Ninerscoin-main\backend\routes\admin_routes.py", line 369, in get_classes
+    "student_count": len(c.students)
+                         ^^^^^^^^^^
+AttributeError: 'Class' object has no attribute 'students'

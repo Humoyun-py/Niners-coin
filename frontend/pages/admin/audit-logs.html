@@ -13,10 +13,14 @@
 <body class="dashboard-grid">
     <div id="sidebarContainer"></div>
     <main class="main-content">
-        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 30px;">
-            <h2>Xavfsizlik Loglari (Anti-Cheat)</h2>
-            <button class="btn btn-secondary" style="border-color:#DC3545; color:#DC3545;">Hammasini
-                tozalash</button>
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Xavfsizlik Loglari (Anti-Cheat)</h2>
+                    <p class="user-role-badge">Admin Panel</p>
+                </div>
+            </div>
+            <button class="btn btn-secondary" style="border-color:#DC3545; color:#DC3545;">Hammasini tozalash</button>
         </header>
         <div class="card" style="background:white; padding: 0; border-radius:12px; margin-top:20px; overflow: hidden;">
             <div class="table-wrapper">
@@ -32,7 +36,8 @@
                     </thead>
                     <tbody id="auditTableBody">
                         <tr>
-                            <td colspan="4" style="text-align:center; padding:20px;">Ma'lumotlar yuklanmoqda...</td>
+                            <td colspan="4" data-label="Status" style="text-align:center; padding:20px;">Ma'lumotlar
+                                yuklanmoqda...</td>
                         </tr>
                     </tbody>
                 </table>

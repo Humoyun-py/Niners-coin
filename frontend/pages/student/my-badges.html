@@ -9,61 +9,23 @@
     <link rel="stylesheet" href="../../styles/main.css">
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer">
-            <div class="sidebar">
-                <div class="logo" style="margin-bottom: 32px; font-size: 1.8rem; font-weight: 800;">
-                    <span style="color:var(--primary);">NINERS</span>.UZ
-                </div>
-
-                <div class="profile-box">
-                    <div id="sidebarAvatar" class="profile-avatar">S</div>
-                    <div class="profile-info">
-                        <h4 id="sidebarUserName">Student</h4>
-                        <p id="sidebarUserRole">student</p>
-                    </div>
-                </div>
-
-                <div class="menu-label"
-                    style="text-transform: uppercase; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 16px; font-weight: 800; letter-spacing: 1px;">
-                    Main Menu
-                </div>
-
-                <nav class="nav-menu">
-                    <ul id="sidebarMenu" style="list-style: none;">
-                        <li><a href="dashboard.html" class="nav-item"><span>📊</span> Dashboard</a></li>
-                        <div id="roleSpecificLinks">
-                            <!-- Pre-filled for fallback -->
-                            <li><a href="shop.html" class="nav-item"><span>🛍️</span> Shop</a></li>
-                            <li><a href="coins.html" class="nav-item"><span>🟡</span> Coins</a></li>
-                            <li><a href="my-group.html" class="nav-item"><span>👥</span> My Group</a></li>
-                            <li><a href="tests.html" class="nav-item"><span>📝</span> Tests/Quizzes</a></li>
-                            <li><a href="profile.html" class="nav-item"><span>👤</span> Profile</a></li>
-                            <li><a href="my-badges.html" class="nav-item active"><span>🏅</span> My Badges</a></li>
-                        </div>
-                    </ul>
-                </nav>
-
-                <div class="sidebar-footer">
-                    <button onclick="logout()" class="btn logout-btn"><span>🚪</span> Logout</button>
-                </div>
-            </div>
-        </div>
-        <main class="main-content">
-            <header
-                style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
                 <div>
                     <h2 data-i18n="my_badges">My Badges</h2>
-                    <p style="color: var(--text-muted);" data-i18n="badges_intro">Collection of your achievements</p>
+                    <p class="user-role-badge">Student Panel</p>
                 </div>
-            </header>
-
-
-            <div id="badgesContainer" class="responsive-grid">
-                <p>Loading badges...</p>
             </div>
-        </main>
+        </header>
+
+
+        <div id="badgesContainer" class="responsive-grid">
+            <p>Loading badges...</p>
+        </div>
+    </main>
     </div>
 
     <script src="../../js/translations.js"></script>

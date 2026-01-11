@@ -96,6 +96,8 @@ class Class(db.Model):
     name = db.Column(db.String(50), nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=True)
     students = db.relationship('Student', backref='student_class', lazy=True)
+    schedule_days = db.Column(db.String(50), nullable=True) # "Dushanba|Chorshanba|Juma" or "Seshanba|Payshanba|Shanba"
+    schedule_time = db.Column(db.String(10), nullable=True) # "14:00"
 
     def to_dict(self):
         teacher_name = "N/A"
@@ -108,7 +110,9 @@ class Class(db.Model):
             "id": self.id,
             "name": self.name,
             "teacher_name": teacher_name,
-            "student_count": len(self.students) if self.students else 0
+            "student_count": len(self.students) if self.students else 0,
+            "schedule_days": self.schedule_days,
+            "schedule_time": self.schedule_time
         }
 
 class CoinTransaction(db.Model):
@@ -142,6 +146,28 @@ class StudentBadge(db.Model):
 
     student = db.relationship('Student', backref=db.backref('badges', lazy=True))
     badge = db.relationship('Badge')
+
+class Homework(db.Model):
+    __tablename__ = 'homeworks'
+    id = db.Column(db.Integer, primary_key=True)
+    class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=False)
+    teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    deadline = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    target_class = db.relationship('Class', backref=db.backref('homeworks', lazy=True))
+    author = db.relationship('Teacher', backref=db.backref('homeworks', lazy=True))
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "class_name": self.target_class.name if self.target_class else "Unknown",
+            "description": self.description,
+            "deadline": self.deadline.isoformat() if self.deadline else None,
+            "created_at": self.created_at.isoformat()
+        }
 
 class Test(db.Model):
     __tablename__ = 'tests'
@@ -242,16 +268,7 @@ class TestResult(db.Model):
     student = db.relationship('Student', backref='test_history')
     test = db.relationship('Test')
 
-class Homework(db.Model):
-    __tablename__ = 'homeworks'
-    id = db.Column(db.Integer, primary_key=True)
-    class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=False)
-    title = db.Column(db.String(150), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    xp_reward = db.Column(db.Integer, default=50)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    class_obj = db.relationship('Class', backref='homework_assignments')
+
 
 class HomeworkSubmission(db.Model):
     __tablename__ = 'homework_submissions'

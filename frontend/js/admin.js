@@ -252,15 +252,34 @@ const AdminModule = {
                         ${options}
                     </select>
                 </div>
+                <div class="input-group">
+                    <label class="input-label">Dars Kunlari</label>
+                    <select id="classDays" class="form-control">
+                        <option value="Dushanba|Chorshanba|Juma">Dushanba - Chorshanba - Juma</option>
+                        <option value="Seshanba|Payshanba|Shanba">Seshanba - Payshanba - Shanba</option>
+                    </select>
+                </div>
+                 <div class="input-group">
+                    <label class="input-label">Dars Soati</label>
+                    <input type="text" id="classTime" class="form-control" placeholder="Masalan: 14:00">
+                </div>
             `;
 
             this.createModal('Create New Group', formContent, async () => {
                 const name = document.getElementById('className').value;
                 const teacherId = document.getElementById('classTeacher').value;
+                const scheduleDays = document.getElementById('classDays').value;
+                const scheduleTime = document.getElementById('classTime').value;
+
                 if (!name || !teacherId) return alert("All fields are required!");
 
                 try {
-                    await api.post('/admin/classes', { name, teacher_id: parseInt(teacherId) });
+                    await api.post('/admin/classes', {
+                        name,
+                        teacher_id: parseInt(teacherId),
+                        schedule_days: scheduleDays,
+                        schedule_time: scheduleTime
+                    });
                     alert("Group created successfully!");
                     this.initDashboard();
                 } catch (e) { alert("Error: " + e.message); }
@@ -277,6 +296,9 @@ const AdminModule = {
             const teachers = (await api.get('/admin/users')).filter(u => u.role === 'teacher');
             const options = teachers.map(t => `<option value="${t.id}" ${t.full_name === cls.teacher_name ? 'selected' : ''}>${t.full_name}</option>`).join('');
 
+            const d1Selected = (!cls.schedule_days || cls.schedule_days === 'Dushanba|Chorshanba|Juma') ? 'selected' : '';
+            const d2Selected = (cls.schedule_days === 'Seshanba|Payshanba|Shanba') ? 'selected' : '';
+
             const formContent = `
                 <div class="input-group">
                     <label class="input-label">Group Name</label>
@@ -289,13 +311,32 @@ const AdminModule = {
                         ${options}
                     </select>
                 </div>
+                <div class="input-group">
+                    <label class="input-label">Dars Kunlari</label>
+                    <select id="editClassDays" class="form-control">
+                        <option value="Dushanba|Chorshanba|Juma" ${d1Selected}>Dushanba - Chorshanba - Juma</option>
+                        <option value="Seshanba|Payshanba|Shanba" ${d2Selected}>Seshanba - Payshanba - Shanba</option>
+                    </select>
+                </div>
+                 <div class="input-group">
+                    <label class="input-label">Dars Soati</label>
+                    <input type="text" id="editClassTime" class="form-control" value="${cls.schedule_time || ''}" placeholder="Masalan: 14:00">
+                </div>
             `;
 
             this.createModal('Edit Group', formContent, async () => {
                 const name = document.getElementById('editClassName').value;
                 const teacherId = document.getElementById('editClassTeacher').value;
+                const scheduleDays = document.getElementById('editClassDays').value;
+                const scheduleTime = document.getElementById('editClassTime').value;
+
                 try {
-                    await api.put(`/admin/classes/${classId}`, { name, teacher_id: teacherId ? parseInt(teacherId) : undefined });
+                    await api.put(`/admin/classes/${classId}`, {
+                        name,
+                        teacher_id: teacherId ? parseInt(teacherId) : undefined,
+                        schedule_days: scheduleDays,
+                        schedule_time: scheduleTime
+                    });
                     alert("Group updated successfully!");
                     this.initDashboard();
                 } catch (e) { alert("Error: " + e.message); }

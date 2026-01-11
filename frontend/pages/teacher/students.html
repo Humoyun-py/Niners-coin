@@ -7,19 +7,23 @@
     <link rel="stylesheet" href="../../styles/main.css">
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <header style="margin-bottom: 30px;">
-                <h2>Mening O'quvchilarim</h2>
-                <p style="color: var(--text-muted);">Guruhni tanlang va o'quvchilar ko'rsatkichlarini boshqaring.</p>
-            </header>
-
-            <div id="studentsPageContainer">
-                <p>Yuklanmoqda...</p>
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Mening O'quvchilarim</h2>
+                    <p class="user-role-badge">Teacher Panel</p>
+                </div>
             </div>
-        </main>
+            <button onclick="TeacherModule.showCreateHomeworkModal()" class="btn btn-primary">+ Vazifa Qo'shish</button>
+        </header>
+
+        <div id="studentsPageContainer">
+            <p>Yuklanmoqda...</p>
+        </div>
+    </main>
     </div>
 
     <script src="../../js/api.js"></script>

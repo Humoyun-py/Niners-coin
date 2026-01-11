@@ -42,27 +42,29 @@
     <div class="dashboard-grid">
         <div id="sidebarContainer"></div>
         <main class="main-content">
-            <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-                <div style="flex-grow: 1;">
-                    <h1 id="welcomeMsg" style="font-size: 2.2rem; font-weight: 800; margin-bottom: 8px;">Welcome!</h1>
-                    <p style="color: var(--text-muted); font-size: 1.1rem;" data-i18n="dashboard_subtitle">Ready to
-                        level up your English today?</p>
+            <header class="dashboard-header flex-wrap-mobile">
+                <div class="header-left">
+                    <div>
+                        <h1 id="welcomeMsg" style="margin-bottom: 4px;">Welcome!</h1>
+                        <p class="user-role-badge" data-i18n="dashboard_subtitle">Ready to level up your English today?
+                        </p>
+                    </div>
                 </div>
 
-                <div class="user-profile" style="display: flex; align-items: center; gap: 12px;">
+                <div class="user-profile">
                     <span class="coin-badge" id="coinBalance">0 🟡</span>
-                    <div style="text-align: right;">
+                    <div class="hide-mobile" style="text-align: right;">
                         <div style="font-weight: 600;" id="userName">User Name</div>
                         <div style="font-size: 0.8rem; color: var(--text-muted);">Student</div>
                     </div>
                 </div>
             </header>
 
-            <div class="dashboard-layout"
+            <div class="dashboard-layout mobile-stack"
                 style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
                 <!-- WORD OF THE DAY (MATCHING UPLOADED IMAGE) -->
                 <div class="card vocab-card"
-                    style="background: #FFD200; color: #1A1A1A; position: relative; overflow: hidden; padding: 45px; border-radius: 30px; height: 100%; min-height: 340px; display: flex; flex-direction: column; justify-content: center; border: none; box-shadow: 0 25px 50px -12px rgba(255, 210, 0, 0.3);">
+                    style="background: #FFD200; color: #1A1A1A; position: relative; overflow: hidden; padding: clamp(24px, 5vw, 45px); border-radius: 30px; height: 100%; min-height: 280px; display: flex; flex-direction: column; justify-content: center; border: none; box-shadow: 0 25px 50px -12px rgba(255, 210, 0, 0.3);">
 
                     <div style="position: relative; z-index: 2; margin-bottom: auto;">
                         <span
@@ -72,12 +74,12 @@
                         </span>
 
                         <h2 id="dailyWord"
-                            style="font-size: 4rem; font-weight: 800; margin: 0; letter-spacing: -2px; line-height: 1;">
+                            style="font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; margin: 0; letter-spacing: -2px; line-height: 1;">
                             Eloquence
                         </h2>
 
                         <p id="dailyDef"
-                            style="font-size: 1.15rem; font-weight: 700; line-height: 1.5; color: rgba(26,26,26,0.9); max-width: 90%; margin-bottom: 10px;">
+                            style="font-size: clamp(1rem, 3vw, 1.15rem); font-weight: 700; line-height: 1.5; color: rgba(26,26,26,0.9); max-width: 90%; margin-bottom: 10px;">
                             "Fluent or persuasive speaking or writing."
                         </p>
                     </div>
@@ -140,23 +142,22 @@
             </div>
 
             <!-- LEVEL & RANK AREA -->
-            <div style="margin-top: 24px; display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
+            <div class="mobile-stack"
+                style="margin-top: 24px; display: grid; grid-template-columns: 2fr 1fr; gap: 24px;">
                 <div class="card"
                     style="background: white; padding: 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);">
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div class="flex-wrap-mobile"
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 15px;">
                         <div>
                             <h3 style="margin: 0;" data-i18n="english_proficiency">English Proficiency</h3>
                             <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 4px;"
-                                data-i18n="track_journey">Track your journey
-                                to fluency</p>
+                                data-i18n="track_journey">Track your journey to fluency</p>
                         </div>
-                        <div style="text-align: right;">
+                        <div style="text-align: right;" class="mt-mobile-s">
                             <span style="font-size: 1.5rem; font-weight: 800; color: var(--primary);"
                                 id="rankText">Newbie</span>
                             <div style="font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted);"
-                                data-i18n="current_rank">
-                                Current Rank</div>
+                                data-i18n="current_rank">Current Rank</div>
                         </div>
                     </div>
 
@@ -166,8 +167,8 @@
                             style="position: absolute; left: 0; top: 0; height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), #FF8C00); border-radius: 6px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);">
                         </div>
                     </div>
-                    <div
-                        style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
+                    <div class="flex-wrap-mobile"
+                        style="display: flex; justify-content: space-between; margin-top: 10px; font-size: 0.8rem; font-weight: 600; color: var(--text-muted); gap: 10px;">
                         <span class="xp-label-current">0 XP</span>
                         <span id="nextRankText">Next: Intermediate (1000 XP)</span>
                         <span class="xp-label-max">1000 XP</span>
@@ -175,7 +176,7 @@
                 </div>
 
                 <div class="stat-card"
-                    style="justify-content: center; align-items: center; background: linear-gradient(135deg, #FF6B6B, #EE5253); color: white;">
+                    style="justify-content: center; align-items: center; background: linear-gradient(135deg, #FF6B6B, #EE5253); color: white; min-height: 150px;">
                     <div style="font-size: 2.5rem; margin-bottom: 5px;">🔥</div>
                     <h3 style="margin: 0;" id="streakCount">0 Day</h3>
                     <p style="color: rgba(255,255,255,0.9); margin: 0; font-weight: 600;" data-i18n="daily_streak">Daily

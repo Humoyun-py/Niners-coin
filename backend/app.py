@@ -103,17 +103,28 @@ def create_app():
                 ("block_reason", "VARCHAR(255)"),
                 ("debt_amount", "FLOAT DEFAULT 0.0")
             ],
-            "coin_transactions": [("teacher_id", "INTEGER REFERENCES teachers(id)")]
+            "coin_transactions": [("teacher_id", "INTEGER REFERENCES teachers(id)")],
+            "classes": [
+                ("schedule_days", "VARCHAR(50)"),
+                ("schedule_time", "VARCHAR(10)")
+            ]
         }
         
         for table, cols in tables_columns.items():
             for col_name, col_type in cols:
                 try:
-                    db.session.execute(text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {col_name} {col_type}"))
-                    print(f"Schema Sync: Added column {col_name} to {table} (if not exists)")
+                    # SQLite < 3.35 doesn't support IF NOT EXISTS in ALTER TABLE
+                    # We try to add. If it exists, it will throw an error, which we catch.
+                    db.session.execute(text(f"ALTER TABLE {table} ADD COLUMN {col_name} {col_type}"))
+                    print(f"Schema Sync: Added column {col_name} to {table}")
                 except Exception as e:
-                    print(f"Schema Sync Warning for {table}.{col_name}: {e}")
-                    db.session.rollback() # Critical: Rollback to keep session valid
+                    # Check if error is because column exists
+                    err_str = str(e).lower()
+                    if "duplicate column" in err_str or "exists" in err_str:
+                        print(f"Schema Sync Info: Column {col_name} already exists in {table}.")
+                    else:
+                        print(f"Schema Sync Warning for {table}.{col_name}: {e}")
+                    db.session.rollback()
         
         db.session.commit()
 

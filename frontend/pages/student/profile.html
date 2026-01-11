@@ -55,76 +55,78 @@
     </style>
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <header style="margin-bottom: 32px;">
-                <h2>Profile Settings</h2>
-                <p style="color: var(--text-muted);">Manage your personal information</p>
-            </header>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                <!-- Profile Form -->
-                <div class="card"
-                    style="background: white; padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);">
-                    <div
-                        style="display: flex; align-items: center; gap: 24px; margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #F0F2F5;">
-                        <div id="profileAvatar"
-                            style="width: 80px; height: 80px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700; box-shadow: 0 10px 20px rgba(255, 210, 0, 0.2);">
-                            ?
-                        </div>
-                        <div>
-                            <h3 id="displayFullName" style="margin: 0;">User</h3>
-                            <p id="displayUsername" style="color: var(--text-muted); margin: 4px 0 0 0;">@username</p>
-                        </div>
-                    </div>
-
-                    <form id="profileForm" style="display: flex; flex-direction: column; gap: 20px;">
-                        <div class="form-group">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Full
-                                Name</label>
-                            <input type="text" id="fullNameInput" class="form-control" style="width: 100%;" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label
-                                style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Email
-                                Address</label>
-                            <input type="email" id="emailInput" class="form-control" style="width: 100%;" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label
-                                style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Role</label>
-                            <input type="text" id="roleDisplay" class="form-control"
-                                style="width: 100%; background: #F8F9FA; cursor: not-allowed;" readonly>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary"
-                            style="margin-top: 10px; width: 100%; padding: 14px; font-weight: 700;">
-                            Save Changes
-                        </button>
-                    </form>
-                </div>
-
-                <!-- My Badges -->
-                <div class="card"
-                    style="background: white; padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <h3 style="margin: 0;">My Badges</h3>
-                        <span style="font-size: 0.8rem; background: #EEE; padding: 4px 10px; border-radius: 20px;">🏆
-                            Collection</span>
-                    </div>
-                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">Complete tasks to unlock
-                        badges!</p>
-
-                    <div id="badgesContainer" class="badge-grid">
-                        <p>Loading badges...</p>
-                    </div>
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Profile Settings</h2>
+                    <p class="user-role-badge">Student Panel</p>
                 </div>
             </div>
-        </main>
+        </header>
+
+        <div class="mobile-stack" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <!-- Profile Form -->
+            <div class="card"
+                style="background: white; padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);">
+                <div
+                    style="display: flex; align-items: center; gap: 24px; margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #F0F2F5;">
+                    <div id="profileAvatar"
+                        style="width: 80px; height: 80px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700; box-shadow: 0 10px 20px rgba(255, 210, 0, 0.2);">
+                        ?
+                    </div>
+                    <div>
+                        <h3 id="displayFullName" style="margin: 0;">User</h3>
+                        <p id="displayUsername" style="color: var(--text-muted); margin: 4px 0 0 0;">@username</p>
+                    </div>
+                </div>
+
+                <form id="profileForm" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Full
+                            Name</label>
+                        <input type="text" id="fullNameInput" class="form-control" style="width: 100%;" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Email
+                            Address</label>
+                        <input type="email" id="emailInput" class="form-control" style="width: 100%;" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label
+                            style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Role</label>
+                        <input type="text" id="roleDisplay" class="form-control"
+                            style="width: 100%; background: #F8F9FA; cursor: not-allowed;" readonly>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"
+                        style="margin-top: 10px; width: 100%; padding: 14px; font-weight: 700;">
+                        Save Changes
+                    </button>
+                </form>
+            </div>
+
+            <!-- My Badges -->
+            <div class="card"
+                style="background: white; padding: 30px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0;">My Badges</h3>
+                    <span style="font-size: 0.8rem; background: #EEE; padding: 4px 10px; border-radius: 20px;">🏆
+                        Collection</span>
+                </div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-top: 8px;">Complete tasks to unlock
+                    badges!</p>
+
+                <div id="badgesContainer" class="badge-grid">
+                    <p>Loading badges...</p>
+                </div>
+            </div>
+        </div>
+    </main>
     </div>
 
     <script src="../../js/api.js"></script>

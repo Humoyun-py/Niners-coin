@@ -400,25 +400,41 @@ const TeacherModule = {
                         <div>
                             <div style="font-weight: 700; font-size: 1rem;">${s.full_name}</div>
                             <div style="font-size: 0.8rem; color: var(--text-muted);">ID: #${s.id}</div>
+                            <div style="font-size: 0.85rem; color: var(--secondary); font-weight:600;">Balans: ${parseFloat(s.balance).toFixed(1)} 🟡</div>
                         </div>
                     </div>
                     
                     <!-- Controls Area -->
-                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; flex: 2; justify-content: flex-end;">
+                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; flex: 3; justify-content: flex-end;">
                         <!-- Status Toggles -->
-                        <div class="attendance-toggles" style="display: flex; background: #f8f9fa; padding: 4px; border-radius: 8px; border: 1px solid #e9ecef;">
-                            <label style="cursor: pointer; padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 6px; position: relative;">
-                                <input type="radio" name="att_${s.id}" value="present" checked style="accent-color: #2ecc71; width: 16px; height: 16px;"> 
-                                <span>Bor</span>
-                            </label>
-                            <label style="cursor: pointer; padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-                                <input type="radio" name="att_${s.id}" value="absent" style="accent-color: #e74c3c; width: 16px; height: 16px;"> 
-                                <span>Yo'q</span>
-                            </label>
-                            <label style="cursor: pointer; padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; display: flex; align-items: center; gap: 6px;">
-                                <input type="radio" name="att_${s.id}" value="late" style="accent-color: #f1c40f; width: 16px; height: 16px;"> 
-                                <span>Kech</span>
-                            </label>
+                         <div style="border-right:1px solid #eee; padding-right:15px;">
+                            <div class="attendance-toggles" style="display: flex; background: #f8f9fa; padding: 4px; border-radius: 8px; border: 1px solid #e9ecef;">
+                                <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px; position: relative;">
+                                    <input type="radio" name="att_${s.id}" value="present" checked style="accent-color: #2ecc71; width: 14px; height: 14px;"> 
+                                    <span>Bor</span>
+                                </label>
+                                <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                    <input type="radio" name="att_${s.id}" value="absent" style="accent-color: #e74c3c; width: 14px; height: 14px;"> 
+                                    <span>Yo'q</span>
+                                </label>
+                                <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                    <input type="radio" name="att_${s.id}" value="late" style="accent-color: #f1c40f; width: 14px; height: 14px;"> 
+                                    <span>Kech</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Extra Coins -->
+                        <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:280px;">
+                            <div style="flex:1;">
+                                <input type="text" id="reason_${s.id}" class="form-control" placeholder="Uyga vazifa / Faollik" style="font-size:0.85rem; padding:8px;">
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span style="font-size:0.85rem; font-weight:600; color:#555; white-space:nowrap;">Coin qo'yish:</span>
+                                <input type="number" id="coin_${s.id}" class="form-control" placeholder="0" min="0" step="1" style="font-size:0.9rem; padding:8px; width:70px; text-align:center; font-weight:700; color:var(--primary);">
+                                <button class="btn btn-sm btn-success" title="Darhol yuborish" onclick="TeacherModule.sendIndividualCoins(this, ${s.id}, '${s.full_name.replace(/'/g, "\\'")}')" style="padding: 8px 12px;">Yuborish</button>
+                            </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -438,15 +454,15 @@ const TeacherModule = {
                     </div>
                     
                     <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 8px 16px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e1e4e8;">
-                            <span style="font-weight: 600; color: #4b5563;">🪙 ${this.t('coin_for_lesson')}:</span>
-                            <input type="number" id="globalCoinInput" value="1" min="0" step="0.5" style="width: 70px; border: 1px solid #d1d5db; border-radius: 6px; padding: 4px 8px; font-weight: 700; text-align: center; color: var(--primary);">
+                        <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 8px 16px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e1e4e8;" title="Faqat 'Bor' bo'lganlarga avtomatik beriladi">
+                            <span style="font-weight: 600; color: #4b5563;">🎁 Davomat uchun:</span>
+                            <input type="number" id="globalCoinInput" value="1" min="0" step="0.5" style="width: 60px; border: 1px solid #d1d5db; border-radius: 6px; padding: 4px 8px; font-weight: 700; text-align: center; color: var(--primary);">
                         </div>
                         <button class="btn btn-secondary" onclick="TeacherModule.manageTopics(${classId})">📚 Mavzular</button>
                     </div>
                 </div>
 
-                <div style="max-width: 900px; margin: 0 auto;">
+                <div style="max-width: 1000px; margin: 0 auto;">
                     ${rows}
                     <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); position: sticky; bottom: 20px; text-align: right; border-top: 1px solid #eee;">
                         <button class="btn btn-primary" style="padding: 14px 40px; font-size: 1.1rem; border-radius: 30px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);" onclick="TeacherModule.saveAttendance(${classId})">
@@ -463,25 +479,40 @@ const TeacherModule = {
 
     async saveAttendance(classId) {
         const selects = document.querySelectorAll('input[type="radio"]:checked');
-        const globalCoin = parseFloat(document.getElementById('globalCoinInput')?.value) || 1;
+        const globalCoin = parseFloat(document.getElementById('globalCoinInput')?.value) || 0;
 
         const records = Array.from(selects).map(radio => {
             const studentId = parseInt(radio.name.split('_')[1]);
-            let coins = 0;
-            if (radio.value === 'present') coins = globalCoin;
+            const status = radio.value;
+
+            // Attendance Coin (only if present)
+            let att_coins = (status === 'present') ? globalCoin : 0;
+
+            // Bonus Coin
+            const bonusInput = document.getElementById(`coin_${studentId}`);
+            const reasonInput = document.getElementById(`reason_${studentId}`);
+
+            const bonusAmount = parseFloat(bonusInput?.value) || 0;
+            const bonusReason = reasonInput?.value || 'Qo\'shimcha faollik';
 
             return {
                 student_id: studentId,
-                status: radio.value,
-                coins: coins
+                status: status,
+                coins: att_coins,
+                bonus_amount: bonusAmount,
+                bonus_reason: bonusReason
             };
         });
 
         try {
-            await api.post('/teacher/attendance', { class_id: classId, records });
-            alert("Davomat saqlandi! Coinlar berildi. 💰✅");
+            const res = await api.post('/teacher/attendance', { class_id: classId, records });
+
+            // Calculate totals for feedback
+            const totalCoins = records.reduce((sum, r) => sum + r.coins + r.bonus_amount, 0);
+
+            alert(`Davomat saqlandi! Jami ${totalCoins} coin berildi. 💰✅`);
+
             if (window.location.search.includes('classId')) {
-                const urlParams = new URLSearchParams(window.location.search);
                 this.loadAttendanceForm(classId);
             } else {
                 this.initAttendancePage();
@@ -490,31 +521,126 @@ const TeacherModule = {
     },
 
     async initHomeworkPage() {
+        this.loadHomeworks();
+    },
+
+    async loadHomeworks() {
         try {
-            const data = await api.get('/teacher/dashboard');
-            const container = document.getElementById('homeworkContainer');
-            if (data.classes.length === 0) {
-                container.innerHTML = '<p>Guruhlar topilmadi.</p>';
+            const list = await api.get('/teacher/homework');
+            const container = document.getElementById('homeworkList');
+            if (!container) return;
+
+            if (list.length === 0) {
+                container.innerHTML = '<p class="text-muted" style="grid-column: 1/-1;">Hozircha uyga vazifalar yo\'q.</p>';
                 return;
             }
 
-            const classCards = data.classes.map(c => `
-                <div class="card" style="padding: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border-left: 5px solid var(--primary);">
-                    <div>
-                        <h3 style="margin-bottom: 5px;">${c.name}</h3>
-                        <p style="color: var(--text-muted); font-size: 0.85rem;">${c.student_count} ta o'quvchi</p>
+            container.innerHTML = list.map(h => `
+                <div class="card" style="display: flex; flex-direction: column;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px;">
+                        <span class="badge" style="background:#E3F2FD; color:#1565C0;">${h.class_name}</span>
+                        <span style="font-size: 0.8rem; color: #888;">${h.deadline ? 'Muddat: ' + h.deadline : 'Muddatsiz'}</span>
                     </div>
-                    <button class="btn btn-primary" onclick="TeacherModule.manageTopics(${c.id})">Vazifalar / Mavzular</button>
+                    <p style="font-size: 1rem; color: var(--text-dark); margin-bottom: 15px; flex-grow: 1;">${h.description}</p>
+                    <div style="font-size: 0.75rem; color: #aaa; text-align: right;">
+                        Yaratildi: ${new Date(h.created_at).toLocaleDateString()}
+                    </div>
                 </div>
             `).join('');
 
-            container.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                    <h2>Uy vazifalarini boshqarish</h2>
+        } catch (e) {
+            console.error(e);
+            const container = document.getElementById('homeworkList');
+            if (container) container.innerHTML = '<p style="color:red">Xatolik yuz berdi.</p>';
+        }
+    },
+
+    async showCreateHomeworkModal() {
+        try {
+            const dashboardData = await api.get('/teacher/dashboard');
+            const classes = dashboardData.classes || [];
+            if (classes.length === 0) return alert("Sizda guruhlar mavjud emas.");
+
+            const options = classes.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+
+            const content = `
+                <div class="input-group">
+                    <label class="input-label">Qaysi Guruhga?</label>
+                    <select id="hwClass" class="form-control">
+                        ${options}
+                    </select>
                 </div>
-                ${classCards}
+                <div class="input-group">
+                    <label class="input-label">Vazifa Matni</label>
+                    <textarea id="hwDesc" class="form-control" rows="4" placeholder="Masalan: 12-betdagi 1-5 mashqlarni bajarish..."></textarea>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Topshirish Muddati (Ixtiyoriy)</label>
+                    <input type="date" id="hwDeadline" class="form-control">
+                </div>
             `;
-        } catch (e) { console.error(e); }
+
+            this.createModal('Yangi Vazifa', content, async () => {
+                const classId = document.getElementById('hwClass').value;
+                const desc = document.getElementById('hwDesc').value;
+                const deadline = document.getElementById('hwDeadline').value;
+
+                if (!desc) return alert("Vazifa matnini kiriting!");
+
+                try {
+                    await api.post('/teacher/homework', {
+                        class_id: classId,
+                        description: desc,
+                        deadline: deadline
+                    });
+                    alert("Vazifa muvaffaqiyatli yuklandi!");
+                    this.loadHomeworks();
+                } catch (e) {
+                    alert("Xatolik: " + e.message);
+                }
+            });
+
+        } catch (e) {
+            alert("Guruhlarni yuklashda xatolik: " + e.message);
+        }
+    },
+
+    createModal(title, content, onSave) {
+        const existing = document.querySelector('.modal-overlay');
+        if (existing) existing.remove();
+
+        const modalHTML = `
+            <div class="modal-overlay active">
+                <div class="modal-box">
+                    <div class="modal-header">
+                        <div class="modal-title">${title}</div>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
+                    </div>
+                    <div class="modal-body">
+                        ${content}
+                    </div>
+                    <div style="margin-top: 24px; display: flex; justify-content: flex-end; gap: 12px;">
+                        <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Bekor qilish</button>
+                        <button class="btn btn-primary" id="modalSaveBtn">Saqlash</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        document.getElementById('modalSaveBtn').onclick = async () => {
+            const btn = document.getElementById('modalSaveBtn');
+            btn.innerHTML = 'Saqlanmoqda...';
+            btn.disabled = true;
+            try {
+                await onSave();
+                document.querySelector('.modal-overlay')?.remove();
+            } catch (e) {
+                console.error(e);
+                btn.innerHTML = 'Saqlash';
+                btn.disabled = false;
+            }
+        };
     },
 
     async initStudentsPage() {
@@ -550,12 +676,12 @@ const TeacherModule = {
             const data = await api.get(`/teacher/classes/${classId}`);
             const rows = data.students.map(s => `
                 <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 15px;">
+                    <td data-label="O'quvchi" style="padding: 15px;">
                         <div style="font-weight: 700;">${s.full_name}</div>
                         <div style="font-size: 0.75rem; color: #888;">ID: ${s.id} | @${s.username}</div>
                     </td>
-                    <td style="padding: 15px;"><span class="coin-badge">${parseFloat(s.balance).toFixed(2)} 🟡</span></td>
-                    <td style="padding: 15px;">
+                    <td data-label="Coinlar" style="padding: 15px;"><span class="coin-badge">${parseFloat(s.balance).toFixed(2)} 🟡</span></td>
+                    <td data-label="Amal" style="padding: 15px;">
                          <button class="btn btn-sm btn-primary" onclick="TeacherModule.quickAward(${s.id}, '${s.full_name}')">✨ Rag'batlantirish</button>
                     </td>
                 </tr>
@@ -563,7 +689,7 @@ const TeacherModule = {
 
             area.innerHTML = `
                 <div class="table-wrapper">
-                    <table style="width: 100%; border-collapse: collapse;">
+                    <table class="responsive-table" style="width: 100%; border-collapse: collapse;">
                         <thead><tr style="text-align: left; border-bottom: 2px solid #eee; color: #999; font-size: 0.8rem; text-transform: uppercase;">
                             <th style="padding: 15px;">O'quvchi</th><th style="padding: 15px;">Coinlar</th><th style="padding: 15px;">Amal</th>
                         </tr></thead>
@@ -572,6 +698,38 @@ const TeacherModule = {
                 </div>
             `;
         } catch (e) { area.innerHTML = '<p>Xatolik!</p>'; }
+    },
+
+    async sendIndividualCoins(btn, studentId, studentName) {
+        const input = document.getElementById(`coin_${studentId}`);
+        const reasonInput = document.getElementById(`reason_${studentId}`);
+        const amount = parseFloat(input.value) || 0;
+        const reason = reasonInput.value || "Qo'shimcha faollik";
+
+        if (amount <= 0) return alert("Coin miqdori kiritilmadi!");
+
+        if (!confirm(`${studentName} ga ${amount} coin yuborilsinmi?`)) return;
+
+        // btn is passed directly
+        const originalText = btn.innerText;
+        btn.disabled = true;
+        btn.innerText = 'Run...';
+
+        try {
+            const res = await api.post('/teacher/award-individual', {
+                student_id: studentId,
+                amount: amount,
+                reason: reason
+            });
+            alert(`Muvaffaqiyatli! ${studentName} balans: ${res.new_balance.toFixed(1)} 🟡`);
+            input.value = ''; // Clear input to avoid double send on bulk save
+            reasonInput.value = '';
+        } catch (e) {
+            alert(e.message || "Xatolik yuz berdi");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = originalText;
+        }
     }
 };
 

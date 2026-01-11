@@ -7,30 +7,36 @@
     <link rel="stylesheet" href="../../styles/main.css">
 </head>
 
-<body>
-    <div class="dashboard-grid">
-        <div id="sidebarContainer"></div>
-        <main class="main-content">
-            <h2>Bildirishnomalar</h2>
-            <div id="notif-list" style="margin-top:24px;">
-                <div class="card"
-                    style="background:white; padding:16px; border-radius:12px; margin-bottom:12px; display:flex; gap:16px; align-items:center;">
-                    <div
-                        style="background:#FFF9E6; color:var(--primary); padding:10px; border-radius:50%; font-weight:700;">
-                        !</div>
-                    <div>
-                        <div style="font-weight:600;">Yangi yutuq!</div>
-                        <div style="font-size:0.9rem; color:var(--text-muted);">Farzandingiz Aziz "Centurion" nishonini
-                            qo'lga kiritdi.</div>
-                        <div style="font-size:0.75rem; color:#CCC; margin-top:4px;">1 soat oldin</div>
-                    </div>
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Bildirishnomalar</h2>
+                    <p class="user-role-badge">Parent Panel</p>
                 </div>
             </div>
-        </main>
+        </header>
+        <div id="notif-list" style="margin-top:24px;">
+            <div class="card flex-wrap-mobile"
+                style="background:white; padding:16px; border-radius:12px; margin-bottom:12px; display:flex; gap:16px; align-items:center;">
+                <div
+                    style="background:#FFF9E6; color:var(--primary); padding:10px; border-radius:50%; font-weight:700;">
+                    !</div>
+                <div>
+                    <div style="font-weight:600;">Yangi yutuq!</div>
+                    <div style="font-size:0.9rem; color:var(--text-muted);">Farzandingiz Aziz "Centurion" nishonini
+                        qo'lga kiritdi.</div>
+                    <div style="font-size:0.75rem; color:#CCC; margin-top:4px;">1 soat oldin</div>
+                </div>
+            </div>
+        </div>
+    </main>
     </div>
+    <script src="../../js/sidebar-loader.js"></script>
     <script src="../../js/api.js"></script>
     <script>
-        fetch('../../components/sidebar.html').then(res => res.text()).then(html => document.getElementById('sidebarContainer').innerHTML = html);
 
         async function loadNotifications() {
             try {
@@ -39,7 +45,7 @@
                 const list = document.getElementById('notif-list');
                 if (data && data.length > 0) {
                     list.innerHTML = data.map(n => `
-                        <div class="card" style="background:white; padding:16px; border-radius:12px; margin-bottom:12px; display:flex; gap:16px; align-items:center;">
+                        <div class="card flex-wrap-mobile" style="background:white; padding:16px; border-radius:12px; margin-bottom:12px; display:flex; gap:16px; align-items:center;">
                             <div style="background:${n.is_read ? '#EEE' : '#FFF9E6'}; color:var(--primary); padding:10px; border-radius:50%; font-weight:700;">!</div>
                             <div>
                                 <div style="font-weight:600;">${n.title}</div>

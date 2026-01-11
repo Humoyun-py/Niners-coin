@@ -21,7 +21,6 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 16px;
-            flex-wrap: wrap;
             gap: 15px;
         }
 
@@ -41,10 +40,12 @@
     </style>
     <div id="sidebarContainer"></div>
     <main class="main-content">
-        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-            <div>
-                <h2>🛍️ Shop Management</h2>
-                <p style="color: var(--text-muted);">Manage inventory and view purchase history.</p>
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>🛍️ Shop Management</h2>
+                    <p class="user-role-badge">Admin Panel</p>
+                </div>
             </div>
             <button onclick="AdminModule.addShopItem()" class="btn btn-primary">+ Add New Item</button>
         </header>

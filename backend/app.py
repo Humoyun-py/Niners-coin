@@ -204,6 +204,13 @@ def create_app():
                 ("content", "TEXT"),
                 ("image_url", "VARCHAR(500)"),
                 ("admin_comment", "VARCHAR(255)")
+            ],
+            "homeworks": [
+                ("teacher_id", "INTEGER REFERENCES teachers(id)"),
+                ("class_id", "INTEGER REFERENCES classes(id)"),
+                ("description", "TEXT"),
+                ("deadline", "TIMESTAMP"),
+                ("created_at", "TIMESTAMP")
             ]
         }
         

@@ -288,19 +288,21 @@ def delete_user(user_id):
         
     try:
         # Cascade Delete Manually
-        # 1. Linked logs / complaints / requests where user_id is FK
+        # A. Common Relations
         Complaint.query.filter_by(user_id=user.id).delete()
         Notification.query.filter_by(user_id=user.id).delete()
         AuditLog.query.filter_by(user_id=user.id).delete()
         ApprovalRequest.query.filter_by(admin_id=user.id).delete()
         
-        # 2. Student Specific
+        # B. Student Specific
         if user.role == 'student' and user.student_profile:
             student = user.student_profile
-            # Delete related student data
+            # 1. Delete Badges & Purchases & Coins
             StudentBadge.query.filter_by(student_id=student.id).delete()
             Purchase.query.filter_by(student_id=student.id).delete()
             CoinTransaction.query.filter_by(student_id=student.id).delete()
+            
+            # 2. Delete Academic Records
             from models.all_models import Attendance, HomeworkSubmission, TestResult
             Attendance.query.filter_by(student_id=student.id).delete()
             HomeworkSubmission.query.filter_by(student_id=student.id).delete()
@@ -308,29 +310,33 @@ def delete_user(user_id):
             
             db.session.delete(student)
 
-        # 3. Teacher Specific
+        # C. Teacher Specific
         if user.role == 'teacher' and user.teacher_profile:
             teacher = user.teacher_profile
-            # Unlink classes
+            # 1. Unlink Classes (Set teacher_id = None)
             classes = Class.query.filter_by(teacher_id=teacher.id).all()
             for c in classes:
                 c.teacher_id = None
             
-            # Delete tests created by teacher
-            from models.all_models import Test
-            # Also their results? Cascade usually handles test results if test is deleted, 
-            # but we kept tests. If we delete teacher, we might want to keep tests or delete them.
-            # Let's keep tests but unlink? Or delete? Teacher deletion implies removing their stuff usually.
-            # Safe bet: Unlink or Delete. Let's delete Tests manually.
+            # 2. Delete Teacher's created content
+            from models.all_models import Test, Homework
+            
+            # Delete Tests and their Results
             tests = Test.query.filter_by(teacher_id=teacher.id).all()
             for t in tests:
                 TestResult.query.filter_by(test_id=t.id).delete()
                 db.session.delete(t)
+                
+            # Delete Homeworks and their Submissions
+            homeworks = Homework.query.filter_by(teacher_id=teacher.id).all()
+            for h in homeworks:
+                HomeworkSubmission.query.filter_by(homework_id=h.id).delete()
+                db.session.delete(h)
 
-            CoinTransaction.query.filter_by(teacher_id=teacher.id).delete() # Issued by teacher
+            CoinTransaction.query.filter_by(teacher_id=teacher.id).delete()
             db.session.delete(teacher)
 
-        # 4. Parent Specific
+        # D. Parent Specific
         if user.role == 'parent' and user.parent_profile:
             db.session.delete(user.parent_profile)
 
@@ -366,7 +372,9 @@ def get_classes():
                 "name": c.name,
                 "teacher_id": c.teacher_id,
                 "teacher_name": teacher_name,
-                "student_count": len(c.students)
+                "student_count": len(c.students),
+                "schedule_days": c.schedule_days,
+                "schedule_time": c.schedule_time
             })
         return jsonify(result), 200
     except Exception as e:
@@ -429,9 +437,24 @@ def delete_class(class_id):
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     cls = Class.query.get_or_404(class_id)
     
-    # Detach students
+    # 1. Detach students
     for s in cls.students:
         s.class_id = None
+        
+    # 2. Delete Class-Specific Data
+    from models.all_models import Attendance, Topic, Homework, HomeworkSubmission
+    
+    # Delete Attendance
+    Attendance.query.filter_by(class_id=cls.id).delete()
+    
+    # Delete Topics
+    Topic.query.filter_by(class_id=cls.id).delete()
+    
+    # Delete Homework and Submissions
+    homeworks = Homework.query.filter_by(class_id=cls.id).all()
+    for hw in homeworks:
+        HomeworkSubmission.query.filter_by(homework_id=hw.id).delete()
+        db.session.delete(hw)
         
     db.session.delete(cls)
     db.session.commit()

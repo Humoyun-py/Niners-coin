@@ -245,6 +245,7 @@ def add_homework(class_id):
     from models.all_models import Homework
     new_hw = Homework(
         class_id=class_id,
+        teacher_id=teacher.id,  # CRITICAL: Must set teacher_id
         title=data.get('title'),
         description=data.get('description'),
         xp_reward=data.get('xp_reward', 50)

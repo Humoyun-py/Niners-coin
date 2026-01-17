@@ -208,7 +208,9 @@ def create_app():
             "homeworks": [
                 ("teacher_id", "INTEGER REFERENCES teachers(id)"),
                 ("class_id", "INTEGER REFERENCES classes(id)"),
+                ("title", "VARCHAR(100)"),
                 ("description", "TEXT"),
+                ("xp_reward", "INTEGER DEFAULT 50"),
                 ("deadline", "TIMESTAMP"),
                 ("created_at", "TIMESTAMP")
             ],

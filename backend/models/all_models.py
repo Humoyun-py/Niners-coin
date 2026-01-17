@@ -152,7 +152,9 @@ class Homework(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     class_id = db.Column(db.Integer, db.ForeignKey('classes.id'), nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=False)
+    title = db.Column(db.String(100), nullable=True)
     description = db.Column(db.Text, nullable=False)
+    xp_reward = db.Column(db.Integer, default=50)
     deadline = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     

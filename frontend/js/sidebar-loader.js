@@ -167,6 +167,7 @@ const SidebarLoader = {
                     { href: 'shop.html', label: `🛍️ ${t('shop')}` },
                     { href: 'coins.html', label: `🟡 ${t('coins')}` },
                     { href: 'my-group.html', label: `👥 ${t('my_group')}` },
+                    { href: 'my-homework.html', label: `📚 ${t('my_homework') || 'Vazifalarim'}` },
                     { href: 'tests.html', label: `📝 ${t('tests')}` },
                     { href: 'profile.html', label: `👤 ${t('profile')}` },
                     { href: 'my-badges.html', label: `🏅 ${t('my_badges')}` }

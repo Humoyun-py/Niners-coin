@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from models.all_models import db, Teacher, Class, Student, CoinTransaction, Topic
+from models.all_models import db, Teacher, Class, Student, CoinTransaction, Topic, Homework, HomeworkSubmission
 from services.coin_engine import award_coins
 from sqlalchemy import func
 from datetime import datetime
@@ -348,8 +348,6 @@ def homework_management():
             except ValueError:
                 pass # Ignore invalid date
 
-        from models.all_models import Homework # Import locally to ensure processing
-
         new_hw = Homework(
             class_id=class_id,
             teacher_id=teacher.id,
@@ -361,7 +359,6 @@ def homework_management():
         return jsonify({"msg": "Homework created", "homework": new_hw.to_dict()}), 201
 
     else: # GET
-        from models.all_models import Homework
         # Get all homeworks by this teacher
         homeworks = Homework.query.filter_by(teacher_id=teacher.id).order_by(Homework.created_at.desc()).all()
         return jsonify([h.to_dict() for h in homeworks]), 200
@@ -401,3 +398,80 @@ def award_individual():
 
     # Capture current balance
     return jsonify({"msg": "Coin yuborildi!", "new_balance": student.coin_balance}), 200
+
+@teacher_bp.route('/homework/<int:homework_id>/submissions', methods=['GET'])
+@jwt_required()
+def get_homework_submissions(homework_id):
+    user_id = get_jwt_identity()
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
+    if not teacher: return jsonify({"msg": "Teacher not found"}), 404
+
+    homework = Homework.query.get(homework_id)
+    if not homework or homework.teacher_id != teacher.id:
+        return jsonify({"msg": "Homework not found or access denied"}), 404
+        
+    submissions = HomeworkSubmission.query.filter_by(homework_id=homework_id).all()
+    
+    result = []
+    for sub in submissions:
+        student = Student.query.get(sub.student_id)
+        result.append({
+            "id": sub.id,
+            "student_name": student.user.full_name,
+            "student_username": student.user.username,
+            "content": sub.content,
+            "image_url": sub.image_url,
+            "submitted_at": sub.timestamp.isoformat(),
+            "status": sub.status,
+            "admin_comment": sub.admin_comment
+        })
+        
+    return jsonify(result), 200
+
+@teacher_bp.route('/homework/submission/<int:submission_id>/grade', methods=['POST'])
+@jwt_required()
+def grade_submission(submission_id):
+    user_id = get_jwt_identity()
+    teacher = Teacher.query.filter_by(user_id=user_id).first()
+    if not teacher: return jsonify({"msg": "Teacher not found"}), 404
+    
+    submission = HomeworkSubmission.query.get(submission_id)
+    if not submission: return jsonify({"msg": "Submission not found"}), 404
+    
+    # Check if teacher owns the homework
+    if submission.homework.teacher_id != teacher.id:
+        return jsonify({"msg": "Access denied"}), 403
+        
+    data = request.get_json()
+    action = data.get('action') # approve, reject
+    amount = float(data.get('amount', 0))
+    comment = data.get('comment', '')
+    
+    if action == 'approve':
+        if amount > 0:
+            # Check limits
+            today = datetime.utcnow().date()
+            awarded_today = db.session.query(func.sum(CoinTransaction.amount)).filter(
+                CoinTransaction.teacher_id == teacher.id,
+                func.date(CoinTransaction.timestamp) == today,
+                CoinTransaction.amount > 0
+            ).scalar() or 0
+            
+            if awarded_today + amount > teacher.daily_limit:
+               return jsonify({"msg": f"Kunlik limit yetarli emas! (Qoldiq: {teacher.daily_limit - awarded_today})"}), 400
+
+            success, msg = award_coins(submission.student_id, amount, f"Homework: {submission.homework.description[:20]}...", teacher_id=teacher.id)
+            if not success: return jsonify({"msg": msg}), 400
+            
+        submission.status = 'approved'
+        submission.admin_comment = comment
+        db.session.commit()
+        return jsonify({"msg": f"Uy ishi qabul qilindi! {amount} coin berildi."}), 200
+        
+    elif action == 'reject':
+        submission.status = 'rejected'
+        submission.admin_comment = comment
+        db.session.commit()
+        return jsonify({"msg": "Uy ishi rad etildi."}), 200
+        
+    return jsonify({"msg": "Invalid action"}), 400

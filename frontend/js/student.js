@@ -326,5 +326,143 @@ const StudentModule = {
         api.post('/student/test-notification', {})
             .then(res => console.log(res.msg))
             .catch(err => alert("Error: " + err.message));
+    },
+
+    async loadMyHomework() {
+        const container = document.getElementById('homeworkList');
+        if (!container) return;
+
+        try {
+            const homeworks = await api.get('/student/homework');
+
+            if (homeworks.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px;">
+                        <div style="font-size: 3rem; margin-bottom: 10px;">📚</div>
+                        <p class="text-muted">Hozircha vazifa yo'q</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = homeworks.map(hw => {
+                const isOverdue = hw.deadline && new Date(hw.deadline) < new Date();
+                const statusBadge = hw.submitted
+                    ? '<span style="background: #2ecc71; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">✓ Yuborilgan</span>'
+                    : isOverdue
+                        ? '<span style="background: #e74c3c; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">⏰ Muddati o\'tgan</span>'
+                        : '<span style="background: #f39c12; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">⏳ Kutilmoqda</span>';
+
+                return `
+                    <div class="card" style="margin-bottom: 16px; border-left: 4px solid ${hw.submitted ? '#2ecc71' : '#f39c12'};">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div>
+                                <h4 style="margin-bottom: 4px;">${hw.class_name}</h4>
+                                <p style="font-size: 0.85rem; color: #666;">
+                                    ${hw.deadline ? '📅 Muddat: ' + new Date(hw.deadline).toLocaleDateString('uz-UZ') : 'Muddat yo\'q'}
+                                </p>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                            <strong>Vazifa:</strong>
+                            <p style="margin-top: 8px; white-space: pre-wrap;">${hw.description}</p>
+                        </div>
+                        ${hw.submitted ? `
+                            <div style="background: #e8f5e9; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                                <strong style="color: #2ecc71;">Sizning javobingiz:</strong>
+                                <p style="margin-top: 8px; white-space: pre-wrap;">${hw.submission_content}</p>
+                                <p style="font-size: 0.75rem; color: #666; margin-top: 4px;">
+                                    Yuborilgan vaqt: ${new Date(hw.submission_date).toLocaleString('uz-UZ')}
+                                </p>
+                            </div>
+                        ` : `
+                            <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                                <button class="btn" style="flex: 1; background: #3498db; color: white;" 
+                                    onclick="document.getElementById('file_${hw.id}').click()">
+                                    📎 Rasm Yuklash
+                                </button>
+                                <input type="file" id="file_${hw.id}" accept="image/*" style="display: none;" 
+                                    onchange="StudentModule.handleFileUpload(${hw.id}, this)">
+                                
+                                <button class="btn" style="flex: 1; background: #95a5a6; color: white;" 
+                                    onclick="StudentModule.submitPaper(${hw.id})">
+                                    📝 Qog'ozda Bajardim
+                                </button>
+                            </div>
+                            <div id="preview_${hw.id}" style="margin-bottom: 10px; font-size: 0.9rem; color: #2ecc71;"></div>
+                            
+                            <textarea id="hw_${hw.id}" class="form-control" 
+                                placeholder="Yoki javobingizni bu yerga yozing..." 
+                                style="min-height: 80px; margin-bottom: 12px;"></textarea>
+                            
+                            <button class="btn btn-primary" onclick="StudentModule.submitHomework(${hw.id})" 
+                                style="width: 100%; padding: 12px;" id="btn_submit_${hw.id}">
+                                📤 Javobni Yuborish
+                            </button>
+                        `}
+                    </div>
+                `;
+            }).join('');
+        } catch (error) {
+            console.error('Load homework error:', error);
+            container.innerHTML = `
+                <div style="text-align: center; padding: 40px; color: #e74c3c;">
+                    <p>Vazifalarni yuklashda xatolik yuz berdi</p>
+                </div>
+            `;
+        }
+    },
+
+    handleFileUpload(hwId, input) {
+        if (input.files && input.files[0]) {
+            document.getElementById(`preview_${hwId}`).innerText = `📸 Rasm tanlandi: ${input.files[0].name}`;
+        }
+    },
+
+    async submitPaper(hwId) {
+        if (!confirm("Vazifani qog'ozda bajarganingizni tasdiqlaysizmi?")) return;
+
+        const formData = new FormData();
+        formData.append('type', 'paper');
+        formData.append('content', '');
+
+        this._sendHomework(hwId, formData);
+    },
+
+    async submitHomework(hwId) {
+        const textarea = document.getElementById(`hw_${hwId}`);
+        const fileInput = document.getElementById(`file_${hwId}`);
+
+        if (!textarea) return;
+
+        const content = textarea.value.trim();
+        const file = fileInput && fileInput.files[0];
+
+        if (!content && !file) {
+            this.showNotification('⚠️ Diqqat', "Iltimos, rasm yuklang, matn yozing yoki 'Qog'ozda bajardim' tugmasini bosing", 'error');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('type', file ? 'file' : 'text');
+        formData.append('content', content);
+        if (file) {
+            formData.append('file', file);
+        }
+
+        this._sendHomework(hwId, formData);
+    },
+
+    async _sendHomework(hwId, formData) {
+        try {
+            // Use api.upload helper which handles baseURL and Auth headers
+            const result = await api.upload(`/student/homework/${hwId}/submit`, formData);
+
+            this.showNotification('✅ Muvaffaqiyat', result.msg);
+            this.loadMyHomework();
+        } catch (error) {
+            this.showNotification('❌ Xato', error.message, 'error');
+        }
     }
-};  
+};

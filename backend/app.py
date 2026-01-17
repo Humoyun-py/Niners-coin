@@ -199,6 +199,11 @@ def create_app():
             "classes": [
                 ("schedule_days", "VARCHAR(50)"),
                 ("schedule_time", "VARCHAR(10)")
+            ],
+            "homework_submissions": [
+                ("content", "TEXT"),
+                ("image_url", "VARCHAR(500)"),
+                ("admin_comment", "VARCHAR(255)")
             ]
         }
         

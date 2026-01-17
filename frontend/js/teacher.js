@@ -542,8 +542,9 @@ const TeacherModule = {
                         <span style="font-size: 0.8rem; color: #888;">${h.deadline ? 'Muddat: ' + h.deadline : 'Muddatsiz'}</span>
                     </div>
                     <p style="font-size: 1rem; color: var(--text-dark); margin-bottom: 15px; flex-grow: 1;">${h.description}</p>
-                    <div style="font-size: 0.75rem; color: #aaa; text-align: right;">
-                        Yaratildi: ${new Date(h.created_at).toLocaleDateString()}
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <span style="font-size: 0.75rem; color: #aaa;">Yaratildi: ${new Date(h.created_at).toLocaleDateString()}</span>
+                        <button class="btn btn-sm btn-secondary" onclick="TeacherModule.viewSubmissions(${h.id})">📂 Javoblarni ko'rish</button>
                     </div>
                 </div>
             `).join('');
@@ -729,6 +730,110 @@ const TeacherModule = {
         } finally {
             btn.disabled = false;
             btn.innerText = originalText;
+        }
+    },
+
+    async viewSubmissions(hwId) {
+        console.log("View Submissions clicked for:", hwId);
+        const modal = document.getElementById('submissionsModal');
+        modal.classList.add('active');
+        this.loadSubmissions(hwId);
+    },
+
+    async loadSubmissions(hwId) {
+        const container = document.getElementById('submissionsList');
+        container.innerHTML = '<p class="text-center">Yuklanmoqda...</p>';
+
+        try {
+            const submissions = await api.get(`/teacher/homework/${hwId}/submissions`);
+            if (submissions.length === 0) {
+                container.innerHTML = '<p class="text-center text-muted">Hozircha javoblar yo\'q.</p>';
+                return;
+            }
+
+            container.innerHTML = submissions.map(sub => `
+                <div class="card" style="margin-bottom: 15px; border-left: 4px solid ${this._getStatusColor(sub.status)};">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <div>
+                            <strong>${sub.student_name}</strong>
+                            <div style="font-size: 0.8rem; color: #666;">@${sub.student_username}</div>
+                        </div>
+                        <span class="badge" style="background: ${this._getStatusColor(sub.status)}20; color: ${this._getStatusColor(sub.status)};">
+                            ${sub.status.toUpperCase()}
+                        </span>
+                    </div>
+                    
+                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; margin-bottom: 12px;">
+                        ${sub.content ? `<p style="white-space: pre-wrap;">${sub.content}</p>` : ''}
+                        ${sub.image_url ? `
+                            <div style="margin-top: 10px;">
+                                <a href="/${sub.image_url}" target="_blank" style="color: #3498db; font-size: 0.9rem;">📎 To'liq hajmdagi rasm</a>
+                                <img src="/${sub.image_url}" alt="Submission" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd;">
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    ${sub.status === 'submitted' ? `
+                        <div style="display: flex; gap: 10px; align-items: flex-end;">
+                            <div style="flex: 1;">
+                                <label style="font-size: 0.8rem;">Coin:</label>
+                                <input type="number" id="grade_amount_${sub.id}" class="form-control" value="5" min="0" step="0.5">
+                            </div>
+                            <div style="flex: 2;">
+                                <label style="font-size: 0.8rem;">Izoh:</label>
+                                <input type="text" id="grade_comment_${sub.id}" class="form-control" placeholder="Barakalla!">
+                            </div>
+                            <button class="btn btn-success" onclick="TeacherModule.submitGrade(${sub.id}, 'approve')">✅ Qabul</button>
+                            <button class="btn btn-danger" onclick="TeacherModule.submitGrade(${sub.id}, 'reject')">❌ Rad</button>
+                        </div>
+                    ` : `
+                        <div style="font-size: 0.9rem; color: #666;">
+                            Teacher Comment: ${sub.admin_comment || 'No comment'}
+                        </div>
+                    `}
+                </div>
+            `).join('');
+
+        } catch (e) {
+            container.innerHTML = `<p class="text-danger">Error: ${e.message}</p>`;
+        }
+    },
+
+    _getStatusColor(status) {
+        switch (status) {
+            case 'submitted': return '#f1c40f';
+            case 'approved': return '#2ecc71';
+            case 'rejected': return '#e74c3c';
+            default: return '#95a5a6';
+        }
+    },
+
+    async submitGrade(subId, action) {
+        const amount = document.getElementById(`grade_amount_${subId}`)?.value || 0;
+        const comment = document.getElementById(`grade_comment_${subId}`)?.value || '';
+
+        if (action === 'approve' && amount <= 0) {
+            return alert("Coin miqdori 0 dan katta bo'lishi kerak!");
+        }
+
+        try {
+            const res = await api.post(`/teacher/homework/submission/${subId}/grade`, {
+                action, amount, comment
+            });
+            alert(res.msg);
+            // Reload the list to show updated status
+            // We need the homework ID, but it's not passed here. 
+            // Workaround: Find the card in DOM or refresh page.
+            // Better: just remove the card or update it.
+            // For simplicity, close modal or let user refresh manually, 
+            // OR store current hwId in a module variable.
+
+            // Simple refresh of the modal content if we knew the hwId, but we don't easily here.
+            // Let's just reload the page or hide modal for now.
+            document.getElementById('submissionsModal').style.display = 'none';
+            this.initHomeworkPage(); // Full refresh
+        } catch (e) {
+            alert("Xatolik: " + e.message);
         }
     }
 };

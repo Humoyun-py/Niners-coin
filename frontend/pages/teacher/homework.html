@@ -28,6 +28,21 @@
             </div>
         </div>
     </main>
+
+    <!-- SUBMISSIONS MODAL -->
+    <div id="submissionsModal" class="modal-overlay">
+        <div class="modal-box" style="width: 800px; max-width: 95%;">
+            <div class="modal-header">
+                <div class="modal-title">Topshirilgan Vazifalar</div>
+                <button class="modal-close"
+                    onclick="document.getElementById('submissionsModal').classList.remove('active')">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="submissionsList">
+                    <p style="text-align:center; padding: 20px;">Yuklanmoqda...</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="../../js/api.js"></script>

@@ -161,9 +161,13 @@ class Homework(db.Model):
     author = db.relationship('Teacher', backref=db.backref('homeworks', lazy=True))
 
     def to_dict(self):
+        class_name = "Unknown"
+        if self.target_class:
+            class_name = self.target_class.name
+            
         return {
             "id": self.id,
-            "class_name": self.target_class.name if self.target_class else "Unknown",
+            "class_name": class_name,
             "description": self.description,
             "deadline": self.deadline.isoformat() if self.deadline else None,
             "created_at": self.created_at.isoformat()
@@ -275,7 +279,10 @@ class HomeworkSubmission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     homework_id = db.Column(db.Integer, db.ForeignKey('homeworks.id'), nullable=False)
-    status = db.Column(db.String(20), default='pending') # pending, completed
+    content = db.Column(db.Text, nullable=True)
+    image_url = db.Column(db.String(500), nullable=True)
+    admin_comment = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.String(20), default='pending') # pending, submitted, approved, rejected
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     
     student = db.relationship('Student', backref='homework_submissions')

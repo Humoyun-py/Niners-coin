@@ -1,6 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
+from werkzeug.utils import secure_filename
+import os
+from datetime import datetime
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from models.all_models import db, Student, CoinTransaction, Notification, Complaint, ShopItem, Purchase, Topic
+from models.all_models import db, Student, CoinTransaction, Notification, Complaint, ShopItem, Purchase, Topic, Homework, HomeworkSubmission
 from services.coin_engine import spend_coins
 
 student_bp = Blueprint('student', __name__)
@@ -215,3 +218,116 @@ def get_my_badges():
         })
         
     return jsonify(badges_data), 200
+
+@student_bp.route('/homework', methods=['GET'])
+@jwt_required()
+def get_student_homework():
+    """Get all homework assigned to the student's classes"""
+    user_id = get_jwt_identity()
+    student = Student.query.filter_by(user_id=user_id).first()
+    if not student:
+        return jsonify({"msg": "Student profile not found"}), 404
+    
+    # Get all homework for student's class
+    if not student.class_id:
+        return jsonify([]), 200
+    
+    homeworks = Homework.query.filter_by(class_id=student.class_id)\
+        .order_by(Homework.created_at.desc()).all()
+    
+    result = []
+    for hw in homeworks:
+        # Check if student has submitted
+        submission = HomeworkSubmission.query.filter_by(
+            homework_id=hw.id,
+            student_id=student.id
+        ).first()
+        
+        result.append({
+            "id": hw.id,
+            "description": hw.description,
+            "deadline": hw.deadline.isoformat() if hw.deadline else None,
+            "created_at": hw.created_at.isoformat(),
+            "class_name": hw.target_class.name if hw.target_class else "Unknown",
+            "submitted": submission is not None,
+            "submission_content": submission.content if submission else None,
+            "submission_date": submission.timestamp.isoformat() if submission else None,
+            "status": submission.status if submission else "pending"
+        })
+    
+    return jsonify(result), 200
+
+@student_bp.route('/homework/<int:homework_id>/submit', methods=['POST'])
+@jwt_required()
+def submit_homework(homework_id):
+    """Submit homework solution"""
+    user_id = get_jwt_identity()
+    student = Student.query.filter_by(user_id=user_id).first()
+    if not student:
+        return jsonify({"msg": "Student profile not found"}), 404
+    
+    # Check if homework exists
+    homework = Homework.query.get(homework_id)
+    if not homework:
+        return jsonify({"msg": "Homework not found"}), 404
+
+    # Determine submission type
+    content = request.form.get('content', '').strip()
+    submission_type = request.form.get('type', 'text') # text, file, paper
+    
+    image_url = None
+    
+    # Handle File Upload
+    if 'file' in request.files:
+        file = request.files['file']
+        if file and file.filename != '':
+            filename = secure_filename(f"hw_{homework_id}_{student.id}_{int(datetime.utcnow().timestamp())}_{file.filename}")
+            
+            # Use current_app.static_folder (points to 'frontend')
+            upload_base = current_app.static_folder
+            upload_folder = os.path.join(upload_base, 'uploads', 'homeworks')
+            
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+            
+            file_path = os.path.join(upload_folder, filename)
+            file.save(file_path)
+            
+            # URL should be relative to static root
+            image_url = f"uploads/homeworks/{filename}"
+            content = "Rasm yuklandi"
+
+    if submission_type == 'paper' and not content:
+        content = "O'quvchi vazifani qog'ozda bajarganini belgiladi."
+
+    if not content and not image_url:
+        return jsonify({"msg": "Iltimos, javob yozing, rasm yuklang yoki 'Qog'ozda bajardim' tugmasini bosing"}), 400
+    
+    # Check if already submitted
+    existing = HomeworkSubmission.query.filter_by(
+        homework_id=homework_id,
+        student_id=student.id
+    ).first()
+    
+    if existing:
+        # Update existing submission
+        existing.content = content
+        if image_url:
+            existing.image_url = image_url
+        existing.timestamp = db.func.now()
+        existing.status = 'submitted'
+        existing.admin_comment = None # Reset comment on resubmit
+    else:
+        # Create new submission
+        submission = HomeworkSubmission(
+            homework_id=homework_id,
+            student_id=student.id,
+            content=content,
+            image_url=image_url,
+            status='submitted'
+        )
+        db.session.add(submission)
+    
+    db.session.commit()
+    return jsonify({"msg": "Vazifa yuborildi!"}), 200
+    return jsonify({"msg": "Vazifa yuborildi!"}), 200

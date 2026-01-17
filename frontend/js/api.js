@@ -10,6 +10,8 @@ function getLoginUrl() {
 }
 
 const api = {
+    baseURL: API_URL,
+
     async handleResponse(response) {
         if (response.status === 401) {
             // Token expired or invalid

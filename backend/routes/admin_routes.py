@@ -173,6 +173,26 @@ def debug_schema():
     except Exception as e:
         return jsonify({"msg": str(e)}), 500
 
+@admin_bp.route('/debug/fix-students', methods=['GET'])
+@jwt_required()
+def fix_students():
+    if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
+    try:
+        # Unblock ALL students
+        students = Student.query.all()
+        count = 0
+        for s in students:
+            if s.user:
+                s.user.is_active = True
+                s.user.block_reason = None
+                # Optional: s.user.set_password(f"{s.user.username}09") # Force reset passwords if needed
+                count += 1
+        
+        db.session.commit()
+        return jsonify({"msg": f"Success! {count} students unblocked."}), 200
+    except Exception as e:
+        return jsonify({"msg": str(e)}), 500
+
 @admin_bp.route('/users', methods=['POST'])
 @jwt_required()
 def add_user():

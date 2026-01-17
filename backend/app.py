@@ -230,20 +230,18 @@ def create_app():
         for table, cols in tables_columns.items():
             for col_name, col_type in cols:
                 try:
-                    # SQLite < 3.35 doesn't support IF NOT EXISTS in ALTER TABLE
-                    # We try to add. If it exists, it will throw an error, which we catch.
+                    # Individual transaction for each column to prevent global rollback
                     db.session.execute(text(f"ALTER TABLE {table} ADD COLUMN {col_name} {col_type}"))
+                    db.session.commit()
                     print(f"Schema Sync: Added column {col_name} to {table}")
                 except Exception as e:
-                    # Check if error is because column exists
+                    db.session.rollback()
                     err_str = str(e).lower()
-                    if "duplicate column" in err_str or "exists" in err_str:
-                        print(f"Schema Sync Info: Column {col_name} already exists in {table}.")
+                    if "duplicate column" in err_str or "already exists" in err_str:
+                        # Log as info, not warning
+                        pass 
                     else:
                         print(f"Schema Sync Warning for {table}.{col_name}: {e}")
-                    db.session.rollback()
-        
-        db.session.commit()
 
     # Initialize Database if it doesn't exist
     with app.app_context():

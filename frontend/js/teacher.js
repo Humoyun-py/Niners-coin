@@ -66,18 +66,30 @@ const TeacherModule = {
         }
 
         if (!classes || classes.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">${this.t('no_classes')}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;">${this.t('no_classes')}</td></tr>`;
             return;
         }
-        tbody.innerHTML = classes.map(c => `
+        tbody.innerHTML = classes.map(c => {
+            // Format schedule display
+            let scheduleText = 'No Schedule';
+            if (c.schedule_days && c.schedule_time) {
+                scheduleText = `${c.schedule_days} - ${c.schedule_time}`;
+            } else if (c.schedule_days) {
+                scheduleText = c.schedule_days;
+            } else if (c.schedule_time) {
+                scheduleText = c.schedule_time;
+            }
+
+            return `
             <tr style="border-bottom: 1px solid var(--border-light);">
                 <td style="padding: 12px; font-weight: 600;">${c.name}</td>
                 <td style="padding: 12px;">${c.student_count} Students</td>
+                <td style="padding: 12px; color: var(--primary);">${scheduleText}</td>
                 <td style="padding: 12px;">
                     <button class="btn btn-secondary" style="padding: 6px 16px; font-size: 0.8rem;" onclick="TeacherModule.manageClass(${c.id})">Boshqarish</button>
                 </td>
             </tr>
-        `).join('');
+        `}).join('');
     },
 
     initMyStudentsSection(classes) {
@@ -355,7 +367,18 @@ const TeacherModule = {
             }
 
             // Render Class Cards
-            const cards = data.classes.map(c => `
+            const cards = data.classes.map(c => {
+                // Format schedule display
+                let scheduleText = 'No Schedule';
+                if (c.schedule_days && c.schedule_time) {
+                    scheduleText = `📅 ${c.schedule_days} | ⏰ ${c.schedule_time}`;
+                } else if (c.schedule_days) {
+                    scheduleText = `📅 ${c.schedule_days}`;
+                } else if (c.schedule_time) {
+                    scheduleText = `⏰ ${c.schedule_time}`;
+                }
+
+                return `
                 <div class="card" style="padding: 24px; cursor: pointer; transition: transform 0.2s; border: 1px solid transparent; hover: border-color: var(--primary);" 
                     onclick="TeacherModule.loadAttendanceForm(${c.id})">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
@@ -365,10 +388,11 @@ const TeacherModule = {
                         <span style="background: #e6fcf5; color: #0ca678; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">Active</span>
                     </div>
                     <h3 style="margin: 0 0 8px 0;">${c.name}</h3>
-                    <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">${c.student_count} ta o'quvchi</p>
+                    <p style="color: var(--text-muted); margin: 0 0 8px 0; font-size: 0.9rem;">${c.student_count} ta o'quvchi</p>
+                    <p style="color: var(--primary); margin: 0; font-size: 0.85rem; font-weight: 600;">${scheduleText}</p>
                     <button class="btn btn-primary" style="width: 100%; margin-top: 20px;">Davomat qilish</button>
                 </div>
-            `).join('');
+            `}).join('');
 
             container.innerHTML = `
                 <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">

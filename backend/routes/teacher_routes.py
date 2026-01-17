@@ -352,6 +352,7 @@ def homework_management():
         new_hw = Homework(
             class_id=class_id,
             teacher_id=teacher.id,
+            title=data.get('title') or 'Homework',  # Default title if not provided
             description=description,
             deadline=deadline
         )

@@ -147,6 +147,28 @@ def get_users():
             f.write(error_msg)
         return jsonify({"msg": f"Server Error in users: {str(e)}"}), 500
 
+@admin_bp.route('/debug/schema', methods=['GET'])
+@jwt_required()
+def debug_schema():
+    if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
+    try:
+        from sqlalchemy import inspect
+        inspector = inspect(db.engine)
+        tables = inspector.get_table_names()
+        
+        homework_cols = []
+        if 'homeworks' in tables:
+            homework_cols = [c['name'] for c in inspector.get_columns('homeworks')]
+            
+        return jsonify({
+            "tables": tables,
+            "homework_columns": homework_cols,
+            "has_teacher_id": "teacher_id" in homework_cols,
+            "db_url_masked": app.config['SQLALCHEMY_DATABASE_URI'].split('@')[-1] if '@' in app.config['SQLALCHEMY_DATABASE_URI'] else "local"
+        }), 200
+    except Exception as e:
+        return jsonify({"msg": str(e)}), 500
+
 @admin_bp.route('/users', methods=['POST'])
 @jwt_required()
 def add_user():
@@ -288,53 +310,63 @@ def delete_user(user_id):
         
     try:
         # Cascade Delete Manually
-        # A. Common Relations
-        Complaint.query.filter_by(user_id=user.id).delete()
-        Notification.query.filter_by(user_id=user.id).delete()
-        AuditLog.query.filter_by(user_id=user.id).delete()
-        ApprovalRequest.query.filter_by(admin_id=user.id).delete()
+        try:
+             Complaint.query.filter_by(user_id=user.id).delete()
+             Notification.query.filter_by(user_id=user.id).delete()
+             AuditLog.query.filter_by(user_id=user.id).delete()
+             ApprovalRequest.query.filter_by(admin_id=user.id).delete()
+        except Exception as e:
+             return jsonify({"msg": f"Common cleanup failed: {str(e)}"}), 500
         
         # B. Student Specific
         if user.role == 'student' and user.student_profile:
-            student = user.student_profile
-            # 1. Delete Badges & Purchases & Coins
-            StudentBadge.query.filter_by(student_id=student.id).delete()
-            Purchase.query.filter_by(student_id=student.id).delete()
-            CoinTransaction.query.filter_by(student_id=student.id).delete()
-            
-            # 2. Delete Academic Records
-            from models.all_models import Attendance, HomeworkSubmission, TestResult
-            Attendance.query.filter_by(student_id=student.id).delete()
-            HomeworkSubmission.query.filter_by(student_id=student.id).delete()
-            TestResult.query.filter_by(student_id=student.id).delete()
-            
-            db.session.delete(student)
+            try:
+                student = user.student_profile
+                # 1. Delete Badges & Purchases
+                StudentBadge.query.filter_by(student_id=student.id).delete()
+                Purchase.query.filter_by(student_id=student.id).delete()
+                
+                # 2. Coins (Check if model exists/can delete)
+                CoinTransaction.query.filter_by(student_id=student.id).delete()
+                
+                # 3. Delete Academic Records
+                from models.all_models import Attendance, HomeworkSubmission, TestResult
+                Attendance.query.filter_by(student_id=student.id).delete()
+                HomeworkSubmission.query.filter_by(student_id=student.id).delete()
+                TestResult.query.filter_by(student_id=student.id).delete()
+                
+                db.session.delete(student)
+            except Exception as e:
+                 return jsonify({"msg": f"Student cleanup failed: {str(e)}"}), 500
 
         # C. Teacher Specific
         if user.role == 'teacher' and user.teacher_profile:
-            teacher = user.teacher_profile
-            # 1. Unlink Classes (Set teacher_id = None)
-            classes = Class.query.filter_by(teacher_id=teacher.id).all()
-            for c in classes:
-                c.teacher_id = None
-            
-            # 2. Delete Teacher's created content
-            from models.all_models import Test, Homework
-            
-            # Delete Tests and their Results
-            tests = Test.query.filter_by(teacher_id=teacher.id).all()
-            for t in tests:
-                TestResult.query.filter_by(test_id=t.id).delete()
-                db.session.delete(t)
+            try:
+                teacher = user.teacher_profile
+                # 1. Unlink Classes
+                classes = Class.query.filter_by(teacher_id=teacher.id).all()
+                for c in classes:
+                    c.teacher_id = None
                 
-            # Delete Homeworks and their Submissions
-            homeworks = Homework.query.filter_by(teacher_id=teacher.id).all()
-            for h in homeworks:
-                HomeworkSubmission.query.filter_by(homework_id=h.id).delete()
-                db.session.delete(h)
+                # 2. Delete Teacher's content
+                from models.all_models import Test, Homework
+                
+                # Delete Tests and Results
+                tests = Test.query.filter_by(teacher_id=teacher.id).all()
+                for t in tests:
+                    TestResult.query.filter_by(test_id=t.id).delete()
+                    db.session.delete(t)
+                    
+                # Delete Homeworks
+                homeworks = Homework.query.filter_by(teacher_id=teacher.id).all()
+                for h in homeworks:
+                    HomeworkSubmission.query.filter_by(homework_id=h.id).delete()
+                    db.session.delete(h)
 
-            CoinTransaction.query.filter_by(teacher_id=teacher.id).delete()
-            db.session.delete(teacher)
+                CoinTransaction.query.filter_by(teacher_id=teacher.id).delete()
+                db.session.delete(teacher)
+            except Exception as e:
+                 return jsonify({"msg": f"Teacher cleanup failed: {str(e)}"}), 500
 
         # D. Parent Specific
         if user.role == 'parent' and user.parent_profile:
@@ -373,6 +405,7 @@ def get_classes():
                 "teacher_id": c.teacher_id,
                 "teacher_name": teacher_name,
                 "student_count": len(c.students),
+                "students_list": [{"id": s.user.id, "name": s.user.full_name} for s in c.students if s.user],
                 "schedule_days": c.schedule_days,
                 "schedule_time": c.schedule_time
             })
@@ -437,29 +470,39 @@ def delete_class(class_id):
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     cls = Class.query.get_or_404(class_id)
     
-    # 1. Detach students
-    for s in cls.students:
-        s.class_id = None
-        
-    # 2. Delete Class-Specific Data
-    from models.all_models import Attendance, Topic, Homework, HomeworkSubmission
-    
-    # Delete Attendance
-    Attendance.query.filter_by(class_id=cls.id).delete()
-    
-    # Delete Topics
-    Topic.query.filter_by(class_id=cls.id).delete()
-    
-    # Delete Homework and Submissions
-    homeworks = Homework.query.filter_by(class_id=cls.id).all()
-    for hw in homeworks:
-        HomeworkSubmission.query.filter_by(homework_id=hw.id).delete()
-        db.session.delete(hw)
-        
-    db.session.delete(cls)
-    db.session.commit()
-    log_event(get_jwt_identity(), f"Sinf o'chirildi: {cls.id}", severity='danger')
-    return jsonify({"msg": "Sinf o'chirildi"}), 200
+    try:
+        # 1. Detach students
+        try:
+            for s in cls.students:
+                s.class_id = None
+        except Exception as e:
+            return jsonify({"msg": f"Student detach failed: {str(e)}"}), 500
+            
+        # 2. Delete Class-Specific Data
+        try:
+            from models.all_models import Attendance, Topic, Homework, HomeworkSubmission
+            
+            # Delete Attendance
+            Attendance.query.filter_by(class_id=cls.id).delete()
+            
+            # Delete Topics
+            Topic.query.filter_by(class_id=cls.id).delete()
+            
+            # Delete Homework and Submissions
+            homeworks = Homework.query.filter_by(class_id=cls.id).all()
+            for hw in homeworks:
+                HomeworkSubmission.query.filter_by(homework_id=hw.id).delete()
+                db.session.delete(hw)
+        except Exception as e:
+            return jsonify({"msg": f"Class content delete failed: {str(e)}"}), 500
+            
+        db.session.delete(cls)
+        db.session.commit()
+        log_event(get_jwt_identity(), f"Sinf o'chirildi: {cls.id}", severity='danger')
+        return jsonify({"msg": "Sinf o'chirildi"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": f"General delete failed: {str(e)}"}), 500
 
 @admin_bp.route('/audit-logs', methods=['GET'])
 @jwt_required()

@@ -52,6 +52,37 @@ def upload_image():
         # Return the public URL path
         return jsonify({"url": f"/uploads/shop/{filename}"}), 200
 
+@admin_bp.route('/debug/fix-homework-schema', methods=['GET'])
+@jwt_required()
+def fix_homework_schema():
+    if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
+    results = []
+    try:
+        from sqlalchemy import text
+        # Columns to ensure exist
+        columns = [
+            ("teacher_id", "INTEGER REFERENCES teachers(id)"),
+            ("class_id", "INTEGER REFERENCES classes(id)"),
+            ("title", "VARCHAR(100)"),
+            ("description", "TEXT"),
+            ("xp_reward", "INTEGER DEFAULT 50"),
+            ("deadline", "TIMESTAMP"),
+            ("created_at", "TIMESTAMP")
+        ]
+        
+        for col_name, col_type in columns:
+            try:
+                db.session.execute(text(f"ALTER TABLE homeworks ADD COLUMN {col_name} {col_type}"))
+                db.session.commit()
+                results.append(f"✅ Added {col_name}")
+            except Exception as e:
+                db.session.rollback()
+                results.append(f"⚠️ Failed to add {col_name}: {str(e)}") # Likely already exists
+        
+        return jsonify({"msg": "Schema update attempted", "details": results}), 200
+    except Exception as e:
+        return jsonify({"msg": str(e)}), 500
+
 @admin_bp.route('/complaints', methods=['GET'])
 @jwt_required()
 def get_complaints():

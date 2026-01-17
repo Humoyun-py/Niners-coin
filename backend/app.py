@@ -211,6 +211,17 @@ def create_app():
                 ("description", "TEXT"),
                 ("deadline", "TIMESTAMP"),
                 ("created_at", "TIMESTAMP")
+            ],
+            "topics": [
+                ("class_id", "INTEGER REFERENCES classes(id)"),
+                ("title", "VARCHAR(150)"),
+                ("content", "TEXT")
+            ],
+            "attendance": [
+                ("class_id", "INTEGER REFERENCES classes(id)"),
+                ("student_id", "INTEGER REFERENCES students(id)"),
+                ("date", "DATE"),
+                ("status", "VARCHAR(20)")
             ]
         }
         

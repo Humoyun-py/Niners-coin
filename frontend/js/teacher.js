@@ -487,7 +487,10 @@ const TeacherModule = {
                 </div>
 
                 <div style="max-width: 1000px; margin: 0 auto;">
-                    ${rows}
+                    <!-- Scrollable Student List -->
+                    <div style="max-height: 600px; overflow-y: auto; padding-right: 4px; margin-bottom: 20px;">
+                        ${rows}
+                    </div>
                     <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); position: sticky; bottom: 20px; text-align: right; border-top: 1px solid #eee;">
                         <button class="btn btn-primary" style="padding: 14px 40px; font-size: 1.1rem; border-radius: 30px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);" onclick="TeacherModule.saveAttendance(${classId})">
                             ${this.t('save_changes')} ✅

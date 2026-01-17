@@ -257,6 +257,11 @@ def create_app():
         return send_from_directory(app.static_folder, 'login.html')
 
 
+    @app.errorhandler(500)
+    def internal_error(error):
+        import traceback
+        return {"msg": "Critical Server Error", "error": str(error), "trace": traceback.format_exc()}, 500
+
     @app.before_request
     def check_auto_block():
         from datetime import datetime

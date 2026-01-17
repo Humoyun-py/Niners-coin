@@ -1,6 +1,10 @@
 from flask import Blueprint, jsonify, request, Response, send_file
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
-from models.all_models import db, User, Student, Teacher, Parent, Class, AuditLog, Complaint, ApprovalRequest, ShopItem, Purchase, Badge, StudentBadge
+from models.all_models import (
+    db, User, Student, Teacher, Parent, Class, AuditLog, Complaint, ApprovalRequest, 
+    ShopItem, Purchase, Badge, StudentBadge, CoinTransaction, Test, TestResult, 
+    Homework, HomeworkSubmission, Attendance, Notification, Topic, SystemSetting
+)
 from services.report_generator import generate_student_report, generate_student_pdf_report, generate_classroom_indicators
 from services.security_service import log_event
 from werkzeug.security import generate_password_hash
@@ -326,11 +330,10 @@ def delete_user(user_id):
                 StudentBadge.query.filter_by(student_id=student.id).delete()
                 Purchase.query.filter_by(student_id=student.id).delete()
                 
-                # 2. Coins (Check if model exists/can delete)
+                # 2. Coins
                 CoinTransaction.query.filter_by(student_id=student.id).delete()
                 
                 # 3. Delete Academic Records
-                from models.all_models import Attendance, HomeworkSubmission, TestResult
                 Attendance.query.filter_by(student_id=student.id).delete()
                 HomeworkSubmission.query.filter_by(student_id=student.id).delete()
                 TestResult.query.filter_by(student_id=student.id).delete()
@@ -349,8 +352,6 @@ def delete_user(user_id):
                     c.teacher_id = None
                 
                 # 2. Delete Teacher's content
-                from models.all_models import Test, Homework
-                
                 # Delete Tests and Results
                 tests = Test.query.filter_by(teacher_id=teacher.id).all()
                 for t in tests:
@@ -480,8 +481,6 @@ def delete_class(class_id):
             
         # 2. Delete Class-Specific Data
         try:
-            from models.all_models import Attendance, Topic, Homework, HomeworkSubmission
-            
             # Delete Attendance
             Attendance.query.filter_by(class_id=cls.id).delete()
             

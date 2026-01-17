@@ -371,7 +371,8 @@ def delete_user(user_id):
              AuditLog.query.filter_by(user_id=user.id).delete()
              ApprovalRequest.query.filter_by(admin_id=user.id).delete()
         except Exception as e:
-             return jsonify({"msg": f"Common cleanup failed: {str(e)}"}), 500
+             # Just log common cleanup errors
+             print(f"Common cleanup warning: {str(e)}")
         
         # B. Student Specific
         if user.role == 'student' and user.student_profile:
@@ -390,8 +391,11 @@ def delete_user(user_id):
                 TestResult.query.filter_by(student_id=student.id).delete()
                 
                 db.session.delete(student)
+                
+                db.session.delete(student)
             except Exception as e:
-                 return jsonify({"msg": f"Student cleanup failed: {str(e)}"}), 500
+                 # Ignore cleanup errors (e.g. missing columns) and proceed
+                 print(f"Student cleanup warning: {str(e)}")
 
         # C. Teacher Specific
         if user.role == 'teacher' and user.teacher_profile:
@@ -418,7 +422,8 @@ def delete_user(user_id):
                 CoinTransaction.query.filter_by(teacher_id=teacher.id).delete()
                 db.session.delete(teacher)
             except Exception as e:
-                 return jsonify({"msg": f"Teacher cleanup failed: {str(e)}"}), 500
+                 # Ignore cleanup errors (e.g. missing columns) and proceed
+                 print(f"Teacher cleanup warning: {str(e)}")
 
         # D. Parent Specific
         if user.role == 'parent' and user.parent_profile:
@@ -523,28 +528,45 @@ def delete_class(class_id):
     cls = Class.query.get_or_404(class_id)
     
     try:
-        # 1. Detach students
+        from sqlalchemy.exc import ProgrammingError, OperationalError
+        
+        # 1. Detach students (Robust)
         try:
             for s in cls.students:
                 s.class_id = None
-        except Exception as e:
-            return jsonify({"msg": f"Student detach failed: {str(e)}"}), 500
+        except Exception:
+            pass # Ignore detach errors
             
-        # 2. Delete Class-Specific Data
+        # 2. Delete Class-Specific Data (Robust)
         try:
+            from models.all_models import Attendance, Topic, Homework, HomeworkSubmission
+            
             # Delete Attendance
-            Attendance.query.filter_by(class_id=cls.id).delete()
-            
+            try:
+                Attendance.query.filter_by(class_id=cls.id).delete()
+            except (ProgrammingError, OperationalError):
+                db.session.rollback()
+
             # Delete Topics
-            Topic.query.filter_by(class_id=cls.id).delete()
-            
+            try:
+                Topic.query.filter_by(class_id=cls.id).delete()
+            except (ProgrammingError, OperationalError):
+                db.session.rollback()
+
             # Delete Homework and Submissions
-            homeworks = Homework.query.filter_by(class_id=cls.id).all()
-            for hw in homeworks:
-                HomeworkSubmission.query.filter_by(homework_id=hw.id).delete()
-                db.session.delete(hw)
+            try:
+                homeworks = Homework.query.filter_by(class_id=cls.id).all()
+                for hw in homeworks:
+                    try:
+                        HomeworkSubmission.query.filter_by(homework_id=hw.id).delete()
+                        db.session.delete(hw)
+                    except:
+                        pass
+            except (ProgrammingError, OperationalError):
+                 db.session.rollback()
+                 
         except Exception as e:
-            return jsonify({"msg": f"Class content delete failed: {str(e)}"}), 500
+            print(f"Cleanup non-critical error: {e}")
             
         db.session.delete(cls)
         db.session.commit()

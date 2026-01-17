@@ -77,8 +77,11 @@ const api = {
             },
             body: JSON.stringify(data)
         });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.msg || 'Request failed');
+        const result = await response.json().catch(e => ({ msg: response.statusText }));
+        if (!response.ok) {
+            console.error('API PUT Error Body:', result);
+            throw new Error(result.msg || 'Request failed');
+        }
         return result;
     },
 
@@ -89,8 +92,11 @@ const api = {
                 'Authorization': `Bearer ${localStorage.getItem('token')}`
             }
         });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.msg || 'Request failed');
+        const result = await response.json().catch(e => ({ msg: response.statusText, raw_error: e.toString() }));
+        if (!response.ok) {
+            console.error('API DELETE Error Body:', result);
+            throw new Error(result.msg || result.error || 'Request failed');
+        }
         return result;
     },
 

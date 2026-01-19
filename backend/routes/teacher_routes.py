@@ -34,7 +34,13 @@ def teacher_dashboard():
         "rating": teacher.rating,
         "daily_limit": teacher.daily_limit,
         "issued_today": float(issued_today),
-        "classes": [{"id": c.id, "name": c.name, "student_count": len(c.students)} for c in classes],
+        "classes": [{
+            "id": c.id, 
+            "name": c.name, 
+            "student_count": len(c.students),
+            "schedule_days": c.schedule_days,
+            "schedule_time": c.schedule_time
+        } for c in classes],
         "recent_rewards": [{
             "student_name": tx.student.user.full_name,
             "amount": tx.amount,

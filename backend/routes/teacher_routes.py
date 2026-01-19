@@ -39,7 +39,8 @@ def teacher_dashboard():
             "name": c.name, 
             "student_count": len(c.students),
             "schedule_days": c.schedule_days,
-            "schedule_time": c.schedule_time
+            "schedule_time": c.schedule_time,
+            "students": [{"id": s.id, "full_name": s.user.full_name} for s in c.students]
         } for c in classes],
         "recent_rewards": [{
             "student_name": tx.student.user.full_name,

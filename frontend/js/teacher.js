@@ -380,7 +380,7 @@ const TeacherModule = {
 
                 return `
                 <div class="card" style="padding: 24px; cursor: pointer; transition: transform 0.2s; border: 1px solid transparent; hover: border-color: var(--primary);" 
-                    onclick="TeacherModule.loadAttendanceForm(${c.id})">
+                    onclick="if(!event.target.closest('.student-list-item')) TeacherModule.loadAttendanceForm(${c.id})">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
                         <div style="width: 50px; height: 50px; background: #eef2ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.5rem;">
                             👥
@@ -389,8 +389,18 @@ const TeacherModule = {
                     </div>
                     <h3 style="margin: 0 0 8px 0;">${c.name}</h3>
                     <p style="color: var(--text-muted); margin: 0 0 8px 0; font-size: 0.9rem;">${c.student_count} ta o'quvchi</p>
-                    <p style="color: var(--primary); margin: 0; font-size: 0.85rem; font-weight: 600;">${scheduleText}</p>
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 20px;">Davomat qilish</button>
+                    <p style="color: var(--primary); margin: 0 0 16px 0; font-size: 0.85rem; font-weight: 600;">${scheduleText}</p>
+                    
+                    <!-- Scrollable Student List Preview -->
+                    <div class="student-list-item" style="max-height: 120px; overflow-y: auto; background: #f8f9fa; border-radius: 8px; padding: 8px; margin-bottom: 16px; border: 1px solid #eee;">
+                        ${c.students && c.students.length > 0 ? c.students.map(s => `
+                            <div style="padding: 4px 8px; font-size: 0.85rem; color: #555; border-bottom: 1px solid #eee; display:flex; align-items:center; gap:6px;">
+                                <span style="width:6px; height:6px; background:#ccc; border-radius:50%; display:inline-block;"></span> ${s.full_name}
+                            </div>
+                        `).join('') : '<div style="font-size:0.8rem; color:#999; text-align:center;">O\'quvchilar yo\'q</div>'}
+                    </div>
+
+                    <button class="btn btn-primary" style="width: 100%;">Davomat qilish</button>
                 </div>
             `}).join('');
 

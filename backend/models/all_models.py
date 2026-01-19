@@ -237,7 +237,7 @@ class ShopItem(db.Model):
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(255), nullable=True)
     price = db.Column(db.Float, nullable=False)
-    image_url = db.Column(db.String(255), nullable=True) # URL or icon name
+    image_url = db.Column(db.Text, nullable=True) # URL or Base64 string
     stock = db.Column(db.Integer, default=-1) # -1 means infinite
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 

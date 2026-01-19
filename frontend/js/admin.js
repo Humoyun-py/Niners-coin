@@ -438,19 +438,38 @@ const AdminModule = {
             <div class="input-group"><label class="input-label">Name</label><input type="text" id="itemName" class="form-control"></div>
             <div class="input-group"><label class="input-label">Price</label><input type="number" id="itemPrice" class="form-control"></div>
             <div class="input-group"><label class="input-label">Stock (-1 for infinite)</label><input type="number" id="itemStock" class="form-control" value="-1"></div>
-            <div class="input-group"><label class="input-label">Image URL</label><input type="text" id="itemImage" class="form-control"></div>
+            <div class="input-group">
+                <label class="input-label">Product Image</label>
+                <input type="file" id="itemImageFile" class="form-control" accept="image/*">
+                <p style="font-size:0.8rem; color:#666; margin-top:4px;">Select an image (max 1MB recommended)</p>
+            </div>
         `;
         this.createModal('Add Shop Item', content, async () => {
             const name = document.getElementById('itemName').value;
             const price = document.getElementById('itemPrice').value;
             const stock = document.getElementById('itemStock').value;
-            const image_url = document.getElementById('itemImage').value;
+            const fileInput = document.getElementById('itemImageFile');
 
             if (!name || !price) return alert("Name and Price required");
 
+            let image_url = '';
+
+            if (fileInput.files && fileInput.files[0]) {
+                const file = fileInput.files[0];
+                if (file.size > 2 * 1024 * 1024) return alert("Image too large. Max 2MB.");
+
+                // Convert to Base64
+                image_url = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            }
+
             try {
                 await api.post('/admin/shop/items', { name, price: parseFloat(price), stock: parseInt(stock), image_url });
-                alert("Item added!");
+                alert("Item added successfully!");
                 setTimeout(() => AdminModule.openShopManager(), 500);
             } catch (e) { alert("Error: " + e.message); }
         }, 'Add');

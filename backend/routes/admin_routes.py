@@ -77,6 +77,15 @@ def fix_homework_schema():
             except Exception as e:
                 db.session.rollback()
                 results.append(f"⚠️ Failed to add {col_name}: {str(e)}") # Likely already exists
+
+        # Also fix ShopItem image_url type to TEXT for Base64 support
+        try:
+            db.session.execute(text("ALTER TABLE shop_items ALTER COLUMN image_url TYPE TEXT"))
+            db.session.commit()
+            results.append("✅ Changed shop_items.image_url to TEXT")
+        except Exception as e:
+            db.session.rollback()
+            results.append(f"⚠️ Failed to alter shop_items: {str(e)}")
         
         return jsonify({"msg": "Schema update attempted", "details": results}), 200
     except Exception as e:

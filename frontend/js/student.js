@@ -96,16 +96,26 @@ const StudentModule = {
                 return;
             }
 
-            container.innerHTML = items.map(item => `
+            container.innerHTML = items.map(item => {
+                // Fix image path - ensure it starts with / if it's a relative path
+                let imgSrc = item.image_url || 'https://via.placeholder.com/150?text=Item';
+                if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
+                    imgSrc = '/' + imgSrc;
+                }
+
+                return `
                 <div class="shop-item">
-                    <img src="${item.image_url || 'https://via.placeholder.com/150?text=Item'}" class="item-image" alt="${item.name}">
+                    <img src="${imgSrc}" 
+                         class="item-image" 
+                         alt="${item.name}"
+                         onerror="this.onerror=null; this.src='https://via.placeholder.com/150/cccccc/666666?text=No+Image';">
                     <h4>${item.name}</h4>
                     <div class="item-price">${item.price} 🟡</div>
                     <p style="font-size: 0.8rem; color: #666;">${item.stock === -1 ? this.t('unlimited') : item.stock + ' ' + this.t('stock_left')}</p>
                     <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" 
                         onclick="StudentModule.buyItem(${item.id}, '${item.name}', ${item.price})">${this.t('buy_action')}</button>
                 </div>
-            `).join('');
+            `}).join('');
         } catch (e) {
             console.error(e);
             const c = document.getElementById('shopContainer');

@@ -267,6 +267,11 @@ def create_app():
     def login_page():
         return send_from_directory(app.static_folder, 'login.html')
 
+    @app.route('/uploads/<path:filename>')
+    def serve_uploads(filename):
+        """Serve uploaded files (e.g., shop item images)"""
+        uploads_dir = os.path.join(app.static_folder, 'uploads')
+        return send_from_directory(uploads_dir, filename)
 
     @app.errorhandler(500)
     def internal_error(error):

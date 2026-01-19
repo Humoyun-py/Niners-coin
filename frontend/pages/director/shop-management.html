@@ -77,10 +77,20 @@
                 const history = await api.get('/admin/shop/history');
 
                 const invContainer = document.getElementById('inventoryContainer');
-                invContainer.innerHTML = items.map(i => `
+                invContainer.innerHTML = items.map(i => {
+                    // Fix image path - ensure it starts with / if it's a relative path
+                    let imgSrc = i.image_url || 'https://via.placeholder.com/100x100?text=No+Image';
+                    if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
+                        imgSrc = '/' + imgSrc;
+                    }
+                    return `
                     <div class="item-card">
                         <div class="item-info">
-                            <img src="${i.image_url || 'https://via.placeholder.com/60'}" class="item-img" alt="${i.name}">
+                            <img src="${imgSrc}" 
+                                 class="item-img" 
+                                 alt="${i.name}"
+                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/100x100/cccccc/666666?text=No+Image';"
+                                 style="width: 100px; height: 100px; object-fit: cover; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                             <div>
                                 <h4 style="margin:0;">${i.name}</h4>
                                 <div style="color:var(--primary); font-weight:700;">${parseFloat(i.price).toFixed(2)} 🟡</div>
@@ -92,7 +102,7 @@
                             <button onclick="AdminModule.deleteShopItem(${i.id})" class="btn" style="padding:6px 12px; font-size:0.8rem; background:#FFE0E0; color:#DC3545; border:none;">Delete</button>
                         </div>
                     </div>
-                `).join('') || '<p>No items in inventory.</p>';
+                `}).join('') || '<p>No items in inventory.</p>';
 
                 const histContainer = document.getElementById('historyContainer');
                 histContainer.innerHTML = history.map(h => `

@@ -11,17 +11,20 @@
     <style>
         .shop-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 16px;
         }
 
         .shop-item {
             background: white;
             border-radius: var(--radius-lg);
-            padding: 16px;
+            padding: 12px;
             box-shadow: var(--shadow-sm);
             transition: transform 0.2s;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .shop-item:hover {
@@ -31,11 +34,12 @@
 
         .item-image {
             width: 100%;
-            height: 150px;
-            object-fit: cover;
+            height: 180px;
+            object-fit: contain;
             border-radius: var(--radius-md);
             margin-bottom: 12px;
-            background: #f0f0f0;
+            background: #ffffff;
+            padding: 5px;
         }
 
         .item-price {

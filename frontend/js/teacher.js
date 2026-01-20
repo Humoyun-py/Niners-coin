@@ -804,8 +804,12 @@ const TeacherModule = {
                         ${sub.content ? `<p style="white-space: pre-wrap;">${sub.content}</p>` : ''}
                         ${sub.image_url ? `
                             <div style="margin-top: 10px;">
-                                <a href="/${sub.image_url}" target="_blank" style="color: #3498db; font-size: 0.9rem;">📎 To'liq hajmdagi rasm</a>
-                                <img src="/${sub.image_url}" alt="Submission" style="max-width: 100%; height: auto; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd;">
+                                <a href="${sub.image_url.startsWith('data:') ? '#' : '/' + sub.image_url}" 
+                                   ${sub.image_url.startsWith('data:') ? 'onclick="return false;"' : 'target="_blank"'} 
+                                   style="color: #3498db; font-size: 0.9rem;">📎 To'liq hajmdagi rasm</a>
+                                <img src="${sub.image_url.startsWith('data:') ? sub.image_url : '/' + sub.image_url}" 
+                                     alt="Submission" 
+                                     style="max-width: 100%; max-height: 400px; height: auto; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd; object-fit: contain; background: #f8f9fa;">
                             </div>
                         ` : ''}
                     </div>

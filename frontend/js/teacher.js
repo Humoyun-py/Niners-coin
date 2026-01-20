@@ -788,6 +788,16 @@ const TeacherModule = {
                 return;
             }
 
+            // DEBUG: Log submissions to check image_url
+            console.log('Submissions:', submissions);
+            submissions.forEach((sub, idx) => {
+                console.log(`Submission ${idx}:`, {
+                    student: sub.student_name,
+                    hasImage: !!sub.image_url,
+                    imageUrlStart: sub.image_url ? sub.image_url.substring(0, 50) : 'NO IMAGE'
+                });
+            });
+
             container.innerHTML = submissions.map(sub => `
                 <div class="card" style="margin-bottom: 15px; border-left: 4px solid ${this._getStatusColor(sub.status)};">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">

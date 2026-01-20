@@ -804,14 +804,15 @@ const TeacherModule = {
                         ${sub.content ? `<p style="white-space: pre-wrap;">${sub.content}</p>` : ''}
                         ${sub.image_url ? `
                             <div style="margin-top: 10px;">
-                                <a href="${sub.image_url.startsWith('data:') ? '#' : '/' + sub.image_url}" 
-                                   ${sub.image_url.startsWith('data:') ? 'onclick="return false;"' : 'target="_blank"'} 
-                                   style="color: #3498db; font-size: 0.9rem;">📎 To'liq hajmdagi rasm</a>
+                                <p style="font-size: 0.85rem; color: #666; margin-bottom: 5px;">📎 Yuklangan rasm:</p>
                                 <img src="${sub.image_url.startsWith('data:') ? sub.image_url : '/' + sub.image_url}" 
                                      alt="Submission" 
-                                     style="max-width: 100%; max-height: 400px; height: auto; border-radius: 8px; margin-top: 8px; border: 1px solid #ddd; object-fit: contain; background: #f8f9fa;">
+                                     onclick="TeacherModule.openImageModal('${sub.image_url.replace(/'/g, "\\'")}', '${sub.student_name}')"
+                                     style="max-width: 100%; max-height: 300px; height: auto; border-radius: 8px; margin-top: 8px; border: 2px solid #ddd; object-fit: contain; background: #ffffff; cursor: pointer; transition: transform 0.2s;"
+                                     onmouseover="this.style.transform='scale(1.02)'"
+                                     onmouseout="this.style.transform='scale(1)'">
                             </div>
-                        ` : ''}
+                        ` : '<p style="font-size: 0.85rem; color: #999;">Rasm yuklanmagan</p>'}
                     </div>
 
                     ${sub.status === 'submitted' ? `
@@ -876,6 +877,30 @@ const TeacherModule = {
         } catch (e) {
             alert("Xatolik: " + e.message);
         }
+    },
+
+    openImageModal(imageUrl, studentName) {
+        // Remove existing modal if any
+        const existingModal = document.getElementById('imageViewModal');
+        if (existingModal) existingModal.remove();
+
+        const modalHTML = `
+            <div id="imageViewModal" class="modal-overlay active" onclick="this.remove()">
+                <div class="modal-box" style="max-width: 90vw; max-height: 90vh; overflow: auto; background: #ffffff;" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <div class="modal-title">${studentName} - Uy ishi rasmi</div>
+                        <button class="modal-close" onclick="document.getElementById('imageViewModal').remove()">×</button>
+                    </div>
+                    <div class="modal-body" style="text-align: center; padding: 20px; overflow: auto; max-height: 75vh;">
+                        <img src="${imageUrl.startsWith('data:') ? imageUrl : '/' + imageUrl}" 
+                             alt="Homework submission" 
+                             style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHTML);
     }
 };
 

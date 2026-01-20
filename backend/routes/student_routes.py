@@ -271,30 +271,19 @@ def submit_homework(homework_id):
     if not homework:
         return jsonify({"msg": "Homework not found"}), 404
 
-    # Determine submission type
-    content = request.form.get('content', '').strip()
-    submission_type = request.form.get('type', 'text') # text, file, paper
+    # Get JSON data
+    data = request.get_json() or {}
+    content = data.get('content', '').strip()
+    submission_type = data.get('type', 'text')  # text, file, paper
+    image_base64 = data.get('image_base64')
     
     image_url = None
     
-    # Handle File Upload
-    if 'file' in request.files:
-        file = request.files['file']
-        if file and file.filename != '':
-            filename = secure_filename(f"hw_{homework_id}_{student.id}_{int(datetime.utcnow().timestamp())}_{file.filename}")
-            
-            # Use current_app.static_folder (points to 'frontend')
-            upload_base = current_app.static_folder
-            upload_folder = os.path.join(upload_base, 'uploads', 'homeworks')
-            
-            if not os.path.exists(upload_folder):
-                os.makedirs(upload_folder)
-            
-            file_path = os.path.join(upload_folder, filename)
-            file.save(file_path)
-            
-            # URL should be relative to static root
-            image_url = f"uploads/homeworks/{filename}"
+    # Handle Base64 Image
+    if image_base64 and image_base64.startswith('data:image'):
+        # Store Base64 directly in database
+        image_url = image_base64
+        if not content:
             content = "Rasm yuklandi"
 
     if submission_type == 'paper' and not content:

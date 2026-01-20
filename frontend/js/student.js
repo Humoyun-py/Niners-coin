@@ -454,20 +454,41 @@ const StudentModule = {
             return;
         }
 
-        const formData = new FormData();
-        formData.append('type', file ? 'file' : 'text');
-        formData.append('content', content);
+        let imageBase64 = null;
+
         if (file) {
-            formData.append('file', file);
+            // Check file size (max 2MB)
+            if (file.size > 2 * 1024 * 1024) {
+                this.showNotification('❌ Xato', 'Rasm juda katta! Maksimal 2MB bo\'lishi kerak.', 'error');
+                return;
+            }
+
+            // Convert to Base64
+            try {
+                imageBase64 = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+            } catch (error) {
+                this.showNotification('❌ Xato', 'Rasmni yuklashda xatolik', 'error');
+                return;
+            }
         }
 
-        this._sendHomework(hwId, formData);
+        this._sendHomework(hwId, content, imageBase64);
     },
 
-    async _sendHomework(hwId, formData) {
+    async _sendHomework(hwId, content, imageBase64) {
         try {
-            // Use api.upload helper which handles baseURL and Auth headers
-            const result = await api.upload(`/student/homework/${hwId}/submit`, formData);
+            const payload = {
+                type: imageBase64 ? 'file' : 'text',
+                content: content || '',
+                image_base64: imageBase64
+            };
+
+            const result = await api.post(`/student/homework/${hwId}/submit`, payload);
 
             this.showNotification('✅ Muvaffaqiyat', result.msg);
             this.loadMyHomework();

@@ -259,6 +259,15 @@ def create_app():
             db.session.rollback()
             print(f"⚠️ AUTO-FIX: shop_items already correct or error: {str(e)}")
         
+        # AUTO-FIX HOMEWORK IMAGES DATABASE
+        try:
+            db.session.execute(text("ALTER TABLE homework_submissions ALTER COLUMN image_url TYPE TEXT"))
+            db.session.commit()
+            print("✅ AUTO-FIX: homework_submissions.image_url set to TEXT")
+        except Exception as e:
+            db.session.rollback()
+            print(f"⚠️ AUTO-FIX: homework_submissions already correct: {str(e)}")
+        
     migrate.init_app(app, db)
     jwt.init_app(app)
     

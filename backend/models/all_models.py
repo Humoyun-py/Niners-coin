@@ -282,7 +282,7 @@ class HomeworkSubmission(db.Model):
     student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
     homework_id = db.Column(db.Integer, db.ForeignKey('homeworks.id'), nullable=False)
     content = db.Column(db.Text, nullable=True)
-    image_url = db.Column(db.String(500), nullable=True)
+    image_url = db.Column(db.Text, nullable=True)  # Base64 or URL
     admin_comment = db.Column(db.String(255), nullable=True)
     status = db.Column(db.String(20), default='pending') # pending, submitted, approved, rejected
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)

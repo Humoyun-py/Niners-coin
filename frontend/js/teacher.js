@@ -818,7 +818,7 @@ const TeacherModule = {
                         <div style="display: flex; gap: 10px; align-items: flex-end;">
                             <div style="flex: 1;">
                                 <label style="font-size: 0.8rem;">Coin:</label>
-                                <input type="number" id="grade_amount_${sub.id}" class="form-control" value="5" min="0" step="0.5">
+                                <input type="number" id="grade_amount_${sub.id}" class="form-control" value="0" min="0" step="0.5">
                             </div>
                             <div style="flex: 2;">
                                 <label style="font-size: 0.8rem;">Izoh:</label>

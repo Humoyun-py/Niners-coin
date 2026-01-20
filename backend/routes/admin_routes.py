@@ -80,13 +80,21 @@ def fix_homework_schema():
 
         # Also fix ShopItem image_url type to TEXT for Base64 support
         try:
+            # Drop constraint if exists to allow type change
             db.session.execute(text("ALTER TABLE shop_items ALTER COLUMN image_url TYPE TEXT"))
             db.session.commit()
             results.append("✅ Changed shop_items.image_url to TEXT")
         except Exception as e:
             db.session.rollback()
-            results.append(f"⚠️ Failed to alter shop_items: {str(e)}")
-        
+            results.append(f"⚠️ Failed to alter shop_items (trying add): {str(e)}")
+            try:
+                # If column doesn't exist, add it
+                db.session.execute(text("ALTER TABLE shop_items ADD COLUMN image_url TEXT"))
+                db.session.commit()
+                results.append("✅ Added shop_items.image_url as TEXT")
+            except Exception as ex:
+                results.append(f"❌ Critical Shop Fix Failed: {str(ex)}")
+
         return jsonify({"msg": "Schema update attempted", "details": results}), 200
     except Exception as e:
         return jsonify({"msg": str(e)}), 500

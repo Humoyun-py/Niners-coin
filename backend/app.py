@@ -249,15 +249,15 @@ def create_app():
         sync_schema() # Ensure existing tables have new columns
         seed_data()
         
-    # AUTO-FIX SHOP IMAGES DATABASE (runs on every startup)
-    try:
-        from sqlalchemy import text
-        db.session.execute(text("ALTER TABLE shop_items ALTER COLUMN image_url TYPE TEXT"))
-        db.session.commit()
-        print("✅ AUTO-FIX: shop_items.image_url set to TEXT")
-    except Exception as e:
-        db.session.rollback()
-        print(f"⚠️ AUTO-FIX: shop_items already correct or error: {str(e)}")
+        # AUTO-FIX SHOP IMAGES DATABASE (runs on every startup)
+        try:
+            from sqlalchemy import text
+            db.session.execute(text("ALTER TABLE shop_items ALTER COLUMN image_url TYPE TEXT"))
+            db.session.commit()
+            print("✅ AUTO-FIX: shop_items.image_url set to TEXT")
+        except Exception as e:
+            db.session.rollback()
+            print(f"⚠️ AUTO-FIX: shop_items already correct or error: {str(e)}")
         
     migrate.init_app(app, db)
     jwt.init_app(app)

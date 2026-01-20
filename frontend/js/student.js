@@ -99,7 +99,7 @@ const StudentModule = {
             container.innerHTML = items.map(item => {
                 // Fix image path - ensure it starts with / if it's a relative path
                 let imgSrc = item.image_url || 'https://via.placeholder.com/150?text=Item';
-                if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
+                if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('/') && !imgSrc.startsWith('data:')) {
                     imgSrc = '/' + imgSrc;
                 }
 

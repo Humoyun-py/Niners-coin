@@ -80,7 +80,7 @@
                 invContainer.innerHTML = items.map(i => {
                     // Fix image path - ensure it starts with / if it's a relative path
                     let imgSrc = i.image_url || 'https://via.placeholder.com/100x100?text=No+Image';
-                    if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
+                    if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('/') && !imgSrc.startsWith('data:')) {
                         imgSrc = '/' + imgSrc;
                     }
                     return `

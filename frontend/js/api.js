@@ -85,6 +85,23 @@ const api = {
         return result;
     },
 
+    async patch(endpoint, data) {
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(data)
+            });
+            return this.handleResponse(response);
+        } catch (error) {
+            console.error('API PATCH Error:', error);
+            throw error;
+        }
+    },
+
     async delete(endpoint) {
         const response = await fetch(`${API_URL}${endpoint}`, {
             method: 'DELETE',

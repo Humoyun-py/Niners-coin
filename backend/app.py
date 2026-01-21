@@ -279,7 +279,10 @@ def create_app():
             print(f"⚠️ AUTO-FIX: profile_image already exists: {str(e)}")
         
         # NOW seed data (after all schema fixes)
-        seed_data()
+        try:
+            seed_data()
+        except Exception as e:
+            print(f"⚠️ Seed Data Error (Skipping to keep server running): {str(e)}")
         
     migrate.init_app(app, db)
     jwt.init_app(app)

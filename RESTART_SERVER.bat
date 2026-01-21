@@ -1,0 +1,6 @@
+@echo off
+echo Serverni to'xtatish...
+taskkill /F /IM python.exe
+echo Serverni qayta ishga tushirish...
+python backend/app.py
+pause

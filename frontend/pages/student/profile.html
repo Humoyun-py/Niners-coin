@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | Niners.uz</title>
+    <link rel="icon" type="image/png" href="../../assets/logo.png">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../styles/main.css">
     <style>
@@ -13,6 +14,23 @@
             grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             gap: 20px;
             margin-top: 20px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                width: 100% !important;
+                padding: 15px !important;
+            }
         }
 
         .badge-item {
@@ -57,7 +75,7 @@
 
 <body class="dashboard-grid">
     <div id="sidebarContainer"></div>
-    <main class="main-content">
+    <main class="main-content" style="width: 86%;">
         <header class="dashboard-header flex-wrap-mobile">
             <div class="header-left">
                 <div>
@@ -67,17 +85,17 @@
             </div>
         </header>
 
-        <div class="mobile-stack" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div class="profile-grid">
             <!-- Profile Form -->
             <div class="card"
                 style="background: white; padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);">
                 <div
-                    style="display: flex; align-items: center; gap: 24px; margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #F0F2F5;">
-                    <div style="position: relative;">
+                    style="display: flex;  align-items: center; gap: 24px; margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #F0F2F5; ">
+                    <div style="position: relative;  ">
                         <img id="profileAvatarImg" src="" alt="Profile"
                             style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #FFD200; display: none;">
                         <div id="profileAvatar"
-                            style="width: 80px; height: 80px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700; box-shadow: 0 10px 20px rgba(255, 210, 0, 0.2);">
+                            style="width: 80px; height: 80px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700; box-shadow: 0 10px 20px rgba(255, 210, 0, 0.2); ">
                             ?
                         </div>
                         <input type="file" id="profileImageInput" accept="image/*" style="display: none;">

@@ -425,50 +425,46 @@ const TeacherModule = {
             const finalClassName = className || data.name || 'Guruh';
 
             const rows = data.students.map(s => `
-                <div class="attendance-card" style="background: white; border: 1px solid #eee; padding: 16px; border-radius: 12px; margin-bottom: 12px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px;">
-                    <!-- Student Info -->
-                    <div style="display: flex; align-items: center; gap: 12px; min-width: 200px; flex: 1;">
-                        <div style="width: 45px; height: 45px; background: var(--primary-gradient); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">
-                            ${s.full_name[0]}
+                <div class="attendance-card" style="background: white; border: 1px solid #eee; padding: 16px; border-radius: 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 15px;">
+                    <!-- Student Info (Top) -->
+                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 45px; height: 45px; background: var(--primary-gradient); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">
+                                ${s.full_name[0]}
+                            </div>
+                            <div>
+                                <div style="font-weight: 700; font-size: 1rem;">${s.full_name}</div>
+                                <div style="font-size: 0.85rem; color: var(--secondary); font-weight:600;">${parseFloat(s.balance).toFixed(1)} 🟡</div>
+                            </div>
                         </div>
-                        <div>
-                            <div style="font-weight: 700; font-size: 1rem;">${s.full_name}</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">ID: #${s.id}</div>
-                            <div style="font-size: 0.85rem; color: var(--secondary); font-weight:600;">Balans: ${parseFloat(s.balance).toFixed(1)} 🟡</div>
-                        </div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted);">#${s.id}</div>
                     </div>
                     
-                    <!-- Controls Area -->
-                    <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap; flex: 3; justify-content: flex-end;">
+                    <!-- Controls Area (Bottom) -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; width: 100%;">
                         <!-- Status Toggles -->
-                         <div style="border-right:1px solid #eee; padding-right:15px;">
-                            <div class="attendance-toggles" style="display: flex; background: #f8f9fa; padding: 4px; border-radius: 8px; border: 1px solid #e9ecef;">
-                                <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px; position: relative;">
-                                    <input type="radio" name="att_${s.id}" value="present" checked style="accent-color: #2ecc71; width: 14px; height: 14px;"> 
-                                    <span>Bor</span>
-                                </label>
-                                <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                    <input type="radio" name="att_${s.id}" value="absent" style="accent-color: #e74c3c; width: 14px; height: 14px;"> 
-                                    <span>Yo'q</span>
-                                </label>
-                                <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                    <input type="radio" name="att_${s.id}" value="late" style="accent-color: #f1c40f; width: 14px; height: 14px;"> 
-                                    <span>Kech</span>
-                                </label>
-                            </div>
+                        <div class="attendance-toggles" style="display: flex; background: #f8f9fa; padding: 4px; border-radius: 8px; border: 1px solid #e9ecef; flex-grow: 1; justify-content: center;">
+                            <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                <input type="radio" name="att_${s.id}" value="present" checked style="accent-color: #2ecc71; width: 16px; height: 16px;"> 
+                                <span>Bor</span>
+                            </label>
+                            <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                <input type="radio" name="att_${s.id}" value="absent" style="accent-color: #e74c3c; width: 16px; height: 16px;"> 
+                                <span>Yo'q</span>
+                            </label>
+                            <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
+                                <input type="radio" name="att_${s.id}" value="late" style="accent-color: #f1c40f; width: 16px; height: 16px;"> 
+                                <span>Kech</span>
+                            </label>
                         </div>
 
                         <!-- Extra Coins -->
-                        <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:280px;">
-                            <div style="flex:1;">
-                                <input type="text" id="reason_${s.id}" class="form-control" placeholder="Uyga vazifa / Faollik" style="font-size:0.85rem; padding:8px;">
-                            </div>
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <span style="font-size:0.85rem; font-weight:600; color:#555; white-space:nowrap;">Coin qo'yish:</span>
-                                <input type="number" id="coin_${s.id}" class="form-control" placeholder="0" min="0" step="1" style="font-size:0.9rem; padding:8px; width:70px; text-align:center; font-weight:700; color:var(--primary);">
-                                <button class="btn btn-sm btn-success" title="Darhol yuborish" onclick="TeacherModule.sendIndividualCoins(this, ${s.id}, '${s.full_name.replace(/'/g, "\\'")}')" style="padding: 8px 12px;">Yuborish</button>
-                            </div>
-                            </div>
+                        <div style="display:flex; align-items:center; gap:8px; flex-grow: 1; justify-content: space-between; background: #f8f9fa; padding: 6px; border-radius: 8px; border: 1px solid #eee;">
+                            <input type="text" id="reason_${s.id}" class="form-control" placeholder="Sabab" style="font-size:0.85rem; padding:8px; width: 100%;">
+                            <input type="number" id="coin_${s.id}" class="form-control" placeholder="0" min="0" step="1" style="font-size:0.9rem; padding:8px; width:60px; text-align:center; font-weight:700; color:var(--primary);">
+                            <button class="btn btn-sm btn-success" title="Yuborish" onclick="TeacherModule.sendIndividualCoins(this, ${s.id}, '${s.full_name.replace(/'/g, "\\'")}')" style="padding: 8px 10px;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
                         </div>
                     </div>
                 </div>

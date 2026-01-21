@@ -215,6 +215,28 @@ body {
     /* Push content right */
     padding-bottom: var(--space-xl);
     transition: var(--transition);
+    max-width: 1920px;
+    /* Prevent infinite stretching on 4K */
+}
+
+/* === Global Responsive Grids === */
+.auto-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--space-m);
+}
+
+.trio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-m);
+}
+
+/* Notebook/Laptop Specific (1024px - 1499px) */
+@media (min-width: 1024px) and (max-width: 1500px) {
+    .auto-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 /* Removed duplicate main-content definition */

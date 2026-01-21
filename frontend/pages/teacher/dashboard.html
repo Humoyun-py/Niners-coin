@@ -78,23 +78,25 @@
         <div class="card" style="padding: 24px;">
             <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;"
                 data-i18n="groups_list_title">📋 Groups List</h3>
-            <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                    <tr
-                        style="border-bottom: 2px solid var(--border-light); text-align: left; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
-                        <th style="padding: 15px;" data-i18n="group_name">Group Name</th>
-                        <th style="padding: 15px;" data-i18n="students_count">Students count</th>
-                        <th style="padding: 15px;" data-i18n="schedule">Schedule</th>
-                        <th style="padding: 15px;" data-i18n="action">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="classList">
-                    <tr>
-                        <td colspan="3" style="text-align:center; padding:30px; color: var(--text-muted);"
-                            data-i18n="loading">Loading groups...</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; min-width: 600px;">
+                    <thead>
+                        <tr
+                            style="border-bottom: 2px solid var(--border-light); text-align: left; color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">
+                            <th style="padding: 15px;" data-i18n="group_name">Group Name</th>
+                            <th style="padding: 15px;" data-i18n="students_count">Students count</th>
+                            <th style="padding: 15px;" data-i18n="schedule">Schedule</th>
+                            <th style="padding: 15px;" data-i18n="action">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="classList">
+                        <tr>
+                            <td colspan="4" style="text-align:center; padding:30px; color: var(--text-muted);"
+                                data-i18n="loading">Loading groups...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
     </div>
@@ -109,6 +111,20 @@
         LanguageModule.init();
         TeacherModule.initDashboard();
     </script>
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </body>
 
 </html>

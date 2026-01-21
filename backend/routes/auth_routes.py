@@ -48,9 +48,16 @@ def update_profile():
     data = request.get_json()
     if 'full_name' in data: user.full_name = data['full_name']
     if 'email' in data: user.email = data['email']
+    if 'username' in data: user.username = data['username']
+    if 'password' in data and data['password']: user.set_password(data['password'])
+    if 'profile_image' in data: user.profile_image = data['profile_image']
     
-    db.session.commit()
-    return jsonify({"msg": "Profil yangilandi", "user": user.to_dict()}), 200
+    try:
+        db.session.commit()
+        return jsonify({"msg": "Profil yangilandi", "user": user.to_dict()}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": "Xatolik: Username yoki Email band bo'lishi mumkin"}), 400
 @auth_bp.route('/debug/env', methods=['GET'])
 def debug_env():
     import os

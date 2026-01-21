@@ -268,6 +268,15 @@ def create_app():
             db.session.rollback()
             print(f"⚠️ AUTO-FIX: homework_submissions already correct: {str(e)}")
         
+        # AUTO-FIX PROFILE IMAGES
+        try:
+            db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_image TEXT"))
+            db.session.commit()
+            print("✅ AUTO-FIX: users.profile_image column added")
+        except Exception as e:
+            db.session.rollback()
+            print(f"⚠️ AUTO-FIX: profile_image already exists: {str(e)}")
+        
     migrate.init_app(app, db)
     jwt.init_app(app)
     

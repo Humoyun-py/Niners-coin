@@ -18,6 +18,7 @@ class User(db.Model):
     is_active = db.Column(db.Boolean, default=True)
     block_reason = db.Column(db.String(255), nullable=True)
     debt_amount = db.Column(db.Float, default=0.0)
+    profile_image = db.Column(db.Text, nullable=True)  # Base64 image
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def set_password(self, password):
@@ -35,6 +36,7 @@ class User(db.Model):
             "is_active": self.is_active,
             "block_reason": self.block_reason,
             "debt_amount": self.debt_amount,
+            "profile_image": self.profile_image,
             "created_at": self.created_at.isoformat() if self.created_at else None
         }
 

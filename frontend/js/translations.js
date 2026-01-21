@@ -92,6 +92,15 @@ const TRANSLATIONS = {
         "course_kids_desc": "Bolalar uchun maxsus o'yinlar va qiziqarli mashg'ulotlar orqali ingliz tili.",
         "btn_details": "Batafsil",
 
+        // Student Dashboard
+        "dashboard_welcome": "Xush kelibsiz!",
+        "dashboard_subtitle": "Bugun ingliz tilingizni yaxshilashga tayyormisiz?",
+        "word_of_day": "KUNLIK SO'Z",
+        "total_coins": "Jami coinlarim",
+        "completed_tests": "Bajarilgan testlar",
+        "streak_days": "Ketma-ket kunlar",
+        "motivation_title": "motivatsiya",
+
         "reviews_title": "O'quvchilarimiz <span style='color: var(--primary);'>Fikri</span>",
         "review_1": "\"Niners platformasi tufayli o'qishga bo'lgan qiziqishim ortdi. Coinlar yig'ib, o'zimga kerakli kitoblarni sotib oldim. Zo'r!\"",
         "review_2": "\"Farzandimning natijalarini uyda o'tirib kuzata olaman. O'qituvchilar juda malakali va e'tiborli.\"",
@@ -196,6 +205,15 @@ const TRANSLATIONS = {
         "course_kids_desc": "Английский для детей через специальные игры и интересные занятия.",
         "btn_details": "Подробнее",
 
+        // Student Dashboard
+        "dashboard_welcome": "Добро пожаловать!",
+        "dashboard_subtitle": "Готовы улучшить свой английский сегодня?",
+        "word_of_day": "СЛОВО ДНЯ",
+        "total_coins": "Всего коинов",
+        "completed_tests": "Выполненные тесты",
+        "streak_days": "Дней подряд",
+        "motivation_title": "мотивация",
+
         "reviews_title": "Мнения <span style='color: var(--primary);'>Учеников</span>",
         "review_1": "\"Благодаря платформе Niners мой интерес к учебе возрос. Собирая коины, я купил нужные мне книги. Супер!\"",
         "review_2": "\"Я могу наблюдать за результатами своего ребенка, сидя дома. Учителя очень квалифицированные и внимательные.\"",
@@ -299,6 +317,15 @@ const TRANSLATIONS = {
         "course_math_desc": "Improve your logical thinking and problem-solving skills.",
         "course_kids_desc": "English for kids through special games and fun activities.",
         "btn_details": "Details",
+
+        // Student Dashboard
+        "dashboard_welcome": "Welcome!",
+        "dashboard_subtitle": "Ready to level up your English today?",
+        "word_of_day": "WORD OF THE DAY",
+        "total_coins": "Total Coins",
+        "completed_tests": "Completed Tests",
+        "streak_days": "Day Streak",
+        "motivation_title": "motivation",
 
         "reviews_title": "Student <span style='color: var(--primary);'>Reviews</span>",
         "review_1": "\"Thanks to the Niners platform, my interest in studying increased. I bought books I needed by collecting Coins. Great!\"",

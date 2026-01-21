@@ -818,9 +818,17 @@ const TeacherModule = {
                                 <img src="${sub.image_url.startsWith('data:') ? sub.image_url : '/' + sub.image_url}" 
                                      alt="Submission" 
                                      onclick="TeacherModule.openImageModal('${sub.image_url.replace(/'/g, "\\'")}', '${sub.student_name}')"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
                                      style="max-width: 100%; max-height: 300px; height: auto; border-radius: 8px; margin-top: 8px; border: 2px solid #ddd; object-fit: contain; background: #ffffff; cursor: pointer; transition: transform 0.2s;"
                                      onmouseover="this.style.transform='scale(1.02)'"
                                      onmouseout="this.style.transform='scale(1)'">
+                                <div style="display: none; padding: 20px; background: #fff3cd; border: 1px dashed #ffc107; border-radius: 8px; text-align: center; margin-top: 8px;">
+                                    <p style="margin: 0; color: #856404; font-size: 0.9rem;">⚠️ Rasm topilmadi</p>
+                                    <p style="margin: 5px 0 0 0; font-size: 0.8rem; color: #666;">
+                                        Bu eski rasm server qayta ishga tushganda o'chirilgan.<br>
+                                        O'quvchidan yangidan yuklashni so'rang.
+                                    </p>
+                                </div>
                             </div>
                         ` : '<p style="font-size: 0.85rem; color: #999;">Rasm yuklanmagan</p>'}
                     </div>

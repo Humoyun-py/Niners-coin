@@ -3,9 +3,32 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coins | Niners.uz</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../../styles/main.css">
+    <style>
+        @media (max-width: 768px) {
+            .main-content {
+                width: 100% !important;
+                padding: 15px !important;
+            }
+
+            .transaction-item {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+            }
+
+            .transaction-item span {
+                font-size: 0.9rem;
+            }
+
+            .transaction-item b {
+                font-size: 1.1rem !important;
+            }
+        }
+    </style>
 </head>
 
 <body class="dashboard-grid">
@@ -45,7 +68,7 @@
                     const history = document.getElementById('history');
                     if (data.recent_activity.length > 0) {
                         history.innerHTML = data.recent_activity.map(a => `
-                            <div class="flex-wrap-mobile" style="padding:10px; border-bottom:1px solid #F5F5F5; display:flex; justify-content:space-between; align-items: center; gap: 10px;">
+                            <div class="transaction-item flex-wrap-mobile" style="padding:10px; border-bottom:1px solid #F5F5F5; display:flex; justify-content:space-between; align-items: center; gap: 10px;">
                                 <span>${a.source}</span> 
                                 <b style="color:${a.type === 'earn' ? '#2ECC71' : '#E74C3C'}">${a.amount > 0 ? '+' : ''}${a.amount} 🟡</b>
                             </div>

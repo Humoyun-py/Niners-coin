@@ -73,9 +73,18 @@
                 style="background: white; padding: 40px; border-radius: var(--radius-lg); box-shadow: var(--shadow-soft);">
                 <div
                     style="display: flex; align-items: center; gap: 24px; margin-bottom: 32px; padding-bottom: 32px; border-bottom: 1px solid #F0F2F5;">
-                    <div id="profileAvatar"
-                        style="width: 80px; height: 80px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700; box-shadow: 0 10px 20px rgba(255, 210, 0, 0.2);">
-                        ?
+                    <div style="position: relative;">
+                        <img id="profileAvatarImg" src="" alt="Profile"
+                            style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #FFD200; display: none;">
+                        <div id="profileAvatar"
+                            style="width: 80px; height: 80px; background: var(--primary-gradient); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: 700; box-shadow: 0 10px 20px rgba(255, 210, 0, 0.2);">
+                            ?
+                        </div>
+                        <input type="file" id="profileImageInput" accept="image/*" style="display: none;">
+                        <button type="button" onclick="document.getElementById('profileImageInput').click()"
+                            style="position: absolute; bottom: 0; right: 0; width: 28px; height: 28px; border-radius: 50%; background: #FFD200; border: 2px solid white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem;">
+                            📷
+                        </button>
                     </div>
                     <div>
                         <h3 id="displayFullName" style="margin: 0;">User</h3>
@@ -98,9 +107,17 @@
 
                     <div class="form-group">
                         <label
-                            style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Role</label>
-                        <input type="text" id="roleDisplay" class="form-control"
-                            style="width: 100%; background: #F8F9FA; cursor: not-allowed;" readonly>
+                            style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Username</label>
+                        <input type="text" id="usernameInput" class="form-control" style="width: 100%;" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem;">Parol
+                            (yangilash)</label>
+                        <input type="password" id="passwordInput" class="form-control" style="width: 100%;"
+                            placeholder="O'zgartirmoqchi bo'lsangiz yozing">
+                        <small style="color: var(--text-muted); font-size: 0.8rem;">Bo'sh qoldiring, agar parolni
+                            saqlamoqchi bo'lsangiz</small>
                     </div>
 
                     <button type="submit" class="btn btn-primary"

@@ -6,6 +6,7 @@ const StudentModule = {
         this.fetchDashboardData();
         this.loadTests();
         this.loadMyClassInfo();
+        this.loadClassmatesLeaderboard();
         this.initializeWordOfTheDay();
         this.initializeMotivation();
 
@@ -494,6 +495,50 @@ const StudentModule = {
             this.loadMyHomework();
         } catch (error) {
             this.showNotification('❌ Xato', error.message, 'error');
+        }
+    },
+
+    async loadClassmatesLeaderboard() {
+        try {
+            const container = document.getElementById('classmatesLeaderboard');
+            if (!container) return;
+
+            const response = await api.get('/student/classmates');
+            const classmates = response.classmates || [];
+
+            const countEl = document.getElementById('classmateCount');
+            if (countEl) countEl.innerText = `${classmates.length} ta o'quvchi`;
+
+            if (classmates.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Sinfdoshlar yo\'q</p>';
+                return;
+            }
+
+            // Sort by coins (highest first)
+            classmates.sort((a, b) => b.coin_balance - a.coin_balance);
+
+            container.innerHTML = classmates.map((student, index) => `
+                <div style="display: flex; align-items: center; gap: 15px; padding: 12px; background: ${index < 3 ? '#fff9e6' : 'white'}; border-radius: 12px; border: 1px solid ${index < 3 ? '#ffd700' : '#e5e7eb'};">
+                    <div style="font-size: 1.2rem; font-weight: 700; color: ${index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : '#999'}; min-width: 30px;">
+                        ${index + 1}
+                    </div>
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                        ${student.full_name.charAt(0).toUpperCase()}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: #1f2937;">${student.full_name}</div>
+                        <div style="font-size: 0.85rem; color: #6b7280;">@${student.username}</div>
+                    </div>
+                    <div style="font-weight: 700; color: #f59e0b; font-size: 1.1rem;">
+                        ${parseFloat(student.coin_balance).toFixed(1)} 🟡
+                    </div>
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error('Leaderboard error:', error);
+            const container = document.getElementById('classmatesLeaderboard');
+            if (container) container.innerHTML = '<p style="text-align: center; color: red;">Xatolik</p>';
         }
     }
 };

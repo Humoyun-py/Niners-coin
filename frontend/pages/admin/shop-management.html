@@ -23,7 +23,25 @@
             align-items: center;
             box-shadow: var(--shadow-sm);
             gap: 15px;
-            /* Add gap between info and buttons */
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .item-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .item-info {
+                width: 100%;
+            }
+
+            .action-buttons {
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 10px;
+            }
         }
 
         .item-info {
@@ -31,12 +49,10 @@
             align-items: center;
             gap: 15px;
             flex-grow: 1;
-            /* Allow info to take available space */
         }
 
         .item-info div {
             min-width: 0;
-            /* Prevent text overflow */
         }
 
         .item-img {
@@ -87,10 +103,16 @@
 
                 const invContainer = document.getElementById('inventoryContainer');
                 invContainer.innerHTML = items.map(i => {
-                    // Fix image path - ensure it starts with / if it's a relative path
-                    let imgSrc = i.image_url || 'https://via.placeholder.com/100x100?text=No+Image';
-                    if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('/') && !imgSrc.startsWith('data:')) {
-                        imgSrc = '/' + imgSrc;
+                    // Fix image path - ensure it starts with /uploads/ if it's a local shop image
+                    let imgSrc = i.image_url || '';
+                    if (!imgSrc) {
+                        imgSrc = 'https://via.placeholder.com/100x100?text=No+Image';
+                    } else if (!imgSrc.startsWith('http') && !imgSrc.startsWith('data:')) {
+                        if (imgSrc.startsWith('/')) imgSrc = imgSrc.substring(1);
+
+                        if (imgSrc.startsWith('uploads/')) imgSrc = '/' + imgSrc;
+                        else if (imgSrc.startsWith('shop/')) imgSrc = '/uploads/' + imgSrc;
+                        else imgSrc = '/uploads/shop/' + imgSrc;
                     }
                     return `
                     <div class="item-card">
@@ -98,7 +120,7 @@
                             <img src="${imgSrc}" 
                                  class="item-img" 
                                  alt="${i.name}" 
-                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/100x100/cccccc/666666?text=No+Image';" 
+                                 onerror="this.onerror=null; this.src='https://via.placeholder.com/100x100/cccccc/666666?text=Image+Error';" 
                                  style="width: 100px; height: 100px; object-fit: cover; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                             <div>
                                 <h4 style="margin:0;">${i.name}</h4>

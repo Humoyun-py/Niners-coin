@@ -98,10 +98,23 @@ const StudentModule = {
             }
 
             container.innerHTML = items.map(item => {
-                // Fix image path - ensure it starts with / if it's a relative path
-                let imgSrc = item.image_url || 'https://via.placeholder.com/150?text=Item';
-                if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('/') && !imgSrc.startsWith('data:')) {
-                    imgSrc = '/' + imgSrc;
+                // Fix image path - ensure it starts with /uploads/ if it's a local shop image
+                let imgSrc = item.image_url || '';
+                if (!imgSrc) {
+                    imgSrc = 'https://via.placeholder.com/150?text=No+Image';
+                } else if (!imgSrc.startsWith('http') && !imgSrc.startsWith('data:')) {
+                    // It's a local path
+                    // clean up leads
+                    if (imgSrc.startsWith('/')) imgSrc = imgSrc.substring(1);
+
+                    if (imgSrc.startsWith('uploads/')) {
+                        imgSrc = '/' + imgSrc;
+                    } else if (imgSrc.startsWith('shop/')) {
+                        imgSrc = '/uploads/' + imgSrc;
+                    } else {
+                        // assume it's just a filename
+                        imgSrc = '/uploads/shop/' + imgSrc;
+                    }
                 }
 
                 return `
@@ -109,7 +122,7 @@ const StudentModule = {
                     <img src="${imgSrc}" 
                          class="item-image" 
                          alt="${item.name}"
-                         onerror="this.onerror=null; this.src='https://via.placeholder.com/150/cccccc/666666?text=No+Image';">
+                         onerror="this.onerror=null; this.src='https://via.placeholder.com/150/cccccc/666666?text=Image+Error';">
                     <h4>${item.name}</h4>
                     <div class="item-price">${item.price} 🟡</div>
                     <p style="font-size: 0.8rem; color: #666;">${item.stock === -1 ? this.t('unlimited') : item.stock + ' ' + this.t('stock_left')}</p>

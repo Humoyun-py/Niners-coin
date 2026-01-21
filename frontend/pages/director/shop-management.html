@@ -23,6 +23,27 @@
             justify-content: space-between;
             margin-bottom: 16px;
             gap: 15px;
+            flex-wrap: wrap;
+            /* Allow wrapping */
+        }
+
+        @media (max-width: 768px) {
+            .item-card {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .item-info {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
+            .action-buttons {
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 10px;
+            }
         }
 
         .item-info {
@@ -79,10 +100,16 @@
 
                 const invContainer = document.getElementById('inventoryContainer');
                 invContainer.innerHTML = items.map(i => {
-                    // Fix image path - ensure it starts with / if it's a relative path
-                    let imgSrc = i.image_url || 'https://via.placeholder.com/100x100?text=No+Image';
-                    if (imgSrc && !imgSrc.startsWith('http') && !imgSrc.startsWith('/')) {
-                        imgSrc = '/' + imgSrc;
+                    // Fix image path - ensure it starts with /uploads/ if it's a local shop image
+                    let imgSrc = i.image_url || '';
+                    if (!imgSrc) {
+                        imgSrc = 'https://via.placeholder.com/100x100?text=No+Image';
+                    } else if (!imgSrc.startsWith('http') && !imgSrc.startsWith('data:')) {
+                        if (imgSrc.startsWith('/')) imgSrc = imgSrc.substring(1);
+
+                        if (imgSrc.startsWith('uploads/')) imgSrc = '/' + imgSrc;
+                        else if (imgSrc.startsWith('shop/')) imgSrc = '/uploads/' + imgSrc;
+                        else imgSrc = '/uploads/shop/' + imgSrc;
                     }
                     return `
                     <div class="item-card">

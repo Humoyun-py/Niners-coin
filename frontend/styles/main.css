@@ -659,6 +659,10 @@ body {
 @media (max-width: 1500px) {
     .main-content {
         padding: var(--space-m);
+        width: 100% !important;
+        /* Force full width on smaller screens */
+        max-width: 100vw;
+        overflow-x: hidden;
     }
 
     .dashboard-header {

@@ -247,11 +247,12 @@ def create_app():
     with app.app_context():
         db.create_all()
         sync_schema() # Ensure existing tables have new columns
-        seed_data()
         
-        # AUTO-FIX SHOP IMAGES DATABASE (runs on every startup)
+        # AUTO-FIX DATABASE SCHEMA (runs BEFORE seed_data to avoid column errors)
+        from sqlalchemy import text
+        
+        # AUTO-FIX SHOP IMAGES DATABASE
         try:
-            from sqlalchemy import text
             db.session.execute(text("ALTER TABLE shop_items ALTER COLUMN image_url TYPE TEXT"))
             db.session.commit()
             print("✅ AUTO-FIX: shop_items.image_url set to TEXT")
@@ -268,7 +269,7 @@ def create_app():
             db.session.rollback()
             print(f"⚠️ AUTO-FIX: homework_submissions already correct: {str(e)}")
         
-        # AUTO-FIX PROFILE IMAGES
+        # AUTO-FIX PROFILE IMAGES (CRITICAL: Must run before seed_data)
         try:
             db.session.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_image TEXT"))
             db.session.commit()
@@ -276,6 +277,9 @@ def create_app():
         except Exception as e:
             db.session.rollback()
             print(f"⚠️ AUTO-FIX: profile_image already exists: {str(e)}")
+        
+        # NOW seed data (after all schema fixes)
+        seed_data()
         
     migrate.init_app(app, db)
     jwt.init_app(app)

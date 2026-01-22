@@ -56,9 +56,9 @@
         }
 
         .item-img {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px;
+            width: 100px;
+            height: 100px;
+            border-radius: 12px;
             object-fit: cover;
             background: #f0f0f0;
         }
@@ -98,45 +98,83 @@
     <script>
         async function loadShopData() {
             try {
-                const items = await api.get('/admin/shop/items');
-                const history = await api.get('/admin/shop/history');
+                // STATIC ITEMS LIST (Frontend-only mode as requested)
+                const items = [
+                    { name: "Pen", price: 200.00, color: "🟡", stock: 20 },
+                    { name: "Backpack", price: 120, color: "🟡", stock: 10 },
+                    { name: "10% diskount", price: 50, color: "🟡", stock: 50 },
+                    { name: "20% diskount", price: 90.00, color: "🟡", stock: 50 },
+                    { name: "50% diskount", price: 150.00, color: "🟡", stock: 50 },
+                    { name: "100% diskount", price: 250.00, color: "🟡", stock: 50 },
+                    { name: "CEO", price: 50, color: "🟡", stock: 20 },
+                    { name: "Termos", price: 150.00, color: "🟡", stock: 50 },
+                    { name: "Cap", price: 500, color: "🟡", stock: 2 },
+                    { name: "T-shirt", price: 25, color: "🟡", stock: -1 },
+                    { name: "Note", price: 12, color: "🟡", stock: -1 },
+                    { name: "IELTS book", price: 20, color: "🟡", stock: 10 },
+                    { name: "upper intermediate book", price: 30, color: "🟡", stock: 15 },
+                    { name: "intermediate book", price: 200, color: "🟡", stock: 5 },
+                    { name: "Pre intermediatre book", price: 40, color: "🟡", stock: 20 },
+                    { name: "elementary book", price: 45, color: "🟡", stock: 10 },
+                    { name: "beginner book", price: 80, color: "🟡", stock: 30 },
+                    { name: "ielts exam", price: 250, color: "🟡", stock: 8 },
+                    { name: "17 pro max", price: 3200.00, color: "🟡", stock: 6 },
+                    { name: "16 pro max", price: 3000.00, color: "🟡", stock: 3 },
+                    { name: "redmi", price: 500.00, color: "🟡", stock: 10 },
+                    { name: "tv", price: 1500.00, color: "🟡", stock: 5 },
+                    { name: "playstation", price: 1500.00, color: "🟡", stock: 3 },
+                    { name: "Samsung S25 Ultra", price: 3000.00, color: "🟡", stock: 3 },
+                ];
+
+                // Add IDs for UI compatibility
+                items.forEach((item, index) => item.id = index + 1);
+
+                // Try to load history if possible, else empty
+                let history = [];
+                try {
+                    history = await api.get('/admin/shop/history');
+                } catch (e) { console.warn("History fetch failed, ignoring", e); }
 
                 const invContainer = document.getElementById('inventoryContainer');
                 invContainer.innerHTML = items.map(i => {
-                    // FRONTEND MAPPER for images if not present or broken
+                    // FRONTEND MAPPER for images
                     let imgSrc = i.image_url || '';
 
                     // Fallback map
                     const fallbackImages = {
+                        'Bag': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3RKmi6HohKhE-29A0g4DrA-TiLrfDpsFIUA&s',
+                        'Pen': 'https://img.freepik.com/free-vector/realistic-blue-ballpoint-pen_1284-18868.jpg',
+                        'Notebook': 'https://img.freepik.com/free-vector/realistic-copybook-with-blue-cover_1284-15632.jpg',
+                        'Pencil': 'https://img.freepik.com/free-vector/yellow-pencil-white-background_1308-36069.jpg',
+                        'Eraser': 'https://img.freepik.com/free-vector/realistic-eraser-isolated_1284-41774.jpg',
+                        'Tablet': 'https://img.freepik.com/free-vector/realistic-tablet-mockup_1017-19266.jpg',
+                        'Backpack': 'https://images.unsplash.com/photo-1520975912400-5bdfc24f0a4c?auto=format&fit=crop&w=800&q=80',
+                        'Cap': 'https://img.freepik.com/free-vector/realistic-white-cap-front-side-view_1284-13833.jpg',
+                        'T-shirt': 'https://img.freepik.com/free-vector/white-t-shirt-mockup_1017-26279.jpg',
+                        // General fallbacks
                         'ruchka': 'https://img.freepik.com/free-vector/realistic-blue-ballpoint-pen_1284-18868.jpg',
                         'daftar': 'https://img.freepik.com/free-vector/realistic-copybook-with-blue-cover_1284-15632.jpg',
-                        'qalam': 'https://img.freepik.com/free-vector/yellow-pencil-white-background_1308-36069.jpg',
-                        'o\'chirg\'ich': 'https://img.freepik.com/free-vector/realistic-eraser-isolated_1284-41774.jpg',
-                        'planshet': 'https://img.freepik.com/free-vector/realistic-tablet-mockup_1017-19266.jpg',
-                        'sumka': 'https://img.freepik.com/free-vector/school-bag-supplies-realistic-composition_1284-26618.jpg',
-                        'kepka': 'https://img.freepik.com/free-vector/realistic-white-cap-front-side-view_1284-13833.jpg',
-                        'futbolka': 'https://img.freepik.com/free-vector/white-t-shirt-mockup_1017-26279.jpg'
+                        'qalam': 'https://img.freepik.com/free-vector/yellow-pencil-white-background_1308-36069.jpg'
                     };
 
                     if (!imgSrc || imgSrc === 'null') {
                         // Try to match by name (case insensitive partial match)
-                        const lowerName = i.name.toLowerCase();
-                        for (const key in fallbackImages) {
-                            if (lowerName.includes(key)) {
-                                imgSrc = fallbackImages[key];
-                                break;
+                        // Priority to exact match from user provided list
+                        if (fallbackImages[i.name]) {
+                            imgSrc = fallbackImages[i.name];
+                        } else {
+                            const lowerName = i.name.toLowerCase();
+                            for (const key in fallbackImages) {
+                                if (lowerName.includes(key.toLowerCase())) {
+                                    imgSrc = fallbackImages[key];
+                                    break;
+                                }
                             }
                         }
                     }
 
                     if (!imgSrc) {
                         imgSrc = 'https://via.placeholder.com/100x100?text=No+Image';
-                    } else if (!imgSrc.startsWith('http') && !imgSrc.startsWith('data:')) {
-                        if (imgSrc.startsWith('/')) imgSrc = imgSrc.substring(1);
-
-                        if (imgSrc.startsWith('uploads/')) imgSrc = '/' + imgSrc;
-                        else if (imgSrc.startsWith('shop/')) imgSrc = '/uploads/' + imgSrc;
-                        else imgSrc = '/uploads/shop/' + imgSrc;
                     }
                     return `
                     <div class="item-card">

@@ -87,51 +87,93 @@ const StudentModule = {
     async initShop() {
         this.fetchDashboardData(); // Sync balance
         try {
-            const items = await api.get('/student/shop/items');
+            // STATIC ITEMS LIST (Frontend-only mode as requested)
+            const items = [
+                { name: "Pen", price: 200.00, color: "🟡", stock: 20 },
+                { name: "Backpack", price: 120, color: "🟡", stock: 10 },
+                { name: "10% diskount", price: 50, color: "🟡", stock: 50 },
+                { name: "20% diskount", price: 90.00, color: "🟡", stock: 50 },
+                { name: "50% diskount", price: 150.00, color: "🟡", stock: 50 },
+                { name: "100% diskount", price: 250.00, color: "🟡", stock: 50 },
+                { name: "CEO", price: 50, color: "🟡", stock: 20 },
+                { name: "Termos", price: 150.00, color: "🟡", stock: 50 },
+                { name: "Cap", price: 500, color: "🟡", stock: 2 },
+                { name: "T-shirt", price: 25, color: "🟡", stock: -1 },
+                { name: "Note", price: 12, color: "🟡", stock: -1 },
+                { name: "IELTS book", price: 20, color: "🟡", stock: 10 },
+                { name: "upper intermediate book", price: 30, color: "🟡", stock: 15 },
+                { name: "intermediate book", price: 200, color: "🟡", stock: 5 },
+                { name: "Pre intermediatre book", price: 40, color: "🟡", stock: 20 },
+                { name: "elementary book", price: 45, color: "🟡", stock: 10 },
+                { name: "beginner book", price: 80, color: "🟡", stock: 30 },
+                { name: "ielts exam", price: 250, color: "🟡", stock: 8 },
+                { name: "17 pro max", price: 3200.00, color: "🟡", stock: 6 },
+                { name: "16 pro max", price: 3000.00, color: "🟡", stock: 3 },
+                { name: "redmi", price: 500.00, color: "🟡", stock: 10 },
+                { name: "tv", price: 1500.00, color: "🟡", stock: 5 },
+                { name: "playstation", price: 1500.00, color: "🟡", stock: 3 },
+                { name: "Samsung S25 Ultra", price: 3000.00, color: "🟡", stock: 3 },
+            ];
+
+            // Add IDs for UI compatibility
+            items.forEach((item, index) => item.id = index + 1);
+
             const container = document.getElementById('shopContainer');
-
             if (!container) return; // fail safe if not on shop page
-
-            if (items.length === 0) {
-                container.innerHTML = `<p style="text-align:center; grid-column: 1/-1;">${this.t('shop_empty')}</p>`;
-                return;
-            }
 
             container.innerHTML = items.map(item => {
                 // FRONTEND MAPPER for images if not present or broken
-                let imgSrc = item.image_url;
+                let imgSrc = item.image_url || '';
 
                 // Fallback map
                 const fallbackImages = {
-                    'ruchka': 'https://img.freepik.com/free-vector/realistic-blue-ballpoint-pen_1284-18868.jpg',
-                    'daftar': 'https://img.freepik.com/free-vector/realistic-copybook-with-blue-cover_1284-15632.jpg',
-                    'qalam': 'https://img.freepik.com/free-vector/yellow-pencil-white-background_1308-36069.jpg',
-                    'o\'chirg\'ich': 'https://img.freepik.com/free-vector/realistic-eraser-isolated_1284-41774.jpg',
-                    'planshet': 'https://img.freepik.com/free-vector/realistic-tablet-mockup_1017-19266.jpg',
-                    'sumka': 'https://img.freepik.com/free-vector/school-bag-supplies-realistic-composition_1284-26618.jpg',
-                    'kepka': 'https://img.freepik.com/free-vector/realistic-white-cap-front-side-view_1284-13833.jpg',
-                    'futbolka': 'https://img.freepik.com/free-vector/white-t-shirt-mockup_1017-26279.jpg'
+                    'Backpack': '/assets/Group%2025.jpg',
+                    'Pen': '/assets/Group%2013.jpg',
+                    'Note': '/assets/Group%2014.jpg',
+                    '10% diskount': '/assets/Group7.jpg',
+                    '20% diskount': '/assets/Group8.jpg',
+                    '50% diskount': '/assets/Group9.jpg',
+                    '100% diskount': '/assets/Group10.jpg',
+                    'CEO': '/assets/Group%2022.jpg',
+                    'Termos': '/assets/Group%2025.jpg',
+                    'Cap': '/assets/Group%2015.jpg',
+                    'T-shirt': '/assets/Group%2012.jpg',
+
+                    // Electronics
+                    '17 pro max': '/assets/Group%201.jpg',
+                    '16 pro max': '/assets/Group%202.jpg',
+                    'redmi': '/assets/Group%204.jpg',
+                    'Samsung S25 Ultra': '/assets/Group%203.jpg',
+                    'tv': '/assets/Group%205.jpg',
+                    'playstation': '/assets/Group%206.jpg',
+                    // Books
+                    'IELTS book': '/assets/Group%2021.jpg',
+                    'ielts exam': '/assets/Group%2023.jpg',
+                    'upper intermediate book': '/assets/Group%2018.jpg',
+                    'intermediate book': '/assets/Group%2019.jpg',
+                    'Pre intermediatre book': '/assets/Group%2021.jpg',
+                    'elementary book': '/assets/Group%2017.jpg',
+                    'beginner book': '/assets/Group%2016.jpg'
                 };
 
                 if (!imgSrc || imgSrc === 'null') {
                     // Try to match by name (case insensitive partial match)
-                    const lowerName = item.name.toLowerCase();
-                    for (const key in fallbackImages) {
-                        if (lowerName.includes(key)) {
-                            imgSrc = fallbackImages[key];
-                            break;
+                    // Priority to exact match from user provided list
+                    if (fallbackImages[item.name]) {
+                        imgSrc = fallbackImages[item.name];
+                    } else {
+                        const lowerName = item.name.toLowerCase();
+                        for (const key in fallbackImages) {
+                            if (lowerName.includes(key.toLowerCase())) {
+                                imgSrc = fallbackImages[key];
+                                break;
+                            }
                         }
                     }
                 }
 
                 if (!imgSrc) {
                     imgSrc = 'https://via.placeholder.com/150?text=No+Image';
-                } else if (!imgSrc.startsWith('http') && !imgSrc.startsWith('data:')) {
-                    // Check if it already has full path
-                    if (imgSrc.startsWith('/')) imgSrc = imgSrc.substring(1);
-                    if (imgSrc.startsWith('uploads/')) imgSrc = '/' + imgSrc;
-                    else if (imgSrc.startsWith('shop/')) imgSrc = '/uploads/' + imgSrc;
-                    else imgSrc = '/uploads/shop/' + imgSrc;
                 }
 
                 return `

@@ -933,3 +933,355 @@ body {
         gap: var(--space-m) !important;
     }
 }
+
+/* ============================================================ */
+/* COMPREHENSIVE RESPONSIVE DESIGN - Teacher Panel Fix */
+/* ============================================================ */
+
+/* Mobile Devices (320px - 480px) */
+@media (max-width: 480px) {
+    .main-content {
+        width: 100% !important;
+        padding: var(--space-s) !important;
+        margin-left: 0 !important;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: var(--space-m);
+    }
+    
+    .header-left {
+        width: 100%;
+        flex-direction: column !important;
+    }
+    
+    .user-profile {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .user-profile button {
+        width: 100%;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: var(--space-s);
+    }
+    
+    .stats-grid .card {
+        padding: 16px !important;
+    }
+    
+    table {
+        font-size: 0.85rem !important;
+    }
+    
+    .btn {
+        padding: 10px 12px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .card {
+        padding: 16px !important;
+        margin-bottom: 16px !important;
+    }
+    
+    h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    h3 {
+        font-size: 1.1rem !important;
+    }
+    
+    .profile-avatar {
+        width: 40px !important;
+        height: 40px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+/* Tablets & Small Devices (481px - 768px) */
+@media (max-width: 768px) {
+    .main-content {
+        width: 100% !important;
+        padding: var(--space-m) !important;
+        margin-left: 0 !important;
+    }
+    
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start !important;
+        gap: var(--space-m);
+        margin-bottom: var(--space-l);
+    }
+    
+    .header-left {
+        width: 100%;
+    }
+    
+    .user-profile {
+        width: 100%;
+    }
+    
+    .user-profile button {
+        width: 100%;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: var(--space-m);
+    }
+    
+    .card {
+        padding: 20px !important;
+    }
+    
+    #recentRewardsContainer,
+    #myStudentsContainer {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--space-m);
+    }
+    
+    table {
+        font-size: 0.9rem;
+    }
+    
+    th, td {
+        padding: 12px !important;
+    }
+}
+
+/* Laptops (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .main-content {
+        width: 100% !important;
+        padding: var(--space-l) !important;
+        margin-left: 0 !important;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .card {
+        padding: 24px !important;
+    }
+    
+    table {
+        font-size: 0.95rem;
+    }
+}
+
+/* Medium Screens (1025px - 1499px) */
+@media (min-width: 1025px) and (max-width: 1499px) {
+    .main-content {
+        width: calc(100% - var(--sidebar-width)) !important;
+        margin-left: var(--sidebar-width) !important;
+        padding: var(--space-l);
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: var(--space-m);
+    }
+    
+    .dashboard-header {
+        flex-wrap: wrap;
+    }
+}
+
+/* Desktop (1500px - 1920px) */
+@media (min-width: 1500px) and (max-width: 1920px) {
+    .main-content {
+        width: calc(100% - var(--sidebar-width)) !important;
+        margin-left: var(--sidebar-width) !important;
+        padding: var(--space-xl);
+        max-width: 1920px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: var(--space-m);
+    }
+    
+    .card {
+        padding: 28px !important;
+    }
+}
+
+/* Large Monitors (4K+, 1921px+) */
+@media (min-width: 1921px) {
+    .main-content {
+        width: calc(100% - var(--sidebar-width)) !important;
+        margin-left: var(--sidebar-width) !important;
+        padding: var(--space-xl);
+        max-width: 2560px;
+        margin: var(--sidebar-width) auto 0 var(--sidebar-width);
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: var(--space-l);
+    }
+    
+    .card {
+        padding: 32px !important;
+    }
+    
+    h2 {
+        font-size: 2.5rem !important;
+    }
+    
+    h3 {
+        font-size: 1.8rem !important;
+    }
+    
+    table {
+        font-size: 1.05rem;
+    }
+    
+    th, td {
+        padding: 20px !important;
+    }
+}
+
+/* Responsive Layouts for Teacher-Specific Components */
+@media (max-width: 768px) {
+    /* Homework Cards */
+    #homeworkList {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Table Responsive Mode */
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    table thead {
+        display: none;
+    }
+    
+    table tr {
+        display: block;
+        margin-bottom: var(--space-m);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        padding: var(--space-m);
+        background: var(--bg-white);
+    }
+    
+    table td {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #f5f5f5;
+    }
+    
+    table td::before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--text-muted);
+    }
+    
+    table td:last-child {
+        border-bottom: none;
+    }
+}
+
+/* Fix Modal Responsiveness */
+.modal-box {
+    max-width: 95vw !important;
+    max-height: 90vh !important;
+    width: auto !important;
+}
+
+@media (max-width: 768px) {
+    .modal-box {
+        margin: var(--space-s) !important;
+        border-radius: var(--radius-lg) !important;
+    }
+    
+    .modal-box h3 {
+        font-size: 1.3rem !important;
+    }
+}
+
+/* Fix Stats Grid Card Content */
+.stats-grid .card h3 {
+    margin: 0 !important;
+}
+
+@media (max-width: 480px) {
+    .stats-grid .card h3 {
+        font-size: 1.5rem !important;
+    }
+    
+    .stats-grid .card p {
+        font-size: 0.8rem !important;
+    }
+}
+
+/* Ensure sidebar doesn't overlap content */
+@media (max-width: 1500px) {
+    .dashboard-grid {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: var(--sidebar-width);
+        height: 100vh;
+        z-index: 1100;
+        transform: translateX(-110%);
+        transition: transform 0.3s ease;
+    }
+    
+    .sidebar.active {
+        transform: translateX(0);
+    }
+    
+    .main-content {
+        flex: 1;
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+/* Additional breakpoints for better tablet/laptop support */
+@media (max-width: 600px) {
+    .card {
+        margin-bottom: 12px !important;
+    }
+    
+    .btn {
+        padding: 8px 10px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .modal-box {
+        width: 90vw !important;
+        max-height: 85vh !important;
+    }
+}
+
+/* Optimized breakpoint for 1920px displays */
+@media (min-width: 1921px) {
+    .main-content {
+        max-width: 2560px !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    
+    .card {
+        padding: 40px !important;
+    }
+}

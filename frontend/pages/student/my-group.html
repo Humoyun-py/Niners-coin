@@ -62,18 +62,18 @@
                     const borderColor = rank <= 3 ? '#ffd700' : '#EEE';
 
                     return `
-                    <div style="background: ${bgColor}; padding: 16px; border-radius: 12px; display: flex; align-items: center; gap: 12px; border: 2px solid ${borderColor};">
-                        <div style="font-size: 1.2rem; font-weight: 700; color: ${rankColor}; min-width: 30px;">
+                    <div style="background: ${bgColor}; padding: 12px; border-radius: 12px; display: flex; align-items: center; gap: 10px; border: 2px solid ${borderColor}; width: 100%; box-sizing: border-box;">
+                        <div style="font-size: 1.1rem; font-weight: 700; color: ${rankColor}; min-width: 24px;">
                             ${rank}
                         </div>
-                        <div style="width: 40px; height: 40px; flex-shrink: 0; background: ${c.is_me ? 'var(--primary-gradient)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+                        <div style="width: 36px; height: 36px; flex-shrink: 0; background: ${c.is_me ? 'var(--primary-gradient)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
                             ${c.full_name[0]}
                         </div>
-                        <div style="flex: 1;">
-                            <div style="font-weight: 600;">${c.full_name} ${c.is_me ? '(You)' : ''}</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">@${c.username || 'student'}</div>
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.95rem;">${c.full_name} ${c.is_me ? '(You)' : ''}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">@${c.username || 'student'}</div>
                         </div>
-                        <div style="font-weight: 700; color: #f59e0b; font-size: 1.1rem;">
+                        <div style="font-weight: 700; color: #f59e0b; font-size: 1rem; white-space: nowrap;">
                             ${(c.coin_balance || 0).toFixed(1)} 🟡
                         </div>
                     </div>

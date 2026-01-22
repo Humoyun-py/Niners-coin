@@ -273,7 +273,14 @@ def submit_homework(homework_id):
 
     # Get JSON data
     data = request.get_json() or {}
-    content = data.get('content', '').strip()
+    
+    # Handle content - might be string or dict
+    content_raw = data.get('content', '')
+    if isinstance(content_raw, dict):
+        content = str(content_raw).strip()
+    else:
+        content = str(content_raw).strip()
+    
     submission_type = data.get('type', 'text')  # text, file, paper
     image_base64 = data.get('image_base64')
     

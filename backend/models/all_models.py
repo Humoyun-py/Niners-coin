@@ -288,7 +288,6 @@ class HomeworkSubmission(db.Model):
     admin_comment = db.Column(db.String(255), nullable=True)
     status = db.Column(db.String(20), default='pending') # pending, submitted, approved, rejected
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    
     student = db.relationship('Student', backref='homework_submissions')
     homework = db.relationship('Homework', backref='submissions')
 

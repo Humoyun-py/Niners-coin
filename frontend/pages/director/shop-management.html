@@ -100,8 +100,85 @@
 
                 const invContainer = document.getElementById('inventoryContainer');
                 invContainer.innerHTML = items.map(i => {
-                    // Fix image path - ensure it starts with /uploads/ if it's a local shop image
+                    // FRONTEND MAPPER for images if not present or broken
                     let imgSrc = i.image_url || '';
+
+                    // Fallback map
+                    const fallbackImages = {
+                        'Bag': 'https://img.freepik.com/free-vector/realistic-blue-ballpoint-pen_1284-18868.jpg',
+                        '': 'https://img.freepik.com/free-vector/realistic-copybook-with-blue-cover_1284-15632.jpg',
+                        'Pen': 'https://img.freepik.com/free-vector/yellow-pencil-white-background_1308-36069.jpg',
+                        'Eraser': 'https://img.freepik.com/free-vector/realistic-eraser-isolated_1284-41774.jpg',
+                        'Tablet': 'https://img.freepik.com/free-vector/realistic-tablet-mockup_1017-19266.jpg',
+                        'Backpack': 'https://img.freepik.com/free-vector/school-bag-supplies-realistic-composition_1284-26618.jpg',
+                        'Cap': 'https://img.freepik.com/free-vector/realistic-white-cap-front-side-view_1284-13833.jpg',
+                        'T-shirt': 'https://img.freepik.com/free-vector/white-t-shirt-mockup_1017-26279.jpg'
+                    };  
+                    
+                    const items = [
+    {name:"Pen", price:10},
+    {name:"Notebook", price:15},
+    {name:"Bag", price:120},
+    {name:"Backpack", price:150},
+    {name:"Eraser", price:5},
+    {name:"Pencil", price:7},
+    {name:"Ruler", price:8},
+    {name:"Cap", price:50},
+    {name:"T-shirt", price:100},
+    {name:"Tablet", price:500},
+
+    {name:"Color Pencils", price:25},
+    {name:"Marker", price:12},
+    {name:"Diary", price:20},
+    {name:"Geometry Set", price:30},
+    {name:"Calculator", price:200},
+    {name:"Water Bottle", price:40},
+    {name:"Lunch Box", price:45},
+    {name:"USB Flash", price:80},
+    {name:"Headphones", price:250},
+    {name:"Power Bank", price:300},
+
+    {name:"Sticker Pack", price:10},
+    {name:"Drawing Book", price:18},
+    {name:"Scissors", price:12},
+    {name:"Glue", price:6},
+    {name:"Whiteboard Marker", price:14},
+    {name:"Highlighter", price:9},
+    {name:"Folder", price:16},
+    {name:"Desk Organizer", price:60},
+    {name:"Mini Fan", price:90},
+    {name:"Alarm Clock", price:110}
+];
+const shop = document.getElementById("shop");
+
+items.forEach(item => {
+    const img = fallbackImages[item.name] || fallbackImages.default;
+
+    shop.innerHTML += `
+        <div class="card">
+            <img src="${img}">
+            <h4>${item.name}</h4>
+            <div class="price">${item.price} 🪙</div>
+            <button onclick="buy('${item.name}')">Sotib olish</button>
+        </div>
+    `;
+});
+
+function buy(name) {
+    alert(name + " demo xarid qilindi ✅");
+}
+
+                    if (!imgSrc || imgSrc === 'null') {
+                        // Try to match by name (case insensitive partial match)
+                        const lowerName = i.name.toLowerCase();
+                        for (const key in fallbackImages) {
+                            if (lowerName.includes(key)) {
+                                imgSrc = fallbackImages[key];
+                                break;
+                            }
+                        }
+                    }
+
                     if (!imgSrc) {
                         imgSrc = 'https://via.placeholder.com/100x100?text=No+Image';
                     } else if (!imgSrc.startsWith('http') && !imgSrc.startsWith('data:')) {

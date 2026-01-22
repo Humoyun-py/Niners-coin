@@ -98,23 +98,40 @@ const StudentModule = {
             }
 
             container.innerHTML = items.map(item => {
-                // Fix image path - ensure it starts with /uploads/ if it's a local shop image
-                let imgSrc = item.image_url || '';
+                // FRONTEND MAPPER for images if not present or broken
+                let imgSrc = item.image_url;
+
+                // Fallback map
+                const fallbackImages = {
+                    'ruchka': 'https://img.freepik.com/free-vector/realistic-blue-ballpoint-pen_1284-18868.jpg',
+                    'daftar': 'https://img.freepik.com/free-vector/realistic-copybook-with-blue-cover_1284-15632.jpg',
+                    'qalam': 'https://img.freepik.com/free-vector/yellow-pencil-white-background_1308-36069.jpg',
+                    'o\'chirg\'ich': 'https://img.freepik.com/free-vector/realistic-eraser-isolated_1284-41774.jpg',
+                    'planshet': 'https://img.freepik.com/free-vector/realistic-tablet-mockup_1017-19266.jpg',
+                    'sumka': 'https://img.freepik.com/free-vector/school-bag-supplies-realistic-composition_1284-26618.jpg',
+                    'kepka': 'https://img.freepik.com/free-vector/realistic-white-cap-front-side-view_1284-13833.jpg',
+                    'futbolka': 'https://img.freepik.com/free-vector/white-t-shirt-mockup_1017-26279.jpg'
+                };
+
+                if (!imgSrc || imgSrc === 'null') {
+                    // Try to match by name (case insensitive partial match)
+                    const lowerName = item.name.toLowerCase();
+                    for (const key in fallbackImages) {
+                        if (lowerName.includes(key)) {
+                            imgSrc = fallbackImages[key];
+                            break;
+                        }
+                    }
+                }
+
                 if (!imgSrc) {
                     imgSrc = 'https://via.placeholder.com/150?text=No+Image';
                 } else if (!imgSrc.startsWith('http') && !imgSrc.startsWith('data:')) {
-                    // It's a local path
-                    // clean up leads
+                    // Check if it already has full path
                     if (imgSrc.startsWith('/')) imgSrc = imgSrc.substring(1);
-
-                    if (imgSrc.startsWith('uploads/')) {
-                        imgSrc = '/' + imgSrc;
-                    } else if (imgSrc.startsWith('shop/')) {
-                        imgSrc = '/uploads/' + imgSrc;
-                    } else {
-                        // assume it's just a filename
-                        imgSrc = '/uploads/shop/' + imgSrc;
-                    }
+                    if (imgSrc.startsWith('uploads/')) imgSrc = '/' + imgSrc;
+                    else if (imgSrc.startsWith('shop/')) imgSrc = '/uploads/' + imgSrc;
+                    else imgSrc = '/uploads/shop/' + imgSrc;
                 }
 
                 return `

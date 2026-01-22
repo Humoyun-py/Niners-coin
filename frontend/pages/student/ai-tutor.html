@@ -10,148 +10,175 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../../styles/main.css">
     <style>
+        .main-content {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            overflow: hidden;
+            /* Lock main scroll */
+        }
+
         .chat-container {
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 140px);
+            flex: 1;
+            /* Fill remaining height */
             background: white;
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-soft);
             overflow: hidden;
+            position: relative;
+            margin-bottom: 0;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .chat-header {
-            padding: 20px;
-            border-bottom: 1px solid #eee;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
             display: flex;
             align-items: center;
-            gap: 15px;
-            background: #fff;
+            gap: 16px;
+            flex-shrink: 0;
         }
 
         .ai-avatar {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #00C6FF, #0072FF);
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+            flex-shrink: 0;
+        }
+
+        .chat-header h3 {
+            margin: 0 0 4px 0;
             font-size: 1.2rem;
-            box-shadow: 0 4px 10px rgba(0, 114, 255, 0.3);
+        }
+
+        .chat-header p {
+            margin: 0;
+            font-size: 0.85rem;
+            color: var(--text-muted);
         }
 
         .chat-messages {
             flex: 1;
-            padding: 20px;
+            padding: 24px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            background: #f9f9f9;
+            gap: 16px;
+            background: #f8f9fc;
+            scroll-behavior: smooth;
         }
 
         .message {
-            max-width: 80%;
-            padding: 12px 18px;
+            max-width: 75%;
+            padding: 14px 20px;
             border-radius: 18px;
-            line-height: 1.5;
+            font-size: 1rem;
+            line-height: 1.6;
             position: relative;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            word-wrap: break-word;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
         }
 
         .message.user {
-            align-self: flex-end;
             background: var(--primary);
             color: white;
+            align-self: flex-end;
             border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
         }
 
         .message.ai {
-            align-self: flex-start;
             background: white;
             color: var(--text-dark);
+            align-self: flex-start;
             border-bottom-left-radius: 4px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            border: 1px solid #eee;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .chat-input-area {
-            padding: 20px;
+            padding: 16px 24px;
             background: white;
-            border-top: 1px solid #eee;
+            border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 10px;
+            gap: 12px;
+            align-items: center;
+            flex-shrink: 0;
         }
 
         .chat-input {
             flex: 1;
-            padding: 12px 20px;
-            border: 2px solid #eee;
+            padding: 14px 20px;
+            border: 2px solid #edf2f9;
             border-radius: 30px;
-            font-family: inherit;
             font-size: 1rem;
+            transition: all 0.3s ease;
             outline: none;
-            transition: border-color 0.3s;
+            background: #f8f9fc;
         }
 
         .chat-input:focus {
             border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
         }
 
         .send-btn {
             width: 50px;
             height: 50px;
             border-radius: 50%;
-            border: none;
             background: var(--primary);
             color: white;
-            font-size: 1.2rem;
+            border: none;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
+            font-size: 1.2rem;
+            flex-shrink: 0;
         }
 
         .send-btn:hover {
             transform: scale(1.05);
             background: var(--primary-dark);
+            box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
         }
 
         .send-btn:disabled {
-            background: #ccc;
+            background: #e2e8f0;
+            color: #a0aec0;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
         .typing-indicator {
             display: flex;
-            gap: 5px;
-            padding: 10px 15px;
+            gap: 6px;
+            padding: 12px 18px;
             background: white;
-            border-radius: 18px;
-            align-self: flex-start;
+            border-radius: 20px;
+            width: fit-content;
             margin-bottom: 10px;
-            border: 1px solid #eee;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-left: 10px;
         }
 
         .dot {
             width: 8px;
             height: 8px;
-            background: #ccc;
+            background: #cbd5e0;
             border-radius: 50%;
             animation: bounce 1.4s infinite ease-in-out both;
         }
@@ -176,6 +203,78 @@
                 transform: scale(1);
             }
         }
+
+        /* --- RESPONSIVE CSS --- */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 12px;
+                height: 100vh;
+                /* On mobile, usually simpler scrolling is better */
+            }
+
+            .dashboard-header {
+                margin-bottom: 12px;
+                padding: 0 4px;
+            }
+
+            .dashboard-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .chat-container {
+                border-radius: 16px;
+                /* Account for mobile browser bottom bars */
+                margin-bottom: 60px;
+            }
+
+            .chat-header {
+                padding: 12px 16px;
+            }
+
+            .ai-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 1.1rem;
+            }
+
+            .chat-header h3 {
+                font-size: 1rem;
+            }
+
+            .chat-header p {
+                font-size: 0.75rem;
+                max-width: 200px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .chat-messages {
+                padding: 16px;
+            }
+
+            .message {
+                max-width: 88%;
+                padding: 10px 16px;
+                font-size: 0.95rem;
+            }
+
+            .chat-input-area {
+                padding: 10px 12px;
+            }
+
+            .chat-input {
+                padding: 10px 16px;
+                font-size: 16px;
+                /* Prevents iOS zoom */
+            }
+
+            .send-btn {
+                width: 44px;
+                height: 44px;
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 
@@ -189,10 +288,10 @@
                     <p class="user-role-badge">Sizning shaxsiy yordamchingiz</p>
                 </div>
             </div>
-            <!-- Coins are always good to see -->
             <div class="user-profile">
-                <span class="coin-badge" style="background: var(--secondary-light); color: var(--secondary-dark);">Made
-                    with Gemini 💎</span>
+                <span class="coin-badge" style="background: var(--secondary-light); color: var(--secondary-dark);">
+                    Made with Gemini 💎
+                </span>
             </div>
         </header>
 
@@ -200,9 +299,8 @@
             <div class="chat-header">
                 <div class="ai-avatar"><i class="fas fa-robot"></i></div>
                 <div>
-                    <h3 style="margin:0;">Niners AI</h3>
-                    <p style="margin:0; font-size: 0.8rem; color: var(--text-muted);">Ingliz, Rus va O'zbek tillarida
-                        yordamchi</p>
+                    <h3>Niners AI</h3>
+                    <p>Ingliz, Rus va O'zbek tillarida yordamchi</p>
                 </div>
             </div>
 
@@ -221,7 +319,6 @@
             </div>
         </div>
     </main>
-    </div>
 
     <script src="../../js/translations.js"></script>
     <script src="../../js/api.js"></script>
@@ -239,12 +336,9 @@
         function addMessage(text, type) {
             const div = document.createElement('div');
             div.className = `message ${type}`;
-            // Simple replace for newlines to br, but be careful with HTML injection if strict security needed. 
-            // For now, textContent is safer for user input, innerHTML for AI (assuming safe MD or simple text)
             if (type === 'user') {
                 div.textContent = text;
             } else {
-                // Formatting basic markdown-like bolding
                 let formatted = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
                 formatted = formatted.replace(/\n/g, '<br>');
                 div.innerHTML = formatted;
@@ -271,17 +365,14 @@
             const text = userInput.value.trim();
             if (!text) return;
 
-            // 1. Add User Message
             addMessage(text, 'user');
             userInput.value = '';
 
-            // 2. Show Typing
             showTyping();
             userInput.disabled = true;
             sendBtn.disabled = true;
 
             try {
-                // 3. Call API
                 const response = await api.post('/ai/chat', { message: text });
 
                 removeTyping();
@@ -307,8 +398,11 @@
             if (e.key === 'Enter') sendMessage();
         });
 
-        // Focus on load
-        userInput.focus();
+        // initial focus
+        // On mobile, auto-focus might bring up keyboard unwantedly, so maybe only if width > 768
+        if (window.innerWidth > 768) {
+            userInput.focus();
+        }
     </script>
 </body>
 

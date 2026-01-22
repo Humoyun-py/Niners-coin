@@ -375,6 +375,93 @@ const AdminModule = {
         } catch (e) { alert("Error: " + e.message); }
     },
 
+    async manageClassStudents(classId, className) {
+        try {
+            // Fetch class details with students
+            const classes = await api.get('/admin/classes');
+            const classData = classes.find(c => c.id === classId);
+
+            if (!classData || !classData.students_list || classData.students_list.length === 0) {
+                return alert('Bu guruhda hech qanday student yo\'q!');
+            }
+
+            const studentsList = classData.students_list.map(student => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-user-graduate" style="color: var(--primary);"></i>
+                        <div>
+                            <div style="font-weight: 600;">${student.name}</div>
+                            <div style="font-size: 0.8rem; color: #888;">${student.username || ''}</div>
+                        </div>
+                    </div>
+                    <button 
+                        onclick="AdminModule.removeStudentFromClass(${classId}, ${student.id}, '${student.name}')" 
+                        class="btn" 
+                        style="padding: 6px 12px; font-size: 0.8rem; background: #FFEBEE; color: #C62828; border: none;">
+                        <i class="fas fa-user-times"></i> Remove
+                    </button>
+                </div>
+            `).join('');
+
+            const modalContent = `
+                <div style="margin-bottom: 16px;">
+                    <h4 style="margin-bottom: 8px;">Guruh: ${className}</h4>
+                    <p style="color: #666; font-size: 0.9rem;">Jami: ${classData.students_list.length} ta student</p>
+                </div>
+                <div style="max-height: 400px; overflow-y: auto; border: 1px solid #eee; border-radius: 8px;">
+                    ${studentsList}
+                </div>
+            `;
+
+            const existing = document.querySelector('.modal-overlay');
+            if (existing) existing.remove();
+
+            const modalHTML = `
+                <div class="modal-overlay active">
+                    <div class="modal-box">
+                        <div class="modal-header">
+                            <div class="modal-title">Guruh Studentlari</div>
+                            <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">×</button>
+                        </div>
+                        <div class="modal-body">
+                            ${modalContent}
+                        </div>
+                        <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
+                            <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Close</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+        } catch (e) {
+            console.error(e);
+            alert("Error: " + e.message);
+        }
+    },
+
+    async removeStudentFromClass(classId, studentId, studentName) {
+        if (!confirm(`${studentName} ni guruhdan olib tashlaysizmi?`)) return;
+
+        try {
+            await api.delete(`/admin/classes/${classId}/students/${studentId}`);
+            alert('Student guruhdan olib tashlandi!');
+
+            // Close modal and reload
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) modal.remove();
+
+            // Reload classes page if on classes page
+            if (typeof loadClasses === 'function') {
+                loadClasses();
+            } else {
+                this.initDashboard();
+            }
+        } catch (e) {
+            alert("Error: " + e.message);
+        }
+    },
+
     async toggleUserStatus(userId) {
         try {
             const users = await api.get('/admin/users');

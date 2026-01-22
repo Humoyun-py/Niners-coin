@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Lesson | Niners.uz</title>
+    <link rel="icon" type="image/png" href="../../assets/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <script src='https://meet.jit.si/external_api.js'></script>
+    <style>
+        .video-container {
+            height: calc(100vh - 140px);
+            background: #000;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .start-screen {
+            text-align: center;
+            color: white;
+            padding: 40px;
+        }
+
+        .start-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            background: var(--primary-dark);
+        }
+
+        .start-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        #jitsi-meet-conf-container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Online Lesson Demo 📹</h2>
+                    <p class="user-role-badge">Connect with your teacher instantly</p>
+                </div>
+            </div>
+            <div class="user-profile">
+                <!-- Placeholder for status -->
+                <span style="color: var(--secondary); font-weight: 600;">🔴 Live Demo</span>
+            </div>
+        </header>
+
+        <div class="card" style="padding: 24px; height: calc(100vh - 120px); display: flex; flex-direction: column;">
+            <div id="videoContainer" class="video-container">
+                <div id="startScreen" class="start-screen">
+                    <i class="fas fa-video" style="font-size: 4rem; margin-bottom: 20px; color: var(--secondary);"></i>
+                    <h2>Join Online Class</h2>
+                    <p style="color: #aaa; max-width: 400px; margin: 0 auto;">
+                        Click below to start a secure video call with your teacher.
+                        Please ensure your camera and microphone are ready.
+                    </p>
+                    <button class="start-btn" onclick="startCall()">
+                        <i class="fas fa-phone-alt"></i> Start Video Call
+                    </button>
+                    <p id="errorMsg" style="color: #ff4444; margin-top: 15px; display: none;"></p>
+                </div>
+            </div>
+        </div>
+    </main>
+    </div>
+
+    <script src="../../js/translations.js"></script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/sidebar-loader.js"></script>
+
+    <script>
+        let apiObj = null;
+
+        async function startCall() {
+            const startScreen = document.getElementById('startScreen');
+            const container = document.getElementById('videoContainer');
+            const btn = document.querySelector('.start-btn');
+            const errorMsg = document.getElementById('errorMsg');
+
+            // Reset UI
+            errorMsg.style.display = 'none';
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connecting...';
+
+            try {
+                // 1. Get Room Name from Backend
+                const response = await api.get('/video/join');
+
+                if (response.error) {
+                    errorMsg.innerText = "Xatolik: " + response.error;
+                    errorMsg.style.display = 'block';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-phone-alt"></i> Start Video Call';
+                    return;
+                }
+
+                const roomName = response.room_name;
+                const displayName = response.display_name || "Student";
+                const userRole = response.role; // 'student' or 'teacher'
+
+                // 2. Clear start screen
+                startScreen.style.display = 'none';
+
+                // 3. Add Jitsi container if not exists
+                let jitsiDiv = document.getElementById('jitsi-meet-conf-container');
+                if (!jitsiDiv) {
+                    jitsiDiv = document.createElement('div');
+                    jitsiDiv.id = 'jitsi-meet-conf-container';
+                    container.appendChild(jitsiDiv);
+                }
+
+                const domain = 'meet.jit.si';
+                const options = {
+                    roomName: roomName,
+                    width: '100%',
+                    height: '100%',
+                    parentNode: jitsiDiv,
+                    userInfo: {
+                        displayName: displayName
+                    },
+                    configOverwrite: {
+                        startWithAudioMuted: true,
+                        startWithVideoMuted: true,
+                        prejoinPageEnabled: false
+                    },
+                    interfaceConfigOverwrite: {
+                        TOOLBAR_BUTTONS: [
+                            'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+                            'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                            'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                            'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+                            'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone',
+                            'security'
+                        ],
+                    }
+                };
+
+                apiObj = new JitsiMeetExternalAPI(domain, options);
+
+                // Handle hangup
+                apiObj.addEventListeners({
+                    videoConferenceLeft: function () {
+                        container.innerHTML = '';
+                        container.appendChild(startScreen);
+                        startScreen.style.display = 'block';
+                        apiObj.dispose();
+                        apiObj = null;
+
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-phone-alt"></i> Start Video Call';
+                    }
+                });
+
+            } catch (error) {
+                console.error(error);
+                errorMsg.innerText = "Serverga ulanishda xatolik bo'ldi.";
+                errorMsg.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-phone-alt"></i> Start Video Call';
+            }
+        }
+    </script>
+</body>
+
+</html>

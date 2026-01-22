@@ -160,12 +160,15 @@ const SidebarLoader = {
                     { href: 'attendance.html', label: `📝 ${t('attendance')}` },
                     { href: 'homework.html', label: `📚 ${t('homework')}` },
                     { href: 'students.html', label: `👨‍🎓 ${t('students')}` },
+                    { href: 'online-lesson.html', label: `📹 Online Dars` },
                     { href: 'javascript:TeacherModule.awardCoinsToStudent()', label: `🟡 ${t('award_student') || 'Coin berish'}` },
                     { href: 'activity.html', label: `📈 ${t('activity_log')}` }
                 ],
                 student: [
                     { href: 'shop.html', label: `🛍️ ${t('shop')}` },
                     { href: 'coins.html', label: `🟡 ${t('coins')}` },
+                    { href: 'ai-tutor.html', label: `🤖 Niners AI` },
+                    { href: 'online-lesson.html', label: `📹 Online Dars` },
                     { href: 'my-group.html', label: `👥 ${t('my_group')}` },
                     { href: 'my-homework.html', label: `📚 ${t('my_homework') || 'Vazifalarim'}` },
                     { href: 'tests.html', label: `📝 ${t('tests')}` },

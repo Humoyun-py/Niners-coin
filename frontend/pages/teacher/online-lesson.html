@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Lessons (Teacher) | Niners.uz</title>
+    <link rel="icon" type="image/png" href="../../assets/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <script src='https://meet.jit.si/external_api.js'></script>
+    <style>
+        .class-card {
+            background: white;
+            border-radius: var(--radius-md);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s;
+            border: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .class-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .class-info h3 {
+            margin: 0 0 5px 0;
+            color: var(--text-dark);
+        }
+
+        .class-schedule {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .join-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .join-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Overlay for video */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .video-header {
+            height: 60px;
+            background: #222;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: white;
+        }
+
+        .close-video-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #jitsi-container {
+            flex: 1;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Online Lessons 📹</h2>
+                    <p class="user-role-badge">Connect with your students</p>
+                </div>
+            </div>
+        </header>
+
+        <div id="loading" style="text-align: center; padding: 40px;">
+            <i class="fas fa-spinner fa-spin fa-2x"></i> Loading your classes...
+        </div>
+
+        <div id="classesList" style="display: none;">
+            <!-- Classes will be injected here -->
+        </div>
+    </main>
+
+    <!-- Video Modal -->
+    <div id="videoOverlay" class="video-overlay">
+        <div class="video-header">
+            <span id="videoTitle" style="font-weight: bold;">Classroom</span>
+            <button class="close-video-btn" onclick="closeVideo()"><i class="fas fa-times"></i> Close Call</button>
+        </div>
+        <div id="jitsi-container"></div>
+    </div>
+
+    <script src="../../js/translations.js"></script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/sidebar-loader.js"></script>
+
+    <script>
+        let apiObj = null;
+        let teacherName = "Teacher";
+
+        async function loadClasses() {
+            try {
+                const response = await api.get('/video/rooms');
+
+                if (response.error) {
+                    document.getElementById('loading').innerText = "Error: " + response.error;
+                    return;
+                }
+
+                teacherName = response.teacher_name;
+                const list = document.getElementById('classesList');
+                list.innerHTML = '';
+
+                if (response.rooms.length === 0) {
+                    list.innerHTML = '<p style="text-align:center; color:#666;">No classes assigned to you yet.</p>';
+                } else {
+                    response.rooms.forEach(room => {
+                        const div = document.createElement('div');
+                        div.className = 'class-card';
+                        div.innerHTML = `
+                            <div class="class-info">
+                                <h3><i class="fas fa-chalkboard-teacher" style="color:var(--primary);"></i> ${room.class_name}</h3>
+                                <div class="class-schedule"><i class="far fa-clock"></i> ${room.schedule}</div>
+                            </div>
+                            <button class="join-btn" onclick="startVideo('${room.room_name}', '${room.class_name}')">
+                                <i class="fas fa-video"></i> Start Lesson
+                            </button>
+                        `;
+                        list.appendChild(div);
+                    });
+                }
+
+                document.getElementById('loading').style.display = 'none';
+                list.style.display = 'block';
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading').innerText = "Failed to load classes.";
+            }
+        }
+
+        function startVideo(roomName, className) {
+            const overlay = document.getElementById('videoOverlay');
+            const container = document.getElementById('jitsi-container');
+            const title = document.getElementById('videoTitle');
+
+            overlay.style.display = 'flex';
+            title.innerText = "🔴 Live: " + className;
+
+            const domain = 'meet.jit.si';
+            const options = {
+                roomName: roomName,
+                width: '100%',
+                height: '100%',
+                parentNode: container,
+                userInfo: {
+                    displayName: teacherName + " (Teacher)"
+                },
+                configOverwrite: {
+                    prejoinPageEnabled: false
+                },
+                interfaceConfigOverwrite: {
+                    TOOLBAR_BUTTONS: [
+                        'microphone', 'camera', 'closedcaptions', 'desktop', 'fullscreen',
+                        'fodeviceselection', 'hangup', 'profile', 'chat', 'recording',
+                        'livestreaming', 'etherpad', 'sharedvideo', 'settings', 'raisehand',
+                        'videoquality', 'filmstrip', 'invite', 'feedback', 'stats', 'shortcuts',
+                        'tileview', 'videobackgroundblur', 'download', 'help', 'mute-everyone',
+                        'security'
+                    ],
+                }
+            };
+
+            apiObj = new JitsiMeetExternalAPI(domain, options);
+
+            apiObj.addEventListeners({
+                videoConferenceLeft: function () {
+                    closeVideo();
+                }
+            });
+        }
+
+        function closeVideo() {
+            const overlay = document.getElementById('videoOverlay');
+            const container = document.getElementById('jitsi-container');
+
+            if (apiObj) {
+                apiObj.dispose();
+                apiObj = null;
+            }
+
+            container.innerHTML = '';
+            overlay.style.display = 'none';
+        }
+
+        document.addEventListener('DOMContentLoaded', loadClasses);
+    </script>
+</body>
+
+</html>

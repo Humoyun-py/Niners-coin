@@ -11,6 +11,9 @@ from routes.teacher_routes import teacher_bp
 from routes.admin_routes import admin_bp
 from routes.director_routes import director_bp
 from routes.coin_test_routes import coin_test_bp
+from routes.ai_routes import ai_bp
+from routes.video_routes import video_bp
+
 
 load_dotenv()
 
@@ -293,6 +296,8 @@ def create_app():
     app.register_blueprint(admin_bp, url_prefix='/api/admin')
     app.register_blueprint(director_bp, url_prefix='/api/director')
     app.register_blueprint(coin_test_bp, url_prefix='/api/game')
+    app.register_blueprint(ai_bp, url_prefix='/api/ai')
+    app.register_blueprint(video_bp, url_prefix='/api/video')
     
     @app.route('/')
     def index():

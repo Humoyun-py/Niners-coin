@@ -1285,3 +1285,113 @@ body {
         padding: 40px !important;
     }
 }
+
+/* ============================================
+   ENHANCED TEACHER PANEL RESPONSIVE DESIGN
+   ============================================ */
+
+/* TABLET SPECIFIC (768px-1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: var(--space-l);
+    }
+    
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    table {
+        min-width: 600px;
+    }
+}
+
+/* LAPTOP & DESKTOP (1024px-1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+    .stats-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: var(--space-l);
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: var(--sidebar-width) 1fr;
+    }
+    
+    .sidebar {
+        position: fixed !important;
+        transform: translateX(0) !important;
+    }
+    
+    .main-content {
+        margin-left: var(--sidebar-width);
+        padding: var(--space-xl);
+    }
+}
+
+/* LARGE DESKTOP (1440px-1919px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+    .main-content {
+        max-width: 1600px;
+        padding: var(--space-2xl);
+    }
+    
+    .card {
+        padding: 32px !important;
+    }
+    
+    .btn {
+        padding: 12px 24px;
+    }
+}
+
+/* Touch-friendly for all mobile/tablet */
+@media (max-width: 1023px) {
+    .btn, button {
+        min-height: 44px;
+    }
+    
+    .form-control, input, select, textarea {
+        min-height: 44px;
+        font-size: 16px; /* Prevents iOS zoom */
+    }
+    
+    /* Teacher-specific: Stack header elements */
+    .dashboard-header {
+        flex-direction: column;
+        gap: var(--space-m);
+    }
+    
+    .header-left, .user-profile {
+        width: 100%;
+    }
+}
+
+/* Student/Class cards responsive grid */
+#myStudentsContainer,
+#classListContainer {
+    display: grid;
+    gap: var(--space-m);
+}
+
+@media (max-width: 767px) {
+    #myStudentsContainer,
+    #classListContainer {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    #myStudentsContainer,
+    #classListContainer {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    #myStudentsContainer,
+    #classListContainer {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+

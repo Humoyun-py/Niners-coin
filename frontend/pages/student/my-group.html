@@ -51,17 +51,33 @@
                 document.getElementById('teacherNameDisplay').innerText = `Teacher: ${data.teacher_name}`;
 
                 const list = document.getElementById('classmatesList');
-                list.innerHTML = data.classmates.map(c => `
-                    <div style="background: #F8F9FA; padding: 16px; border-radius: 12px; display: flex; align-items: center; gap: 12px; border: 1px solid #EEE;">
-                        <div style="width: 40px; height: 40px; background: ${c.is_me ? 'var(--primary-gradient)' : '#DDD'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
+
+                // Sort by coin_balance
+                const sortedClassmates = data.classmates.sort((a, b) => (b.coin_balance || 0) - (a.coin_balance || 0));
+
+                list.innerHTML = sortedClassmates.map((c, index) => {
+                    const rank = index + 1;
+                    const rankColor = rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : '#999';
+                    const bgColor = rank <= 3 ? '#fff9e6' : '#F8F9FA';
+                    const borderColor = rank <= 3 ? '#ffd700' : '#EEE';
+
+                    return `
+                    <div style="background: ${bgColor}; padding: 16px; border-radius: 12px; display: flex; align-items: center; gap: 12px; border: 2px solid ${borderColor};">
+                        <div style="font-size: 1.2rem; font-weight: 700; color: ${rankColor}; min-width: 30px;">
+                            ${rank}
+                        </div>
+                        <div style="width: 40px; height: 40px; background: ${c.is_me ? 'var(--primary-gradient)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">
                             ${c.full_name[0]}
                         </div>
-                        <div>
+                        <div style="flex: 1;">
                             <div style="font-weight: 600;">${c.full_name} ${c.is_me ? '(You)' : ''}</div>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">${c.rank}</div>
+                            <div style="font-size: 0.8rem; color: var(--text-muted);">@${c.username || 'student'}</div>
+                        </div>
+                        <div style="font-weight: 700; color: #f59e0b; font-size: 1.1rem;">
+                            ${(c.coin_balance || 0).toFixed(1)} 🟡
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
 
                 // Load Topics as well
                 const topics = await api.get('/student/my-group/topics');

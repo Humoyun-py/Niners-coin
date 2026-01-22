@@ -183,6 +183,8 @@ def get_my_class_details():
         classmates.append({
             "id": s.id,
             "full_name": s.user.full_name,
+            "username": s.user.username,
+            "coin_balance": s.coin_balance,
             "rank": s.rank,
             "is_me": s.id == student.id
         })

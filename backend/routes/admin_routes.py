@@ -349,6 +349,27 @@ def add_student_to_class(class_id):
     log_event(get_jwt_identity(), f"Student {student.user.username} {class_id}-sinfga qo'shildi")
     return jsonify({"msg": "Student sinfga biriktirildi"}), 200
 
+@admin_bp.route('/classes/<int:class_id>/students/<int:student_id>', methods=['DELETE'])
+@jwt_required()
+def remove_student_from_class(class_id, student_id):
+    if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
+    
+    student = Student.query.get(student_id)
+    if not student:
+        # Try finding by user_id instead
+        student = Student.query.filter_by(user_id=student_id).first()
+    
+    if not student:
+        return jsonify({"msg": "Student topilmadi"}), 404
+    
+    if student.class_id != class_id:
+        return jsonify({"msg": "Student bu sinfda emas"}), 400
+    
+    student.class_id = None
+    db.session.commit()
+    log_event(get_jwt_identity(), f"Student {student.user.username} {class_id}-sinfdan olib tashlandi")
+    return jsonify({"msg": "Student sinfdan olib tashlandi"}), 200
+
 @admin_bp.route('/users/<int:user_id>/toggle-block', methods=['POST'])
 @jwt_required()
 def toggle_block(user_id):

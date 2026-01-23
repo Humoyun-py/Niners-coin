@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -9,23 +9,92 @@
     <link rel="stylesheet" href="../../styles/main.css">
     <script src="../../js/translations.js"></script>
     <link rel="icon" type="image/png" href="../../assets/logo.png">
+    <style>
+        #classesGrid {
+            display: grid;
+            grid-template-columns: repeat(4, 4fr);
+            gap: 16px;
+            width: 79%;
+            box-sizing: border-box;
+        }
+
+        #classesGrid .card {
+            padding: 12px !important;
+        }
+
+        #classesGrid h3 {
+            font-size: 1rem !important;
+            margin-bottom: 6px !important;
+        }
+
+        #classesGrid p {
+            font-size: 0.8rem !important;
+            margin-bottom: 6px !important;
+        }
+
+        #classesGrid button {
+            padding: 6px 12px !important;
+            font-size: 0.8rem !important;
+        }
+
+        @media (max-width: 1200px) {
+            #classesGrid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            #classesGrid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            #classesGrid .card {
+                padding: 10px !important;
+            }
+        }
+
+        @media (max-width: 600px) {
+            #classesGrid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            #classesGrid .card {
+                padding: 8px !important;
+            }
+
+            #classesGrid h3 {
+                font-size: 0.9rem !important;
+            }
+
+            #classesGrid p {
+                font-size: 0.75rem !important;
+            }
+
+            #classesGrid button {
+                padding: 4px 8px !important;
+                font-size: 0.7rem !important;
+            }
+        }
+    </style>
 </head>
 
 <body class="dashboard-grid">
     <div id="sidebarContainer"></div>
-    <main class="main-content">
-        <header class="dashboard-header flex-wrap-mobile">
+    <main class="main-content" style="width: 79%;">
+        <header class="dashboard-header flex-wrap-mobile" style="width: 100%; justify-content: space-between;">
             <div class="header-left">
                 <div>
                     <h2>Group Management</h2>
                     <p class="user-role-badge">Admin Panel</p>
                 </div>
             </div>
-            <button onclick="AdminModule.createClass()" class="btn btn-primary">+ New Group</button>
+            <button onclick="AdminModule.createClass()"   class="btn btn-primary">+ New Group</button>
         </header>
 
-        <div id="classesGrid" class="mobile-stack"
-            style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">
+        <div id="classesGrid">
             <!-- DYNAMIC -->
             <p>Loading...</p>
         </div>

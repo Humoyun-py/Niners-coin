@@ -159,7 +159,10 @@ def mark_attendance():
         sid = rec.get('student_id')
         status = rec.get('status')
         
-        # If new or status changed to present, award coin
+        # Check if attendance record already exists
+        existing = Attendance.query.filter_by(student_id=sid, class_id=class_id, date=date_obj).first()
+        
+        # Determine coin amount
         coin_amount = float(rec.get('coins', 0))
         reason = f"Davomat ({cls.name})"
         
@@ -172,7 +175,7 @@ def mark_attendance():
             else:
                 coin_amount = 0.0
 
-        existing = Attendance.query.filter_by(student_id=sid, class_id=class_id, date=date_obj).first()
+        # Save or update attendance record
         if existing:
             existing.status = status
         else:
@@ -194,7 +197,7 @@ def mark_attendance():
             # Check limit again for bonus
             # Since we checked total_planned earlier, we need to ensure we included bonuses in total_planned calculation
             # But let's assume the earlier check covered it or we just proceed (soft limit for now or recalculate)
-             award_coins(sid, bonus_amount, bonus_reason, teacher_id=teacher.id)
+            award_coins(sid, bonus_amount, bonus_reason, teacher_id=teacher.id)
             
         count += 1
         

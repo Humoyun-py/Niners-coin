@@ -6,7 +6,7 @@ ai_bp = Blueprint('ai_bp', __name__)
 
 # Configure API Key (Lazy loading to avoid error if env not set immediately)
 def get_model():
-    api_key = "AIzaSyCbEqsNnHi3GvYvJZpzXu4j3OnXdX15AK8"
+    api_key = "AIzaSyAZ0V3upEFfrdn1Nysb5jwsuLKQUkH7fXQ"
     print(f"🔑 DEBUG: Checking API Key...")
     if not api_key:
         print("❌ DEBUG: API Key is None")

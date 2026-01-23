@@ -328,4 +328,28 @@ def submit_homework(homework_id):
     
     db.session.commit()
     return jsonify({"msg": "Vazifa yuborildi!"}), 200
-    return jsonify({"msg": "Vazifa yuborildi!"}), 200
+
+@student_bp.route('/ai/chat', methods=['POST'])
+@jwt_required()
+def ai_chat():
+    """AI Tutor chat endpoint"""
+    user_id = get_jwt_identity()
+    student = Student.query.filter_by(user_id=user_id).first()
+    
+    if not student:
+        return jsonify({"error": "Student not found"}), 404
+    
+    data = request.get_json()
+    message = data.get('message', '').strip()
+    
+    if not message:
+        return jsonify({"error": "Message is required"}), 400
+    
+    # Simple AI response (placeholder)
+    # In production, integrate with OpenAI API or similar
+    ai_response = f"Sizning savolingiz: '{message}' qabul qilindi. Bu feature hozir ishlab chiqilmoqda."
+    
+    return jsonify({
+        "response": ai_response,
+        "error": None
+    }), 200

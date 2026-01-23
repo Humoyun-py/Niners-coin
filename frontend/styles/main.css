@@ -624,11 +624,18 @@ body {
     padding: var(--space-m) var(--space-l);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-soft);
-    position: sticky;
-    top: var(--space-l);
+    position: relative;
     z-index: 100;
     flex-wrap: wrap;
     gap: var(--space-m);
+    min-height: auto;
+    overflow: visible;
+}
+
+.dashboard-header button {
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: fit-content;
 }
 
 @media (max-width: 600px) {
@@ -642,6 +649,11 @@ body {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--space-xs);
+    }
+    
+    .dashboard-header button {
+        width: 100%;
+        min-width: 100%;
     }
 }
 
@@ -794,604 +806,781 @@ body {
         gap: var(--space-m);
     }
 
-    .modal-box {
-        width: 95%;
-        padding: var(--space-l);
+
+    /* === TEACHER PANEL RESPONSIVE & COMPACT STYLES === */
+
+    /* Compact Grid for Cards (Attendance List, Dashboard) */
+    .teacher-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
     }
-}
 
-/* Unified Footer */
-.dashboard-footer {
-    border-top: 1px solid var(--border-light);
-    margin-top: var(--space-2xl);
-    padding: var(--space-xl) 0;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: var(--font-sm);
-}
+    /* Compact Card Style */
+    .compact-card {
+        padding: 16px !important;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
 
-.dashboard-footer .footer-links {
-    margin-top: var(--space-s);
-    display: flex;
-    justify-content: center;
-    gap: var(--space-l);
-    flex-wrap: wrap;
-}
+    .compact-card h3 {
+        font-size: 1.1rem;
+        margin-bottom: 6px;
+    }
 
-.dashboard-footer .footer-links a {
-    color: var(--text-muted);
-    text-decoration: none;
-    transition: var(--transition);
-    min-height: var(--touch-min);
-    display: inline-flex;
-    align-items: center;
-}
+    .compact-card p {
+        font-size: 0.9rem;
+        margin-bottom: 8px;
+    }
 
-.dashboard-footer .footer-links a:hover {
-    color: var(--primary);
-}
+    /* Attendance Form List */
+    .attendance-list-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
 
-/* Data Table Styles */
-.table-container {
-    overflow-x: auto;
-    margin-top: var(--space-m);
-    -webkit-overflow-scrolling: touch;
-}
+    .attendance-card {
+        padding: 12px 16px !important;
+        border-radius: 12px;
+        border: 1px solid var(--border-light);
+        background: white;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
 
-.data-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 40rem;
-}
+    /* Attendance Header (Student Name & Avatar) */
+    .att-student-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
 
-.data-table th,
-.data-table td {
-    padding: var(--space-m);
-    text-align: left;
-    border-bottom: 1px solid var(--border-light);
-}
+    .att-student-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
 
-.data-table th {
-    background: #F9FAFB;
-    font-weight: 700;
-    font-size: var(--font-sm);
-    color: var(--text-dark);
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
+    .att-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: var(--primary-gradient);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
 
-/* Grid helper for mobile */
-.mobile-stack {
-    display: grid !important;
-    gap: var(--space-m);
-}
+    .att-name {
+        font-weight: 700;
+        font-size: 0.95rem;
+    }
 
-@media (max-width: 1500px) {
+    .att-sub {
+        font-size: 0.8rem;
+        color: var(--secondary);
+        font-weight: 600;
+    }
+
+    /* Controls (Radio Buttons & Inputs) */
+    .att-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .att-toggles {
+        display: flex;
+        background: #f8f9fa;
+        padding: 3px;
+        border-radius: 8px;
+        border: 1px solid #eee;
+        flex: 1;
+        min-width: 200px;
+        justify-content: space-between;
+    }
+
+    .att-toggle-label {
+        flex: 1;
+        text-align: center;
+        padding: 6px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 600;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        transition: background 0.2s;
+    }
+
+    .att-toggle-label:hover {
+        background: rgba(0, 0, 0, 0.02);
+    }
+
+    .att-inputs {
+        display: flex;
+        gap: 8px;
+        flex: 1;
+        min-width: 200px;
+    }
+
+    /* MEDIA QUERIES FOR TEACHER PANEL */
+
+    /* Mobile Phones (< 480px) */
+    @media (max-width: 480px) {
+        .teacher-grid {
+            grid-template-columns: 1fr;
+            /* Full width cards */
+        }
+
+        .compact-card {
+            padding: 12px !important;
+        }
+
+        .att-controls {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .att-toggles,
+        .att-inputs {
+            width: 100%;
+            min-width: unset;
+        }
+    }
+
+    /* Tablets (481px - 768px) */
+    @media (min-width: 481px) and (max-width: 768px) {
+        .teacher-grid {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+    }
+
+    /* Large Screens */
+    @media (min-width: 1600px) {
+        .teacher-grid {
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        }
+
+        .compact-card h3 {
+            font-size: 1.25rem;
+        }
+    }
+
+
+    /* Unified Footer */
+    .dashboard-footer {
+        border-top: 1px solid var(--border-light);
+        margin-top: var(--space-2xl);
+        padding: var(--space-xl) 0;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: var(--font-sm);
+    }
+
+    .dashboard-footer .footer-links {
+        margin-top: var(--space-s);
+        display: flex;
+        justify-content: center;
+        gap: var(--space-l);
+        flex-wrap: wrap;
+    }
+
+    .dashboard-footer .footer-links a {
+        color: var(--text-muted);
+        text-decoration: none;
+        transition: var(--transition);
+        min-height: var(--touch-min);
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .dashboard-footer .footer-links a:hover {
+        color: var(--primary);
+    }
+
+    /* Data Table Styles */
+    .table-container {
+        overflow-x: auto;
+        margin-top: var(--space-m);
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 40rem;
+    }
+
+    .data-table th,
+    .data-table td {
+        padding: var(--space-m);
+        text-align: left;
+        border-bottom: 1px solid var(--border-light);
+    }
+
+    .data-table th {
+        background: #F9FAFB;
+        font-weight: 700;
+        font-size: var(--font-sm);
+        color: var(--text-dark);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    /* Grid helper for mobile */
     .mobile-stack {
-        grid-template-columns: 1fr !important;
+        display: grid !important;
+        gap: var(--space-m);
     }
-}
 
-/* Visibility Utilities */
-.hide-mobile {
-    display: block;
-}
+    @media (max-width: 1500px) {
+        .mobile-stack {
+            grid-template-columns: 1fr !important;
+        }
+    }
 
-.show-mobile {
-    display: none;
-}
-
-@media (max-width: 768px) {
+    /* Visibility Utilities */
     .hide-mobile {
-        display: none !important;
+        display: block;
     }
 
     .show-mobile {
-        display: block !important;
-    }
-
-    .modal-box {
-        width: 92%;
-        margin: var(--space-m);
-    }
-}
-
-/* Word break & Spacing utilities */
-.text-break {
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-
-@media (max-width: 768px) {
-    .mt-mobile-s {
-        margin-top: var(--space-s) !important;
-    }
-
-    .mt-mobile-m {
-        margin-top: var(--space-m) !important;
-    }
-
-    .mb-mobile-s {
-        margin-bottom: var(--space-s) !important;
-    }
-
-    .mb-mobile-m {
-        margin-bottom: var(--space-m) !important;
-    }
-}
-
-/* Flex Wrap Utility */
-.flex-wrap-mobile {
-    display: flex;
-    flex-wrap: nowrap;
-}
-
-@media (max-width: 768px) {
-    .flex-wrap-mobile {
-        flex-wrap: wrap !important;
-        gap: var(--space-m) !important;
-    }
-}
-
-/* ============================================================ */
-/* COMPREHENSIVE RESPONSIVE DESIGN - Teacher Panel Fix */
-/* ============================================================ */
-
-/* Mobile Devices (320px - 480px) */
-@media (max-width: 480px) {
-    .main-content {
-        width: 100% !important;
-        padding: var(--space-s) !important;
-        margin-left: 0 !important;
-    }
-    
-    .dashboard-header {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: var(--space-m);
-    }
-    
-    .header-left {
-        width: 100%;
-        flex-direction: column !important;
-    }
-    
-    .user-profile {
-        width: 100%;
-        justify-content: flex-start;
-    }
-    
-    .user-profile button {
-        width: 100%;
-    }
-    
-    .stats-grid {
-        grid-template-columns: 1fr !important;
-        gap: var(--space-s);
-    }
-    
-    .stats-grid .card {
-        padding: 16px !important;
-    }
-    
-    table {
-        font-size: 0.85rem !important;
-    }
-    
-    .btn {
-        padding: 10px 12px !important;
-        font-size: 0.85rem !important;
-    }
-    
-    .card {
-        padding: 16px !important;
-        margin-bottom: 16px !important;
-    }
-    
-    h2 {
-        font-size: 1.5rem !important;
-    }
-    
-    h3 {
-        font-size: 1.1rem !important;
-    }
-    
-    .profile-avatar {
-        width: 40px !important;
-        height: 40px !important;
-        font-size: 0.9rem !important;
-    }
-}
-
-/* Tablets & Small Devices (481px - 768px) */
-@media (max-width: 768px) {
-    .main-content {
-        width: 100% !important;
-        padding: var(--space-m) !important;
-        margin-left: 0 !important;
-    }
-    
-    .dashboard-header {
-        flex-direction: column;
-        align-items: flex-start !important;
-        gap: var(--space-m);
-        margin-bottom: var(--space-l);
-    }
-    
-    .header-left {
-        width: 100%;
-    }
-    
-    .user-profile {
-        width: 100%;
-    }
-    
-    .user-profile button {
-        width: 100%;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: var(--space-m);
-    }
-    
-    .card {
-        padding: 20px !important;
-    }
-    
-    #recentRewardsContainer,
-    #myStudentsContainer {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: var(--space-m);
-    }
-    
-    table {
-        font-size: 0.9rem;
-    }
-    
-    th, td {
-        padding: 12px !important;
-    }
-}
-
-/* Laptops (769px - 1024px) */
-@media (min-width: 769px) and (max-width: 1024px) {
-    .main-content {
-        width: 100% !important;
-        padding: var(--space-l) !important;
-        margin-left: 0 !important;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-    
-    .card {
-        padding: 24px !important;
-    }
-    
-    table {
-        font-size: 0.95rem;
-    }
-}
-
-/* Medium Screens (1025px - 1499px) */
-@media (min-width: 1025px) and (max-width: 1499px) {
-    .main-content {
-        width: calc(100% - var(--sidebar-width)) !important;
-        margin-left: var(--sidebar-width) !important;
-        padding: var(--space-l);
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: var(--space-m);
-    }
-    
-    .dashboard-header {
-        flex-wrap: wrap;
-    }
-}
-
-/* Desktop (1500px - 1920px) */
-@media (min-width: 1500px) and (max-width: 1920px) {
-    .main-content {
-        width: calc(100% - var(--sidebar-width)) !important;
-        margin-left: var(--sidebar-width) !important;
-        padding: var(--space-xl);
-        max-width: 1920px;
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: var(--space-m);
-    }
-    
-    .card {
-        padding: 28px !important;
-    }
-}
-
-/* Large Monitors (4K+, 1921px+) */
-@media (min-width: 1921px) {
-    .main-content {
-        width: calc(100% - var(--sidebar-width)) !important;
-        margin-left: var(--sidebar-width) !important;
-        padding: var(--space-xl);
-        max-width: 2560px;
-        margin: var(--sidebar-width) auto 0 var(--sidebar-width);
-    }
-    
-    .stats-grid {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: var(--space-l);
-    }
-    
-    .card {
-        padding: 32px !important;
-    }
-    
-    h2 {
-        font-size: 2.5rem !important;
-    }
-    
-    h3 {
-        font-size: 1.8rem !important;
-    }
-    
-    table {
-        font-size: 1.05rem;
-    }
-    
-    th, td {
-        padding: 20px !important;
-    }
-}
-
-/* Responsive Layouts for Teacher-Specific Components */
-@media (max-width: 768px) {
-    /* Homework Cards */
-    #homeworkList {
-        grid-template-columns: 1fr !important;
-    }
-    
-    /* Table Responsive Mode */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    
-    table thead {
         display: none;
     }
-    
-    table tr {
-        display: block;
-        margin-bottom: var(--space-m);
-        border: 1px solid var(--border-light);
-        border-radius: var(--radius-md);
-        padding: var(--space-m);
-        background: var(--bg-white);
+
+    @media (max-width: 768px) {
+        .hide-mobile {
+            display: none !important;
+        }
+
+        .show-mobile {
+            display: block !important;
+        }
+
+        .modal-box {
+            width: 92%;
+            margin: var(--space-m);
+        }
     }
-    
-    table td {
+
+    /* Word break & Spacing utilities */
+    .text-break {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    @media (max-width: 768px) {
+        .mt-mobile-s {
+            margin-top: var(--space-s) !important;
+        }
+
+        .mt-mobile-m {
+            margin-top: var(--space-m) !important;
+        }
+
+        .mb-mobile-s {
+            margin-bottom: var(--space-s) !important;
+        }
+
+        .mb-mobile-m {
+            margin-bottom: var(--space-m) !important;
+        }
+    }
+
+    /* Flex Wrap Utility */
+    .flex-wrap-mobile {
         display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #f5f5f5;
+        flex-wrap: nowrap;
     }
-    
-    table td::before {
-        content: attr(data-label);
-        font-weight: 700;
-        color: var(--text-muted);
-    }
-    
-    table td:last-child {
-        border-bottom: none;
-    }
-}
 
-/* Fix Modal Responsiveness */
-.modal-box {
-    max-width: 95vw !important;
-    max-height: 90vh !important;
-    width: auto !important;
-}
+    @media (max-width: 768px) {
+        .flex-wrap-mobile {
+            flex-wrap: wrap !important;
+            gap: var(--space-m) !important;
+        }
+    }
 
-@media (max-width: 768px) {
+    /* ============================================================ */
+    /* COMPREHENSIVE RESPONSIVE DESIGN - Teacher Panel Fix */
+    /* ============================================================ */
+
+    /* Mobile Devices (320px - 480px) */
+    @media (max-width: 480px) {
+        .main-content {
+            width: 100% !important;
+            padding: var(--space-s) !important;
+            margin-left: 0 !important;
+        }
+
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: var(--space-m);
+        }
+
+        .header-left {
+            width: 100%;
+            flex-direction: column !important;
+        }
+
+        .user-profile {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .user-profile button {
+            width: 100%;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr !important;
+            gap: var(--space-s);
+        }
+
+        .stats-grid .card {
+            padding: 16px !important;
+        }
+
+        table {
+            font-size: 0.85rem !important;
+        }
+
+        .btn {
+            padding: 10px 12px !important;
+            font-size: 0.85rem !important;
+        }
+
+        .card {
+            padding: 16px !important;
+            margin-bottom: 16px !important;
+        }
+
+        h2 {
+            font-size: 1.5rem !important;
+        }
+
+        h3 {
+            font-size: 1.1rem !important;
+        }
+
+        .profile-avatar {
+            width: 40px !important;
+            height: 40px !important;
+            font-size: 0.9rem !important;
+        }
+    }
+
+    /* Tablets & Small Devices (481px - 768px) */
+    @media (max-width: 768px) {
+        .main-content {
+            width: 100% !important;
+            padding: var(--space-m) !important;
+            margin-left: 0 !important;
+        }
+
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: var(--space-m);
+            margin-bottom: var(--space-l);
+        }
+
+        .header-left {
+            width: 100%;
+        }
+
+        .user-profile {
+            width: 100%;
+        }
+
+        .user-profile button {
+            width: 100%;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: var(--space-m);
+        }
+
+        .card {
+            padding: 20px !important;
+        }
+
+        #recentRewardsContainer,
+        #myStudentsContainer {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: var(--space-m);
+        }
+
+        table {
+            font-size: 0.9rem;
+        }
+
+        th,
+        td {
+            padding: 12px !important;
+        }
+    }
+
+    /* Laptops (769px - 1024px) */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .main-content {
+            width: 100% !important;
+            padding: var(--space-l) !important;
+            margin-left: 0 !important;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+
+        .card {
+            padding: 24px !important;
+        }
+
+        table {
+            font-size: 0.95rem;
+        }
+    }
+
+    /* Medium Screens (1025px - 1499px) */
+    @media (min-width: 1025px) and (max-width: 1499px) {
+        .main-content {
+            width: calc(100% - var(--sidebar-width)) !important;
+            margin-left: var(--sidebar-width) !important;
+            padding: var(--space-l);
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: var(--space-m);
+        }
+
+        .dashboard-header {
+            flex-wrap: wrap;
+        }
+    }
+
+    /* Desktop (1500px - 1920px) */
+    @media (min-width: 1500px) and (max-width: 1920px) {
+        .main-content {
+            width: calc(100% - var(--sidebar-width)) !important;
+            margin-left: var(--sidebar-width) !important;
+            padding: var(--space-xl);
+            max-width: 1920px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: var(--space-m);
+        }
+
+        .card {
+            padding: 28px !important;
+        }
+    }
+
+    /* Large Monitors (4K+, 1921px+) */
+    @media (min-width: 1921px) {
+        .main-content {
+            width: calc(100% - var(--sidebar-width)) !important;
+            margin-left: var(--sidebar-width) !important;
+            padding: var(--space-xl);
+            max-width: 2560px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: var(--space-l);
+        }
+
+        .card {
+            padding: 32px !important;
+        }
+
+        h2 {
+            font-size: 2.5rem !important;
+        }
+
+        h3 {
+            font-size: 1.8rem !important;
+        }
+
+        table {
+            font-size: 1.05rem;
+        }
+
+        th,
+        td {
+            padding: 20px !important;
+        }
+    }
+
+    /* Responsive Layouts for Teacher-Specific Components */
+    @media (max-width: 768px) {
+
+        /* Homework Cards */
+        #homeworkList {
+            grid-template-columns: 1fr !important;
+        }
+
+        /* Table Responsive Mode */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table thead {
+            display: none;
+        }
+
+        table tr {
+            display: block;
+            margin-bottom: var(--space-m);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: var(--space-m);
+            background: var(--bg-white);
+        }
+
+        table td {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        table td::before {
+            content: attr(data-label);
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        table td:last-child {
+            border-bottom: none;
+        }
+    }
+
+    /* Fix Modal Responsiveness */
     .modal-box {
-        margin: var(--space-s) !important;
-        border-radius: var(--radius-lg) !important;
+        max-width: 95vw !important;
+        max-height: 90vh !important;
+        width: auto !important;
     }
-    
-    .modal-box h3 {
-        font-size: 1.3rem !important;
+
+    @media (max-width: 768px) {
+        .modal-box {
+            margin: var(--space-s) !important;
+            border-radius: var(--radius-lg) !important;
+        }
+
+        .modal-box h3 {
+            font-size: 1.3rem !important;
+        }
     }
-}
 
-/* Fix Stats Grid Card Content */
-.stats-grid .card h3 {
-    margin: 0 !important;
-}
-
-@media (max-width: 480px) {
+    /* Fix Stats Grid Card Content */
     .stats-grid .card h3 {
-        font-size: 1.5rem !important;
+        margin: 0 !important;
     }
-    
-    .stats-grid .card p {
-        font-size: 0.8rem !important;
-    }
-}
 
-/* Ensure sidebar doesn't overlap content */
-@media (max-width: 1500px) {
-    .dashboard-grid {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        position: fixed;
-        left: 0;
-        top: 0;
-        width: var(--sidebar-width);
-        height: 100vh;
-        z-index: 1100;
-        transform: translateX(-110%);
-        transition: transform 0.3s ease;
-    }
-    
-    .sidebar.active {
-        transform: translateX(0);
-    }
-    
-    .main-content {
-        flex: 1;
-        width: 100%;
-        margin-left: 0;
-    }
-}
+    @media (max-width: 480px) {
+        .stats-grid .card h3 {
+            font-size: 1.5rem !important;
+        }
 
-/* Additional breakpoints for better tablet/laptop support */
-@media (max-width: 600px) {
-    .card {
-        margin-bottom: 12px !important;
+        .stats-grid .card p {
+            font-size: 0.8rem !important;
+        }
     }
-    
-    .btn {
-        padding: 8px 10px !important;
-        font-size: 0.8rem !important;
-    }
-    
-    .modal-box {
-        width: 90vw !important;
-        max-height: 85vh !important;
-    }
-}
 
-/* Optimized breakpoint for 1920px displays */
-@media (min-width: 1921px) {
-    .main-content {
-        max-width: 2560px !important;
-        margin-left: auto !important;
-        margin-right: auto !important;
-    }
-    
-    .card {
-        padding: 40px !important;
-    }
-}
+    /* Ensure sidebar doesn't overlap content */
+    @media (max-width: 1500px) {
+        .dashboard-grid {
+            display: flex;
+            flex-direction: column;
+        }
 
-/* ============================================
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            z-index: 1100;
+            transform: translateX(-110%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .main-content {
+            flex: 1;
+            width: 100%;
+            margin-left: 0;
+        }
+    }
+
+    /* Additional breakpoints for better tablet/laptop support */
+    @media (max-width: 600px) {
+        .card {
+            margin-bottom: 12px !important;
+        }
+
+        .btn {
+            padding: 8px 10px !important;
+            font-size: 0.8rem !important;
+        }
+
+        .modal-box {
+            width: 90vw !important;
+            max-height: 85vh !important;
+        }
+    }
+
+    /* Optimized breakpoint for 1920px displays */
+    @media (min-width: 1921px) {
+        .main-content {
+            max-width: 2560px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        .card {
+            padding: 40px !important;
+        }
+    }
+
+    /* ============================================
    ENHANCED TEACHER PANEL RESPONSIVE DESIGN
    ============================================ */
 
-/* TABLET SPECIFIC (768px-1023px) */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: var(--space-l);
-    }
-    
-    .table-wrapper {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-    
-    table {
-        min-width: 600px;
-    }
-}
+    /* TABLET SPECIFIC (768px-1023px) */
+    @media (min-width: 768px) and (max-width: 1023px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: var(--space-l);
+        }
 
-/* LAPTOP & DESKTOP (1024px-1439px) */
-@media (min-width: 1024px) and (max-width: 1439px) {
-    .stats-grid {
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: var(--space-l);
-    }
-    
-    .dashboard-grid {
-        grid-template-columns: var(--sidebar-width) 1fr;
-    }
-    
-    .sidebar {
-        position: fixed !important;
-        transform: translateX(0) !important;
-    }
-    
-    .main-content {
-        margin-left: var(--sidebar-width);
-        padding: var(--space-xl);
-    }
-}
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
 
-/* LARGE DESKTOP (1440px-1919px) */
-@media (min-width: 1440px) and (max-width: 1919px) {
-    .main-content {
-        max-width: 1600px;
-        padding: var(--space-2xl);
+        table {
+            min-width: 600px;
+        }
     }
-    
-    .card {
-        padding: 32px !important;
-    }
-    
-    .btn {
-        padding: 12px 24px;
-    }
-}
 
-/* Touch-friendly for all mobile/tablet */
-@media (max-width: 1023px) {
-    .btn, button {
-        min-height: 44px;
+    /* LAPTOP & DESKTOP (1024px-1439px) */
+    @media (min-width: 1024px) and (max-width: 1439px) {
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr) !important;
+            gap: var(--space-l);
+        }
+
+        .dashboard-grid {
+            grid-template-columns: var(--sidebar-width) 1fr;
+        }
+
+        .sidebar {
+            position: fixed !important;
+            transform: translateX(0) !important;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: var(--space-xl);
+        }
     }
-    
-    .form-control, input, select, textarea {
-        min-height: 44px;
-        font-size: 16px; /* Prevents iOS zoom */
+
+    /* LARGE DESKTOP (1440px-1919px) */
+    @media (min-width: 1440px) and (max-width: 1919px) {
+        .main-content {
+            max-width: 1600px;
+            padding: var(--space-2xl);
+        }
+
+        .card {
+            padding: 32px !important;
+        }
+
+        .btn {
+            padding: 12px 24px;
+        }
     }
-    
-    /* Teacher-specific: Stack header elements */
-    .dashboard-header {
-        flex-direction: column;
+
+    /* Touch-friendly for all mobile/tablet */
+    @media (max-width: 1023px) {
+
+        .btn,
+        button {
+            min-height: 44px;
+        }
+
+        .form-control,
+        input,
+        select,
+        textarea {
+            min-height: 44px;
+            font-size: 16px;
+            /* Prevents iOS zoom */
+        }
+
+        /* Teacher-specific: Stack header elements */
+        .dashboard-header {
+            flex-direction: column;
+            gap: var(--space-m);
+        }
+
+        .header-left,
+        .user-profile {
+            width: 100%;
+        }
+    }
+
+    /* Student/Class cards responsive grid */
+    #myStudentsContainer,
+    #classListContainer {
+        display: grid;
         gap: var(--space-m);
     }
-    
-    .header-left, .user-profile {
-        width: 100%;
+
+    @media (max-width: 767px) {
+
+        #myStudentsContainer,
+        #classListContainer {
+            grid-template-columns: 1fr;
+        }
     }
-}
 
-/* Student/Class cards responsive grid */
-#myStudentsContainer,
-#classListContainer {
-    display: grid;
-    gap: var(--space-m);
-}
+    @media (min-width: 768px) and (max-width: 1023px) {
 
-@media (max-width: 767px) {
-    #myStudentsContainer,
-    #classListContainer {
-        grid-template-columns: 1fr;
+        #myStudentsContainer,
+        #classListContainer {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
-}
 
-@media (min-width: 768px) and (max-width: 1023px) {
-    #myStudentsContainer,
-    #classListContainer {
-        grid-template-columns: repeat(2, 1fr);
+    @media (min-width: 1024px) {
+
+        #myStudentsContainer,
+        #classListContainer {
+            grid-template-columns: repeat(3, 1fr);
+        }
     }
-}
-
-@media (min-width: 1024px) {
-    #myStudentsContainer,
-    #classListContainer {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-

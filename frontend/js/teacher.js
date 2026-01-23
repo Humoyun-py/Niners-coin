@@ -110,7 +110,7 @@ const TeacherModule = {
                     ${options}
                 </select>
             </div>
-            <div id="studentsListGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+            <div id="studentsListGrid" class="teacher-grid">
                 <p class="text-muted">Guruhni tanlab o'quvchilarni ko'ring.</p>
             </div>
         `;
@@ -379,33 +379,33 @@ const TeacherModule = {
                 }
 
                 return `
-                <div class="card" style="padding: 24px; cursor: pointer; transition: transform 0.2s; border: 1px solid transparent; hover: border-color: var(--primary);" 
+                <div class="card" style="padding: 15px; cursor: pointer; transition: transform 0.2s; border: 1px solid transparent; hover: border-color: var(--primary);" 
                     onclick="if(!event.target.closest('.student-list-item')) TeacherModule.loadAttendanceForm(${c.id})">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px;">
-                        <div style="width: 50px; height: 50px; background: #eef2ff; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                        <div style="width: 40px; height: 40px; background: #eef2ff; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-size: 1.2rem;">
                             👥
                         </div>
-                        <span style="background: #e6fcf5; color: #0ca678; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;">Active</span>
+                        <span style="background: #e6fcf5; color: #0ca678; padding: 2px 8px; border-radius: 15px; font-size: 0.75rem; font-weight: 700;">Active</span>
                     </div>
-                    <h3 style="margin: 0 0 8px 0;">${c.name}</h3>
-                    <p style="color: var(--text-muted); margin: 0 0 8px 0; font-size: 0.9rem;">${c.student_count} ta o'quvchi</p>
-                    <p style="color: var(--primary); margin: 0 0 16px 0; font-size: 0.85rem; font-weight: 600;">${scheduleText}</p>
+                    <h3 style="margin: 0 0 5px 0; font-size: 1.1rem;">${c.name}</h3>
+                    <p style="color: var(--text-muted); margin: 0 0 6px 0; font-size: 0.85rem;">${c.student_count} ta o'quvchi</p>
+                    <p style="color: var(--primary); margin: 0 0 12px 0; font-size: 0.8rem; font-weight: 600;">${scheduleText}</p>
                     
                     <!-- Scrollable Student List Preview -->
-                    <div class="student-list-item" style="max-height: 120px; overflow-y: auto; background: #f8f9fa; border-radius: 8px; padding: 8px; margin-bottom: 16px; border: 1px solid #eee;">
+                    <div class="student-list-item" style="max-height: 100px; overflow-y: auto; background: #f8f9fa; border-radius: 8px; padding: 6px; margin-bottom: 12px; border: 1px solid #eee;">
                         ${c.students && c.students.length > 0 ? c.students.map(s => `
-                            <div style="padding: 4px 8px; font-size: 0.85rem; color: #555; border-bottom: 1px solid #eee; display:flex; align-items:center; gap:6px;">
-                                <span style="width:6px; height:6px; background:#ccc; border-radius:50%; display:inline-block;"></span> ${s.full_name}
+                            <div style="padding: 3px 6px; font-size: 0.8rem; color: #555; border-bottom: 1px solid #eee; display:flex; align-items:center; gap:5px;">
+                                <span style="width:5px; height:5px; background:#ccc; border-radius:50%; display:inline-block;"></span> ${s.full_name}
                             </div>
-                        `).join('') : '<div style="font-size:0.8rem; color:#999; text-align:center;">O\'quvchilar yo\'q</div>'}
+                        `).join('') : '<div style="font-size:0.75rem; color:#999; text-align:center;">O\'quvchilar yo\'q</div>'}
                     </div>
 
-                    <button class="btn btn-primary" style="width: 100%;">Davomat qilish</button>
+                    <button class="btn btn-primary" style="width: 100%; padding: 8px; font-size: 0.9rem;">Davomat qilish</button>
                 </div>
             `}).join('');
 
             container.innerHTML = `
-                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px;">
+                <div class="teacher-grid">
                     ${cards}
                 </div>
             `;
@@ -425,44 +425,44 @@ const TeacherModule = {
             const finalClassName = className || data.name || 'Guruh';
 
             const rows = data.students.map(s => `
-                <div class="attendance-card" style="background: white; border: 1px solid #eee; padding: 16px; border-radius: 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 15px;">
+                <div class="attendance-card">
                     <!-- Student Info (Top) -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <div style="width: 45px; height: 45px; background: var(--primary-gradient); border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">
+                    <div class="att-student-header">
+                        <div class="att-student-info">
+                            <div class="att-avatar">
                                 ${s.full_name[0]}
                             </div>
                             <div>
-                                <div style="font-weight: 700; font-size: 1rem;">${s.full_name}</div>
-                                <div style="font-size: 0.85rem; color: var(--secondary); font-weight:600;">${parseFloat(s.balance).toFixed(1)} 🟡</div>
+                                <div class="att-name">${s.full_name}</div>
+                                <div class="att-sub">${parseFloat(s.balance).toFixed(1)} 🟡</div>
                             </div>
                         </div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted);">#${s.id}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted);">#${s.id}</div>
                     </div>
                     
                     <!-- Controls Area (Bottom) -->
-                    <div style="display: flex; flex-wrap: wrap; gap: 12px; width: 100%;">
+                    <div class="att-controls">
                         <!-- Status Toggles -->
-                        <div class="attendance-toggles" style="display: flex; background: #f8f9fa; padding: 4px; border-radius: 8px; border: 1px solid #e9ecef; flex-grow: 1; justify-content: center;">
-                            <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                <input type="radio" name="att_${s.id}" value="present" checked style="accent-color: #2ecc71; width: 16px; height: 16px;"> 
+                        <div class="att-toggles">
+                            <label class="att-toggle-label">
+                                <input type="radio" name="att_${s.id}" value="present" checked style="accent-color: #2ecc71;"> 
                                 <span>Bor</span>
                             </label>
-                            <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                <input type="radio" name="att_${s.id}" value="absent" style="accent-color: #e74c3c; width: 16px; height: 16px;"> 
+                            <label class="att-toggle-label">
+                                <input type="radio" name="att_${s.id}" value="absent" style="accent-color: #e74c3c;"> 
                                 <span>Yo'q</span>
                             </label>
-                            <label style="cursor: pointer; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 4px;">
-                                <input type="radio" name="att_${s.id}" value="late" style="accent-color: #f1c40f; width: 16px; height: 16px;"> 
+                            <label class="att-toggle-label">
+                                <input type="radio" name="att_${s.id}" value="late" style="accent-color: #f1c40f;"> 
                                 <span>Kech</span>
                             </label>
                         </div>
 
                         <!-- Extra Coins -->
-                        <div style="display:flex; align-items:center; gap:8px; flex-grow: 1; justify-content: space-between; background: #f8f9fa; padding: 6px; border-radius: 8px; border: 1px solid #eee;">
-                            <input type="text" id="reason_${s.id}" class="form-control" placeholder="Sabab" style="font-size:0.85rem; padding:8px; width: 100%;">
-                            <input type="number" id="coin_${s.id}" class="form-control" placeholder="0" min="0" step="1" style="font-size:0.9rem; padding:8px; width:60px; text-align:center; font-weight:700; color:var(--primary);">
-                            <button class="btn btn-sm btn-success" title="Yuborish" onclick="TeacherModule.sendIndividualCoins(this, ${s.id}, '${s.full_name.replace(/'/g, "\\'")}')" style="padding: 8px 10px;">
+                        <div class="att-inputs">
+                            <input type="text" id="reason_${s.id}" class="form-control" placeholder="Sabab" style="font-size:0.8rem; padding:8px; height: 36px; min-height: unset; flex: 2;">
+                            <input type="number" id="coin_${s.id}" class="form-control" placeholder="0" min="0" step="1" style="font-size:0.9rem; padding:8px; text-align:center; height: 36px; min-height: unset; font-weight:700; color:var(--primary); flex: 1;">
+                            <button class="btn btn-sm btn-success" title="Yuborish" onclick="TeacherModule.sendIndividualCoins(this, ${s.id}, '${s.full_name.replace(/'/g, "\\'")}')" style="padding: 0 12px; height: 36px; min-height: unset;">
                                 <i class="fas fa-paper-plane"></i>
                             </button>
                         </div>
@@ -478,27 +478,22 @@ const TeacherModule = {
                     `<button onclick="TeacherModule.initAttendancePage()" class="btn btn-secondary" style="padding: 8px 16px;">← Ortga</button>`
                 }
                         <div>
-                            <h2 style="margin: 0; font-size: 1.5rem;">${finalClassName}</h2>
-                            <p style="margin: 0; color: var(--text-muted);">Sana: ${new Date().toLocaleDateString()}</p>
+                            <h2 style="margin: 0; font-size: 1.3rem;">${finalClassName}</h2>
+                            <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Sana: ${new Date().toLocaleDateString()}</p>
                         </div>
                     </div>
                     
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="display: flex; align-items: center; gap: 8px; background: white; padding: 8px 16px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e1e4e8;" title="Faqat 'Bor' bo'lganlarga avtomatik beriladi">
-                            <span style="font-weight: 600; color: #4b5563;">🎁 Davomat uchun:</span>
-                            <input type="number" id="globalCoinInput" value="1" min="0" step="0.5" style="width: 60px; border: 1px solid #d1d5db; border-radius: 6px; padding: 4px 8px; font-weight: 700; text-align: center; color: var(--primary);">
-                        </div>
-                        <button class="btn btn-secondary" onclick="TeacherModule.manageTopics(${classId})">📚 Mavzular</button>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="number" id="globalCoinInput" value="1" min="0" step="0.5" style="width: 50px; border: 1px solid #d1d5db; border-radius: 6px; padding: 4px; font-weight: 700; text-align: center; color: var(--primary);" title="Davomat uchun coin">
+                        <button class="btn btn-secondary" onclick="TeacherModule.manageTopics(${classId})" style="padding: 6px 12px; font-size: 0.85rem;">📚 Mavzular</button>
                     </div>
                 </div>
 
-                <div style="max-width: 1000px; margin: 0 auto;">
-                    <!-- Scrollable Student List -->
-                    <div style="max-height: 600px; overflow-y: auto; padding-right: 4px; margin-bottom: 20px;">
-                        ${rows}
-                    </div>
-                    <div style="margin-top: 30px; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); position: sticky; bottom: 20px; text-align: right; border-top: 1px solid #eee;">
-                        <button class="btn btn-primary" style="padding: 14px 40px; font-size: 1.1rem; border-radius: 30px; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);" onclick="TeacherModule.saveAttendance(${classId})">
+                <div style="max-width: 800px; margin: 0 auto; padding-bottom: 80px;" class="attendance-list-container">
+                    ${rows}
+                    
+                    <div style="margin-top: 20px; text-align: right; position: sticky; bottom: 20px; z-index: 10;">
+                        <button class="btn btn-primary" style="padding: 12px 30px; font-size: 1rem; border-radius: 30px; box-shadow: var(--shadow-hover);" onclick="TeacherModule.saveAttendance(${classId})">
                             ${this.t('save_changes')} ✅
                         </button>
                     </div>

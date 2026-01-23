@@ -3,9 +3,28 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Activity Log | Niners.uz</title>
     <link rel="stylesheet" href="../../styles/main.css">
     <link rel="icon" type="image/png" href="../../assets/logo.png">
+    <style>
+        .activity-log-item {
+            border-left: 3px solid var(--primary);
+            padding: 16px;
+            padding-left: 20px;
+            margin-bottom: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .activity-log-item {
+                padding: 12px;
+                padding-left: 16px;
+                margin-bottom: 12px;
+            }
+        }
+    </style>
 </head>
 
 <body class="dashboard-grid">
@@ -20,20 +39,20 @@
             </div>
         </header>
         <div class="card" style="background:white; padding:24px; border-radius:12px; margin-top:24px;">
-            <div style="border-left:3px solid var(--primary); padding-left:16px; margin-bottom:20px;">
+            <div class="activity-log-item">
                 <div style="font-weight:600;">Aziz Karimovga 10 coin berdingiz</div>
                 <div style="font-size:0.85rem; color:var(--text-muted);">Izoh: Matematika fanidan faollik uchun
                 </div>
                 <div style="font-size:0.75rem; color:#CCC;">Bugun, 14:20</div>
             </div>
-            <div style="border-left:3px solid var(--primary); padding-left:16px; margin-bottom:20px;">
+            <div class="activity-log-item">
                 <div style="font-weight:600;">9-B sinf uchun yangi uy vazifasi qo'shildi</div>
                 <div style="font-size:0.85rem; color:var(--text-muted);">Mavzu: Nyuton qonunlari</div>
                 <div style="font-size:0.75rem; color:#CCC;">Kecha, 18:05</div>
             </div>
         </div>
     </main>
-    </div>
+
     <script src="../../js/api.js"></script>
     <script src="../../js/sidebar-loader.js"></script>
 </body>

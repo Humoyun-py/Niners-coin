@@ -3,9 +3,29 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Homework | Niners.uz</title>
     <link rel="icon" type="image/png" href="../../assets/logo.png">
     <link rel="stylesheet" href="../../styles/main.css">
+    <style>
+        #homeworkList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            #homeworkList {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            #homeworkList {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
 </head>
 
 <body class="dashboard-grid">
@@ -18,13 +38,12 @@
                     <p class="user-role-badge">Teacher Panel</p>
                 </div>
             </div>
-            <button onclick="TeacherModule.showCreateHomeworkModal()" class="btn btn-primary">+ Vazifa Qo'shish</button>
+            <button onclick="TeacherModule.showCreateHomeworkModal()" style="margin-right: 200px;" class="btn btn-primary">+ Vazifa Qo'shish</button>
         </header>
 
         <div id="homeworkContent">
             <!-- Homework List will be rendered here -->
-            <div id="homeworkList"
-                style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            <div id="homeworkList">
                 <p>Yuklanmoqda...</p>
             </div>
         </div>
@@ -50,10 +69,19 @@
     <script src="../../js/teacher.js"></script>
     <script src="../../js/sidebar-loader.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            TeacherModule.initHomeworkPage();
-        });
-    </script>
-</body>
-
-</html>
+        // Wait for TeacherModule to be defined
+        function initWhenReady() {
+            if (typeof TeacherModule !== 'undefined' && TeacherModule.initHomeworkPage) {
+                TeacherModule.initHomeworkPage();
+            } else {
+                console.warn('TeacherModule not ready yet, retrying...');
+                setTimeout(initWhenReady, 100);
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWhenReady);
+        } else {
+            initWhenReady();
+        }
+    </script>\n</body>\n\n</html>

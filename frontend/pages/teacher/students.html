@@ -3,9 +3,71 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Students List | Niners.uz</title>
     <link rel="icon" type="image/png" href="../../assets/logo.png">
     <link rel="stylesheet" href="../../styles/main.css">
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+        
+        #studentsPageContainer {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+            overflow-x: auto;
+        }
+        
+        .student-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .student-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 1rem;
+        }
+        
+        /* Table responsive styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        @media (max-width: 768px) {
+            #studentsPageContainer {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .student-card {
+                padding: 16px;
+            }
+            
+            table {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #studentsPageContainer {
+                gap: 12px;
+            }
+            
+            .student-card {
+                padding: 12px;
+            }
+            
+            table {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
 </head>
 
 <body class="dashboard-grid">
@@ -25,15 +87,24 @@
             <p>Yuklanmoqda...</p>
         </div>
     </main>
-    </div>
 
     <script src="../../js/api.js"></script>
     <script src="../../js/teacher.js"></script>
     <script src="../../js/sidebar-loader.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            TeacherModule.initStudentsPage();
-        });
+        function initWhenReady() {
+            if (typeof TeacherModule !== 'undefined' && TeacherModule.initStudentsPage) {
+                TeacherModule.initStudentsPage();
+            } else {
+                setTimeout(initWhenReady, 100);
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initWhenReady);
+        } else {
+            initWhenReady();
+        }
     </script>
 </body>
 

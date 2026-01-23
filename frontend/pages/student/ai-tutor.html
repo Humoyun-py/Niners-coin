@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Niners AI Tutor | Niners.uz</title>
+    <link rel="icon" type="image/png" href="../../assets/logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../../styles/main.css">
+    <style>
+        .main-content {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            overflow: hidden;
+            /* Lock main scroll */
+        }
+
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            /* Fill remaining height */
+            background: white;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 0;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-header {
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+
+        .ai-avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+            flex-shrink: 0;
+        }
+
+        .chat-header h3 {
+            margin: 0 0 2px 0;
+            font-size: 0.95rem;
+        }
+
+        .chat-header p {
+            margin: 0;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 14px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: #f8f9fc;
+            scroll-behavior: smooth;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            position: relative;
+            word-wrap: break-word;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .message.user {
+            background: var(--primary);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.2);
+        }
+
+        .message.ai {
+            background: white;
+            color: var(--text-dark);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .chat-input-area {
+            padding: 10px 14px;
+            background: white;
+            border-top: 2px solid var(--border-light);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 14px;
+            border: 2px solid var(--border-light);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            outline: none;
+            background: #fafbfc;
+            min-height: 40px;
+            box-sizing: border-box;
+        }
+
+        .chat-input::placeholder {
+            color: #999;
+            font-size: 1rem;
+        }
+
+        .chat-input:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+        }
+
+        .send-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            font-size: 1rem;
+            flex-shrink: 0;
+            font-weight: 700;
+            padding: 0;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .send-btn:disabled {
+            background: #e2e8f0;
+            color: #a0aec0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 6px;
+            padding: 12px 18px;
+            background: white;
+            border-radius: 20px;
+            width: fit-content;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            margin-left: 10px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #cbd5e0;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* --- RESPONSIVE CSS --- */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 8px;
+                height: 100vh;
+            }
+
+            .dashboard-header {
+                margin-bottom: 8px;
+                padding: 0 4px;
+                font-size: 0.9rem;
+            }
+
+            .dashboard-header h2 {
+                font-size: 1.3rem;
+            }
+
+            .chat-container {
+                border-radius: 12px;
+                margin-bottom: 0;
+            }
+
+            .chat-header {
+                padding: 8px 12px;
+                gap: 8px;
+            }
+
+            .ai-avatar {
+                width: 34px;
+                height: 34px;
+                font-size: 1rem;
+            }
+
+            .chat-header h3 {
+                font-size: 0.85rem;
+            }
+
+            .chat-header p {
+                font-size: 0.7rem;
+                max-width: 200px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .chat-messages {
+                padding: 12px;
+                gap: 8px;
+            }
+
+            .message {
+                max-width: 85%;
+                padding: 8px 12px;
+                font-size: 0.85rem;
+                border-radius: 10px;
+            }
+
+            .chat-input-area {
+                padding: 8px 12px;
+                gap: 6px;
+            }
+
+            .chat-input {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+                min-height: 38px;
+                border-radius: 6px;
+            }
+
+            .send-btn {
+                width: 38px;
+                height: 38px;
+                border-radius: 6px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 6px;
+            }
+
+            .dashboard-header {
+                margin-bottom: 6px;
+            }
+
+            .dashboard-header h2 {
+                font-size: 1.1rem;
+            }
+
+            .chat-header {
+                padding: 6px 10px;
+            }
+
+            .ai-avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 0.9rem;
+            }
+
+            .chat-messages {
+                padding: 10px;
+            }
+
+            .message {
+                max-width: 88%;
+                padding: 8px 10px;
+                font-size: 0.8rem;
+            }
+
+            .chat-input-area {
+                padding: 6px 10px;
+            }
+
+            .chat-input {
+                padding: 8px 10px;
+                font-size: 0.85rem;
+                min-height: 36px;
+            }
+
+            .send-btn {
+                width: 36px;
+                height: 36px;
+            }
+        }
+    </style>
+</head>
+
+<body class="dashboard-grid">
+    <div id="sidebarContainer"></div>
+    <main class="main-content">
+        <header class="dashboard-header flex-wrap-mobile">
+            <div class="header-left">
+                <div>
+                    <h2>Niners AI Tutor 🤖</h2>
+                    <p class="user-role-badge">Sizning shaxsiy yordamchingiz</p>
+                </div>
+            </div>
+            <div class="user-profile">
+                <span class="coin-badge" style="background: var(--secondary-light); color: var(--secondary-dark);">
+                    Made with Gemini 💎
+                </span>
+            </div>
+        </header>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <div class="ai-avatar"><i class="fas fa-robot"></i></div>
+                <div>
+                    <h3>Niners AI</h3>
+                    <p>Ingliz, Rus va O'zbek tillarida yordamchi</p>
+                </div>
+            </div>
+
+            <div id="messagesList" class="chat-messages">
+                <div class="message ai">
+                    Assalomu alaykum! Men Niners AI yordamchisiman. 👋<br>
+                    Sizga til o'rganishda qanday yordam bera olaman?<br>
+                    <i>(English, Russian yoki O'zbek tilida yozishingiz mumkin)</i>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <input type="text" id="userInput" class="chat-input" placeholder="Savolingizni yozing..."
+                    autocomplete="off">
+                <button id="sendBtn" class="send-btn"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <script src="../../js/translations.js"></script>
+    <script src="../../js/api.js"></script>
+    <script src="../../js/sidebar-loader.js"></script>
+
+    <script>
+        const messagesList = document.getElementById('messagesList');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        function scrollToBottom() {
+            messagesList.scrollTop = messagesList.scrollHeight;
+        }
+
+        function addMessage(text, type) {
+            const div = document.createElement('div');
+            div.className = `message ${type}`;
+            if (type === 'user') {
+                div.textContent = text;
+            } else {
+                let formatted = text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                formatted = formatted.replace(/\n/g, '<br>');
+                div.innerHTML = formatted;
+            }
+            messagesList.appendChild(div);
+            scrollToBottom();
+        }
+
+        function showTyping() {
+            const div = document.createElement('div');
+            div.className = 'typing-indicator';
+            div.id = 'typingIndicator';
+            div.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+            messagesList.appendChild(div);
+            scrollToBottom();
+        }
+
+        function removeTyping() {
+            const typing = document.getElementById('typingIndicator');
+            if (typing) typing.remove();
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            addMessage(text, 'user');
+            userInput.value = '';
+
+            showTyping();
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+
+            try {
+                const response = await api.post('/ai/chat', { message: text });
+
+                removeTyping();
+                if (response.error) {
+                    addMessage("⚠️ Xatolik: " + response.error, 'ai');
+                } else {
+                    addMessage(response.response, 'ai');
+                }
+
+            } catch (error) {
+                removeTyping();
+                console.error(error);
+                addMessage("⚠️ Server bilan bog'lanishda xatolik bo'ldi. Iltimos keyinroq urinib ko'ring.", 'ai');
+            } finally {
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // initial focus
+        // On mobile, auto-focus might bring up keyboard unwantedly, so maybe only if width > 768
+        if (window.innerWidth > 768) {
+            userInput.focus();
+        }
+    </script>
+</body>
+
+</html>

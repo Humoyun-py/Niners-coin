@@ -1,4 +1,5 @@
 from flask import Blueprint, request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 import google.generativeai as genai
 import os
 
@@ -41,7 +42,16 @@ def get_model():
     )
 
 @ai_bp.route("/chat", methods=["POST"])
+@jwt_required()
 def ai_chat():
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    
+    # Only students and parents can access AI tutor
+    allowed_roles = ['student', 'parent']
+    if claims.get('role') not in allowed_roles:
+        return jsonify({"error": "Only students and parents can access AI tutor"}), 403
+    
     model = get_model()
     if not model:
         return jsonify({"error": "Server: AI API Key not configured"}), 500
@@ -65,7 +75,16 @@ def ai_chat():
         return jsonify({"error": f"AI Error: {str(e)}"}), 500
 
 @ai_bp.route("/info", methods=["GET"])
+@jwt_required()
 def ai_info():
+    user_id = get_jwt_identity()
+    claims = get_jwt()
+    
+    # Only students and parents can access AI tutor info
+    allowed_roles = ['student', 'parent']
+    if claims.get('role') not in allowed_roles:
+        return jsonify({"error": "Only students and parents can access AI tutor"}), 403
+    
     return jsonify({
         "name": "Niners AI",
         "description": "Language learning assistant (UZ / RU / EN)",

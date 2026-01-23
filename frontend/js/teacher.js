@@ -425,45 +425,47 @@ const TeacherModule = {
             const finalClassName = className || data.name || 'Guruh';
 
             const rows = data.students.map(s => `
-                <div class="attendance-card">
+                <div class="attendance-card" style="display: flex; flex-direction: column; gap: 20px; padding: 20px; min-height: 320px;">
                     <!-- Student Info (Top) -->
-                    <div class="att-student-header">
-                        <div class="att-student-info">
-                            <div class="att-avatar">
+                    <div class="att-student-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div class="att-student-info" style="display: flex; gap: 16px; align-items: center; flex: 1;">
+                            <div class="att-avatar" style="width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; flex-shrink: 0;">
                                 ${s.full_name[0]}
                             </div>
-                            <div>
-                                <div class="att-name">${s.full_name}</div>
-                                <div class="att-sub">${parseFloat(s.balance).toFixed(1)} 🟡</div>
+                            <div style="flex: 1;">
+                                <div class="att-name" style="font-weight: 700; font-size: 1.1rem; color: var(--text-dark); margin-bottom: 4px;">${s.full_name}</div>
+                                <div class="att-sub" style="font-size: 0.95rem; color: var(--text-muted);">${parseFloat(s.balance).toFixed(1)} 🟡</div>
                             </div>
                         </div>
-                        <div style="font-size: 0.75rem; color: var(--text-muted);">#${s.id}</div>
+                        <div style="font-size: 0.8rem; color: var(--text-muted); background: #f3f4f6; padding: 4px 12px; border-radius: 6px; font-weight: 600;">#${s.id}</div>
                     </div>
                     
                     <!-- Controls Area (Bottom) -->
-                    <div class="att-controls">
+                    <div class="att-controls" style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
                         <!-- Status Toggles -->
-                        <div class="att-toggles">
-                            <label class="att-toggle-label">
-                                <input type="radio" name="att_${s.id}" value="present" checked style="accent-color: #2ecc71;"> 
-                                <span>Bor</span>
+                        <div class="att-toggles" style="display: flex; gap: 16px; padding: 16px; background: #f9fafb; border-radius: 8px; justify-content: space-around;">
+                            <label class="att-toggle-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                                <input type="radio" name="att_${s.id}" value="present" checked style="accent-color: #2ecc71; cursor: pointer; width: 18px; height: 18px;"> 
+                                <span style="font-size: 0.95rem;">Bor</span>
                             </label>
-                            <label class="att-toggle-label">
-                                <input type="radio" name="att_${s.id}" value="absent" style="accent-color: #e74c3c;"> 
-                                <span>Yo'q</span>
+                            <label class="att-toggle-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                                <input type="radio" name="att_${s.id}" value="absent" style="accent-color: #e74c3c; cursor: pointer; width: 18px; height: 18px;"> 
+                                <span style="font-size: 0.95rem;">Yo'q</span>
                             </label>
-                            <label class="att-toggle-label">
-                                <input type="radio" name="att_${s.id}" value="late" style="accent-color: #f1c40f;"> 
-                                <span>Kech</span>
+                            <label class="att-toggle-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+                                <input type="radio" name="att_${s.id}" value="late" style="accent-color: #f1c40f; cursor: pointer; width: 18px; height: 18px;"> 
+                                <span style="font-size: 0.95rem;">Kech</span>
                             </label>
                         </div>
 
                         <!-- Extra Coins -->
-                        <div class="att-inputs">
-                            <input type="text" id="reason_${s.id}" class="form-control" placeholder="Sabab" style="font-size:0.8rem; padding:8px; height: 36px; min-height: unset; flex: 2;">
-                            <input type="number" id="coin_${s.id}" class="form-control" placeholder="0" min="0" step="1" style="font-size:0.9rem; padding:8px; text-align:center; height: 36px; min-height: unset; font-weight:700; color:var(--primary); flex: 1;">
-                            <button class="btn btn-sm btn-success" title="Yuborish" onclick="TeacherModule.sendIndividualCoins(this, ${s.id}, '${s.full_name.replace(/'/g, "\\'")}')" style="padding: 0 12px; height: 36px; min-height: unset;">
-                                <i class="fas fa-paper-plane"></i>
+                        <div class="att-inputs" style="display: flex; flex-direction: column; gap: 12px;">
+                            <div style="display: flex; gap: 12px;">
+                                <input type="text" id="reason_${s.id}" class="form-control" placeholder="Sabab" style="font-size:0.9rem; padding:12px; border: 1px solid #d1d5db; border-radius: 6px; flex: 2;">
+                                <input type="number" id="coin_${s.id}" class="form-control" placeholder="0" min="0" step="1" style="font-size:0.95rem; padding:12px; text-align:center; border: 1px solid #d1d5db; border-radius: 6px; font-weight:700; color:var(--primary); flex: 1;">
+                            </div>
+                            <button class="btn btn-success" title="Yuborish" onclick="TeacherModule.sendIndividualCoins(this, ${s.id}, '${s.full_name.replace(/'/g, "\\'")}')" style="padding: 12px; height: auto; min-height: 44px; font-size: 0.95rem; width: 100%; border-radius: 6px; font-weight: 600;">
+                                📤 Coinlarni yuborish
                             </button>
                         </div>
                     </div>
@@ -489,10 +491,12 @@ const TeacherModule = {
                     </div>
                 </div>
 
-                <div style="max-width: 800px; margin: 0 auto; padding-bottom: 80px;" class="attendance-list-container">
-                    ${rows}
+                <div style="max-width: 100%; margin: 0 auto; padding-bottom: 80px;" class="attendance-list-container">
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 16px; max-width: 100%; margin: 0 auto; padding: 0 16px;">
+                        ${rows}
+                    </div>
                     
-                    <div style="margin-top: 20px; text-align: right; position: sticky; bottom: 20px; z-index: 10;">
+                    <div style="margin-top: 20px; text-align: right; position: sticky; bottom: 20px; z-index: 10; max-width: 100%; margin-left: auto; margin-right: auto; padding-right: 16px;">
                         <button class="btn btn-primary" style="padding: 12px 30px; font-size: 1rem; border-radius: 30px; box-shadow: var(--shadow-hover);" onclick="TeacherModule.saveAttendance(${classId})">
                             ${this.t('save_changes')} ✅
                         </button>
@@ -535,10 +539,25 @@ const TeacherModule = {
         try {
             const res = await api.post('/teacher/attendance', { class_id: classId, records });
 
+            // Count present students
+            const presentCount = records.filter(r => r.status === 'present').length;
+            
+            // Award 3 coins to teacher for each present student
+            if (presentCount > 0) {
+                try {
+                    await api.post('/teacher/add-coin', {
+                        amount: presentCount * 3,
+                        reason: `${presentCount} ta o'quvchining davomatini belgilash`
+                    });
+                } catch (e) {
+                    console.error('Teacher coin award error:', e);
+                }
+            }
+
             // Calculate totals for feedback
             const totalCoins = records.reduce((sum, r) => sum + r.coins + r.bonus_amount, 0);
 
-            alert(`Davomat saqlandi! Jami ${totalCoins} coin berildi. 💰✅`);
+            alert(`Davomat saqlandi! Jami ${totalCoins} coin berildi. Sizga ${presentCount * 3} coin qo'shildi! 💰✅`);
 
             if (window.location.search.includes('classId')) {
                 this.loadAttendanceForm(classId);
@@ -910,6 +929,64 @@ const TeacherModule = {
         `;
 
         document.body.insertAdjacentHTML('beforeend', modalHTML);
+    },
+
+    // Coin Modal Functions
+    currentCoinRewardStudent: null,
+
+    openCoinModal(studentId, studentName) {
+        this.currentCoinRewardStudent = { id: studentId, name: studentName };
+        document.getElementById('coinModalStudentName').innerText = studentName;
+        document.getElementById('coinAmount').value = '3'; // Default to 3 coins
+        document.getElementById('coinReason').value = 'Davomat';
+        const modal = document.getElementById('coinModal');
+        modal.classList.add('active');
+    },
+
+    closeCoinModal() {
+        const modal = document.getElementById('coinModal');
+        modal.classList.remove('active');
+        this.currentCoinRewardStudent = null;
+    },
+
+    async submitCoinReward() {
+        if (!this.currentCoinRewardStudent) return;
+
+        const amount = parseFloat(document.getElementById('coinAmount').value) || 0;
+        const reason = document.getElementById('coinReason').value || 'Davomat';
+
+        if (amount <= 0) {
+            alert('Coin miqdori kiritilmadi!');
+            return;
+        }
+
+        try {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerText = 'Yuborilmoqda...';
+
+            const res = await api.post('/teacher/award-individual', {
+                student_id: this.currentCoinRewardStudent.id,
+                amount: amount,
+                reason: reason
+            });
+
+            alert(`✅ Muvaffaqiyatli! ${this.currentCoinRewardStudent.name} balans: ${res.new_balance.toFixed(1)} 🟡`);
+            
+            // Award 3 coins to teacher
+            await api.post('/teacher/add-coin', {
+                amount: 3,
+                reason: `${this.currentCoinRewardStudent.name} ning davomatini belgilash`
+            });
+
+            this.closeCoinModal();
+        } catch (e) {
+            alert('Xatolik: ' + (e.message || 'Noma\'lum xatolik'));
+        } finally {
+            const btn = event.target;
+            btn.disabled = false;
+            btn.innerText = '📤 Yuborish';
+        }
     }
 };
 

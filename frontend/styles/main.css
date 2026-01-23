@@ -1558,6 +1558,7 @@ body {
     #myStudentsContainer,
     #classListContainer {
         display: grid;
+        display: flex;
         gap: var(--space-m);
     }
 
@@ -1565,7 +1566,7 @@ body {
 
         #myStudentsContainer,
         #classListContainer {
-            grid-template-columns: 1fr;
+            grid-template-columns: 3fr;
         }
     }
 

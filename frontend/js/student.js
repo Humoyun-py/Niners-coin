@@ -370,6 +370,10 @@ const StudentModule = {
             this._cachedTopics = topics;
 
         } catch (e) {
+            // Only log real errors, not "not in group" 404s
+            if (!e.message || !e.message.includes("Siz guruhga biriktirilmagansiz")) {
+                console.error("Load class info error:", e);
+            }
             container.innerHTML = `
                 <div class="card" style="padding: 24px; border-radius: var(--radius-lg); border: 1px dashed #ccc; text-align: center;">
                     <p class="text-muted">${this.t('not_in_group')}</p>
@@ -575,7 +579,7 @@ const StudentModule = {
             const container = document.getElementById('classmatesLeaderboard');
             if (!container) return;
 
-            const response = await api.get('/student/classmates');
+            const response = await api.get('/student/my-class');
             const classmates = response.classmates || [];
 
             const countEl = document.getElementById('classmateCount');
@@ -608,9 +612,15 @@ const StudentModule = {
             `).join('');
 
         } catch (error) {
-            console.error('Leaderboard error:', error);
+            // console.error('Leaderboard error:', error); // reduce noise
             const container = document.getElementById('classmatesLeaderboard');
-            if (container) container.innerHTML = '<p style="text-align: center; color: red;">Xatolik</p>';
+            if (container) {
+                if (error.message && error.message.includes("Siz guruhga biriktirilmagansiz")) {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Guruhga qo\'shilmagansiz.</p>';
+                } else {
+                    container.innerHTML = '<p style="text-align: center; color: var(--text-muted); font-size: 0.8rem;">Ma\'lumot yuklanmadi</p>';
+                }
+            }
         }
     }
 };

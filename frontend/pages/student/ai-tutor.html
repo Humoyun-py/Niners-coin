@@ -225,6 +225,10 @@
                 height: 100vh;
             }
 
+            .menu-btn-header {
+                display: flex !important;
+            }
+
             .dashboard-header {
                 margin-bottom: 8px;
                 padding: 0 4px;
@@ -342,6 +346,11 @@
                 width: 36px;
                 height: 36px;
             }
+
+            /* Hide global floating menu on this page to prevent blocking input */
+            .menu-toggle {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -351,6 +360,11 @@
     <main class="main-content">
         <header class="dashboard-header flex-wrap-mobile">
             <div class="header-left">
+                <!-- Mobile Menu Button (Only visible on mobile) -->
+                <button class="btn btn-secondary menu-btn-header" style="display: none; padding: 8px 12px;"
+                    onclick="document.querySelector('.sidebar').classList.add('active'); document.querySelector('.sidebar-overlay').classList.add('active');">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <div>
                     <h2>Niners AI Tutor 🤖</h2>
                     <p class="user-role-badge">Sizning shaxsiy yordamchingiz</p>

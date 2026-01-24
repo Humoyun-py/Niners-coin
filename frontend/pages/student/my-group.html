@@ -99,7 +99,16 @@
                 }
             } catch (e) {
                 console.error(e);
-                alert("Guruh ma'lumotlarini yuklashda xatolik yuz berdi.");
+                if (e.message && e.message.includes("Siz guruhga biriktirilmagansiz")) {
+                    document.querySelector('.main-content').innerHTML = `
+                        <div style="text-align: center; padding: 50px 20px;">
+                            <h2 style="color: var(--text-dark); margin-bottom: 10px;">Siz guruhga biriktirilmagansiz</h2>
+                            <p style="color: var(--text-muted);">Iltimos, o'quv markazi ma'muriyatiga murojaat qiling.</p>
+                        </div>
+                    `;
+                } else {
+                    alert("Guruh ma'lumotlarini yuklashda xatolik yuz berdi.");
+                }
             }
         }
 

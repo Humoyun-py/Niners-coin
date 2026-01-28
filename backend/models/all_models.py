@@ -15,6 +15,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(20), nullable=False) 
     full_name = db.Column(db.String(100), nullable=False)
+    branch = db.Column(db.String(50), nullable=True) # New: Yunusobod, Gulzor, Beruniy
     is_active = db.Column(db.Boolean, default=True)
     block_reason = db.Column(db.String(255), nullable=True)
     debt_amount = db.Column(db.Float, default=0.0)
@@ -32,6 +33,7 @@ class User(db.Model):
             "username": self.username,
             "email": self.email,
             "role": self.role,
+            "branch": self.branch, # Expose branch
             "full_name": self.full_name,
             "is_active": self.is_active,
             "block_reason": self.block_reason,
@@ -60,6 +62,7 @@ class Student(db.Model):
             "id": self.id,
             "username": self.user.username if self.user else "N/A",
             "full_name": self.user.full_name if self.user else "N/A",
+            "branch": self.user.branch if self.user else "N/A",  # Expose branch
             "coin_balance": self.coin_balance,
             "total_earned": self.total_earned,
             "rank": self.rank,
@@ -81,6 +84,7 @@ class Teacher(db.Model):
         return {
             "id": self.id,
             "full_name": self.user.full_name if self.user else "N/A",
+            "branch": self.user.branch if self.user else "N/A", # Expose branch
             "subject": self.subject or "N/A",
             "rating": self.rating,
             "daily_limit": self.daily_limit
@@ -97,6 +101,7 @@ class Class(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
     teacher_id = db.Column(db.Integer, db.ForeignKey('teachers.id'), nullable=True)
+    branch = db.Column(db.String(50), nullable=True) # New: Ensure classes are also branched
     students = db.relationship('Student', backref='student_class', lazy=True)
     schedule_days = db.Column(db.String(50), nullable=True) # "Dushanba|Chorshanba|Juma" or "Seshanba|Payshanba|Shanba"
     schedule_time = db.Column(db.String(10), nullable=True) # "14:00"
@@ -111,6 +116,7 @@ class Class(db.Model):
         return {
             "id": self.id,
             "name": self.name,
+            "branch": self.branch, # Expose branch
             "teacher_name": teacher_name,
             "student_count": len(self.students) if self.students else 0,
             "schedule_days": self.schedule_days,

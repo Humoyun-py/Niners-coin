@@ -78,6 +78,7 @@
                             <th>Full Name</th>
                             <th>Username</th>
                             <th>Role</th>
+                            <th>Filial</th> <!-- Added Branch Column -->
                             <th>Coins</th>
                             <th>Limit</th>
                             <th>Status</th>
@@ -86,7 +87,7 @@
                     </thead>
                     <tbody id="fullUserTableBody">
                         <tr>
-                            <td colspan="7" style="text-align:center; padding:40px;">Loading users...</td>
+                            <td colspan="8" style="text-align:center; padding:40px;">Loading users...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -124,8 +125,13 @@
                                 ${u.role}
                             </span>
                         </td>
+                        <td data-label="Filial" style="padding: 10px;">
+                            <span style="background:#E3F2FD; color:#1565C0; padding:3px 8px; border-radius:5px; font-size:0.75rem; font-weight:600;">
+                                ${u.branch || 'Main'}
+                            </span>
+                        </td>
                         <td data-label="Coins" style="padding: 10px; font-weight: 700; color: #FFD700;">
-                            ${u.coin_balance !== undefined && u.coin_balance !== null ? parseFloat(u.coin_balance).toFixed(1) + ' 🟡' : '0.0 🟡'}
+                            ${(u.coin_balance || 0).toFixed(1)} 🟡
                         </td>
                         <td data-label="Limit" style="padding: 10px; font-weight: 600; color: var(--primary);">
                             ${u.role === 'teacher' ? (u.daily_limit || 500) + ' 🟡' : '-'}

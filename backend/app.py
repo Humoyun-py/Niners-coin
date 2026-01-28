@@ -69,6 +69,27 @@ def create_app():
             director.set_password('director123')
             db.session.add(director)
         
+        # Seed Branch Admins (Auto-Run)
+        branches = [
+            {"username": "niners-yunusobod", "password": "admin123", "branch": "Yunusobod", "full_name": "Admin Yunusobod"},
+            {"username": "niners-gulzor", "password": "admin123", "branch": "Gulzor", "full_name": "Admin Gulzor"},
+            {"username": "niners-beruniy", "password": "admin123", "branch": "Beruniy", "full_name": "Admin Beruniy"}
+        ]
+        for b in branches:
+            if not User.query.filter_by(username=b['username']).first():
+                ba = User(
+                    username=b['username'],
+                    email=f"{b['username']}@niners.uz",
+                    role='admin',
+                    full_name=b['full_name'],
+                    branch=b['branch']
+                )
+                ba.set_password(b['password'])
+                db.session.add(ba)
+                print(f"✅ Auto-Seeded Branch Admin: {b['username']}")
+        
+        db.session.commit() # Ensure Branch Admins are saved before potential early return below
+        
         # Seed Specific Teachers (Komron, Maruf, Mavlon, Madina, Muslima)
         from models.all_models import Teacher, Student, Class, SystemSetting
         
@@ -196,12 +217,14 @@ def create_app():
             "badges": [("requirement_text", "VARCHAR(255)")],
             "users": [
                 ("block_reason", "VARCHAR(255)"),
-                ("debt_amount", "FLOAT DEFAULT 0.0")
+                ("debt_amount", "FLOAT DEFAULT 0.0"),
+                ("branch", "VARCHAR(50)") # Auto-add branch column
             ],
             "coin_transactions": [("teacher_id", "INTEGER REFERENCES teachers(id)")],
             "classes": [
                 ("schedule_days", "VARCHAR(50)"),
-                ("schedule_time", "VARCHAR(10)")
+                ("schedule_time", "VARCHAR(10)"),
+                ("branch", "VARCHAR(50)") # Auto-add branch column
             ],
             "homework_submissions": [
                 ("content", "TEXT"),

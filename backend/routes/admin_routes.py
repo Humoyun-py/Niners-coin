@@ -165,9 +165,19 @@ def run_payment_check():
 def get_users():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     try:
+        current_user_id = get_jwt_identity()
+        current_admin = User.query.get(current_user_id)
+        
         role_filter = request.args.get('role', 'all')
         
         query = User.query
+        
+        # Branch Isolation Logic
+        if current_admin.branch:
+            # If admin has a branch, only show users from that branch OR users with no branch (if any, optional)
+            # Typically strict isolation is better.
+            query = query.filter_by(branch=current_admin.branch)
+        
         if role_filter != 'all':
             query = query.filter_by(role=role_filter)
             
@@ -186,6 +196,7 @@ def get_users():
                     "email": u.email,
                     "role": u.role,
                     "full_name": u.full_name,
+                    "branch": u.branch, 
                     "is_active": u.is_active,
                     "block_reason": u.block_reason,
                     "debt_amount": u.debt_amount,
@@ -252,6 +263,14 @@ def add_user():
     try:
         data = request.get_json()
         
+        current_user_id = get_jwt_identity()
+        current_admin = User.query.get(current_user_id)
+        
+        # Auto-assign branch if admin is restricted
+        assigned_branch = data.get('branch')
+        if current_admin.branch:
+            assigned_branch = current_admin.branch
+        
         if User.query.filter_by(username=data.get('username')).first():
             return jsonify({"msg": "Username band"}), 400
         
@@ -259,7 +278,8 @@ def add_user():
             username=data.get('username'),
             email=data.get('email', f"{data.get('username')}@niners.uz"),
             role=data.get('role', 'student'),
-            full_name=data.get('full_name')
+            full_name=data.get('full_name'),
+            branch=assigned_branch # Assign branch
         )
         new_user.set_password(data.get('password', '123456')) # Default password
         
@@ -289,7 +309,7 @@ def add_user():
             db.session.add(profile)
             
         db.session.commit()
-        log_event(get_jwt_identity(), f"Yangi foydalanuvchi qo'shildi: {new_user.username} ({new_user.role})")
+        log_event(get_jwt_identity(), f"Yangi foydalanuvchi qo'shildi: {new_user.username} ({new_user.role}) - {assigned_branch}")
         return jsonify({"msg": "Muvaffaqiyatli qo'shildi", "id": new_user.id}), 201
     except Exception as e:
         import traceback
@@ -309,6 +329,10 @@ def update_user(user_id):
     user.full_name = data.get('full_name', user.full_name)
     user.email = data.get('email', user.email)
     
+    # Allow branch update (mostly for Super Admins fix)
+    if 'branch' in data:
+        user.branch = data['branch']
+    
     if data.get('password'):
         user.set_password(data.get('password'))
         
@@ -320,7 +344,7 @@ def update_user(user_id):
         if 'daily_limit' in data:
             user.teacher_profile.daily_limit = float(data['daily_limit'])
         
-    log_event(get_jwt_identity(), f"Foydalanuvchi ma'lumotlari yangilandi: {user.username}")
+    log_event(get_jwt_identity(), f"Foydalanuvchi ma'lumotlari yangilandi: {user.username} ({user.branch if 'branch' in data else ''})")
     db.session.commit()
     return jsonify({"msg": "Ma'lumotlar yangilandi"}), 200
 
@@ -489,7 +513,14 @@ def delete_user(user_id):
 def get_classes():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     try:
-        classes = Class.query.all()
+        current_user_id = get_jwt_identity()
+        current_admin = User.query.get(current_user_id)
+        
+        query = Class.query
+        if current_admin.branch:
+            query = query.filter_by(branch=current_admin.branch)
+            
+        classes = query.all()
         result = []
         for c in classes:
             teacher_name = "Belgilanmagan"
@@ -501,6 +532,7 @@ def get_classes():
             result.append({
                 "id": c.id,
                 "name": c.name,
+                "branch": c.branch, # Expose
                 "teacher_id": c.teacher_id,
                 "teacher_name": teacher_name,
                 "student_count": len(c.students),
@@ -524,6 +556,14 @@ def create_class():
     data = request.get_json()
     teacher_user_id = data.get('teacher_id') # Usually User ID from frontend
     
+    current_user_id = get_jwt_identity()
+    current_admin = User.query.get(current_user_id)
+    
+    # Branch Logic
+    assigned_branch = data.get('branch')
+    if current_admin.branch:
+        assigned_branch = current_admin.branch
+    
     teacher = Teacher.query.filter_by(user_id=teacher_user_id).first()
     if not teacher:
         # Maybe it IS a Teacher.id
@@ -532,12 +572,13 @@ def create_class():
     new_class = Class(
         name=data.get('name'), 
         teacher_id=teacher.id if teacher else None,
+        branch=assigned_branch,
         schedule_days=data.get('schedule_days'),
         schedule_time=data.get('schedule_time')
     )
     db.session.add(new_class)
     db.session.commit()
-    log_event(get_jwt_identity(), f"Yangi sinf yaratildi: {new_class.name}")
+    log_event(get_jwt_identity(), f"Yangi sinf yaratildi: {new_class.name} ({assigned_branch})")
     return jsonify({"msg": "Sinf yaratildi"}), 201
 
 @admin_bp.route('/classes/<int:class_id>', methods=['PUT'])
@@ -550,6 +591,9 @@ def update_class(class_id):
     cls.name = data.get('name', cls.name)
     cls.schedule_days = data.get('schedule_days', cls.schedule_days)
     cls.schedule_time = data.get('schedule_time', cls.schedule_time)
+    
+    if 'branch' in data:
+        cls.branch = data['branch']
     
     teacher_user_id = data.get('teacher_id')
     if teacher_user_id:

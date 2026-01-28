@@ -7,7 +7,7 @@ ai_bp = Blueprint('ai_bp', __name__)
 
 # Configure API Key (Lazy loading to avoid error if env not set immediately)
 def get_model():
-    api_key = os.getenv("GEMINI_API_KEY")
+    api_key = "AIzaSyCbjN0SrA4XYFegGiG4gNMs4Kgpqpm1t3M"
     print(f"🔑 DEBUG: Checking API Key...")
     if not api_key:
         print("❌ DEBUG: API Key is None. Please set GEMINI_API_KEY in .env")

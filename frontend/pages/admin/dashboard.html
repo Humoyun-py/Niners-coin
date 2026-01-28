@@ -16,12 +16,25 @@
 
     <main class="main-content">
         <header class="dashboard-header flex-wrap-mobile">
-            <div class="header-left">
-                <div>
-                    <h1 id="userNameDisplay">Admin Management</h1>
-                    <p class="user-role-badge">System Overiew</p>
-                </div>
+            <h1 id="userNameDisplay">Admin Management</h1>
+            <p class="user-role-badge" id="userRoleDescription">System Overview</p>
             </div>
+            </div>
+
+            <script>
+                // Quick inline script to update branch info
+                document.addEventListener('DOMContentLoaded', async () => {
+                    try {
+                        const user = await api.get('/auth/me');
+                        if (user && user.branch) {
+                            document.getElementById('userNameDisplay').innerHTML += ` <span style="font-size: 0.6em; background: #e3f2fd; color: #1565c0; padding: 4px 8px; border-radius: 8px; vertical-align: middle;">${user.branch}</span>`;
+                            document.getElementById('userRoleDescription').innerText = `Branch Manager: ${user.branch}`;
+                        } else {
+                            document.getElementById('userRoleDescription').innerText = `Super Admin (All Branches)`;
+                        }
+                    } catch (e) { console.error(e); }
+                });
+            </script>
 
             <button onclick="requestDirectorApproval()" class="btn btn-primary">
                 <i class="fas fa-paper-plane"></i> Approval
@@ -83,7 +96,8 @@
             </div>
         </div>
 
-        <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-left: 0;">
+        <section
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-left: 0;">
             <div class="card" style="padding: 24px;">
                 <h3 style="margin-bottom: 20px;" data-i18n="users">Recently Added Users</h3>
                 <div class="table-wrapper">

@@ -27,7 +27,7 @@ def login():
             additional_claims={"role": user.role},
             expires_delta=timedelta(days=1)
         )
-        return jsonify(access_token=access_token, role=user.role, full_name=user.full_name), 200
+        return jsonify(access_token=access_token, role=user.role, full_name=user.full_name, branch=user.branch), 200
     
     return jsonify({"msg": "Username yoki parol xato"}), 401
 

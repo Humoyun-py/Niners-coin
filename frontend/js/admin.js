@@ -111,7 +111,40 @@ const AdminModule = {
     },
 
     async addUser(role) {
+        // Fetch current user (admin) to check branch
+        let currentAdmin = null;
+        try {
+            currentAdmin = await api.get('/auth/me');
+        } catch (e) { console.error("Could not fetch admin info", e); }
+
         let extraFields = '';
+
+        // Branch Selector Logic
+        let branchField = '';
+        if (currentAdmin && !currentAdmin.branch) {
+            // Super Admin - Show Branch Selector
+            branchField = `
+                <div class="input-group">
+                    <label class="input-label">Filial (Branch)</label>
+                    <select id="newBranch" class="form-control">
+                        <option value="">Main (No Branch)</option>
+                        <option value="Yunusobod">Yunusobod</option>
+                        <option value="Gulzor">Gulzor</option>
+                        <option value="Beruniy">Beruniy</option>
+                    </select>
+                </div>
+            `;
+        } else if (currentAdmin && currentAdmin.branch) {
+            // Branch Admin - Show Readonly
+            branchField = `
+                <div class="input-group">
+                    <label class="input-label">Filial</label>
+                    <input type="text" class="form-control" value="${currentAdmin.branch}" disabled style="background: #f0f0f0;">
+                    <p style="font-size: 0.8rem; color: #666;">You can only create users in your branch.</p>
+                </div>
+            `;
+        }
+
         if (role === 'student') {
             let options = '<option value="">Failed to load classes</option>';
             try {
@@ -144,6 +177,7 @@ const AdminModule = {
         }
 
         const formContent = `
+            ${branchField}
             <div class="input-group">
                 <label class="input-label">Username</label>
                 <input type="text" id="newUsername" class="form-control" placeholder="johndoe">
@@ -163,9 +197,15 @@ const AdminModule = {
             const username = document.getElementById('newUsername').value;
             const fullName = document.getElementById('newFullName').value;
             const password = document.getElementById('newPassword').value;
+            let branch = null;
+
+            if (document.getElementById('newBranch')) {
+                branch = document.getElementById('newBranch').value;
+            }
+
             if (!username || !fullName || !password) return alert("All fields are required!");
 
-            let extraData = { password };
+            let extraData = { password, branch };
             if (role === 'student') {
                 const cid = document.getElementById('newClassId').value;
                 if (cid) extraData.class_id = parseInt(cid);
@@ -186,6 +226,10 @@ const AdminModule = {
 
     async editUser(userId) {
         try {
+            // Fetch current admin to check permissions
+            let currentAdmin = null;
+            try { currentAdmin = await api.get('/auth/me'); } catch (e) { }
+
             const users = await api.get('/admin/users');
             const user = users.find(u => u.id === userId);
             if (!user) return;
@@ -200,7 +244,33 @@ const AdminModule = {
                 `;
             }
 
+            // Branch Field Logic
+            let branchField = '';
+            if (currentAdmin && !currentAdmin.branch) {
+                // Super Admin can edit branch
+                const branches = ['Yunusobod', 'Gulzor', 'Beruniy'];
+                const options = branches.map(b => `<option value="${b}" ${user.branch === b ? 'selected' : ''}>${b}</option>`).join('');
+                branchField = `
+                    <div class="input-group">
+                        <label class="input-label">Filial (Branch)</label>
+                        <select id="editBranch" class="form-control">
+                            <option value="">Main (No Branch)</option>
+                            ${options}
+                        </select>
+                    </div>
+                `;
+            } else {
+                // Restricted admin sees query-only
+                branchField = `
+                    <div class="input-group">
+                        <label class="input-label">Filial</label>
+                        <input type="text" class="form-control" value="${user.branch || 'None'}" disabled style="background:#f9f9f9;">
+                    </div>
+                `;
+            }
+
             const formContent = `
+                ${branchField}
                 <div class="input-group">
                     <label class="input-label">Full Name</label>
                     <input type="text" id="editFullName" class="form-control" value="${user.full_name}">
@@ -222,6 +292,11 @@ const AdminModule = {
                 const password = document.getElementById('editPassword').value;
 
                 let updateData = { full_name: fullName, email, password: password || undefined };
+
+                if (document.getElementById('editBranch')) {
+                    updateData.branch = document.getElementById('editBranch').value;
+                }
+
                 if (user.role === 'teacher') {
                     updateData.daily_limit = parseFloat(document.getElementById('editDailyLimit').value);
                 }
@@ -237,10 +312,39 @@ const AdminModule = {
 
     async createClass() {
         try {
+            // Fetch current admin to check permissions
+            let currentAdmin = null;
+            try { currentAdmin = await api.get('/auth/me'); } catch (e) { }
+
             const teachers = (await api.get('/admin/users')).filter(u => u.role === 'teacher');
             const options = teachers.map(t => `<option value="${t.id}">${t.full_name}</option>`).join('');
 
+            // Branch Field Logic
+            let branchField = '';
+            if (currentAdmin && !currentAdmin.branch) {
+                // Super Admin can edit branch
+                const branches = ['Yunusobod', 'Gulzor', 'Beruniy'];
+                const branchOpts = branches.map(b => `<option value="${b}">${b}</option>`).join('');
+                branchField = `
+                    <div class="input-group">
+                        <label class="input-label">Filial (Branch)</label>
+                        <select id="newClassBranch" class="form-control">
+                            <option value="">Main (No Branch)</option>
+                            ${branchOpts}
+                        </select>
+                    </div>
+                `;
+            } else {
+                branchField = `
+                    <div class="input-group">
+                        <label class="input-label">Filial</label>
+                        <input type="text" class="form-control" value="${currentAdmin && currentAdmin.branch ? currentAdmin.branch : 'None'}" disabled style="background:#f9f9f9;">
+                    </div>
+                `;
+            }
+
             const formContent = `
+                ${branchField}
                 <div class="input-group">
                     <label class="input-label">Group Name</label>
                     <input type="text" id="className" class="form-control" placeholder="e.g. IELTS Foundation">
@@ -273,13 +377,19 @@ const AdminModule = {
 
                 if (!name || !teacherId) return alert("All fields are required!");
 
+                let extraData = {
+                    name,
+                    teacher_id: parseInt(teacherId),
+                    schedule_days: scheduleDays,
+                    schedule_time: scheduleTime
+                };
+
+                if (document.getElementById('newClassBranch')) {
+                    extraData.branch = document.getElementById('newClassBranch').value;
+                }
+
                 try {
-                    await api.post('/admin/classes', {
-                        name,
-                        teacher_id: parseInt(teacherId),
-                        schedule_days: scheduleDays,
-                        schedule_time: scheduleTime
-                    });
+                    await api.post('/admin/classes', extraData);
                     alert("Group created successfully!");
                     this.initDashboard();
                 } catch (e) { alert("Error: " + e.message); }
@@ -289,6 +399,10 @@ const AdminModule = {
 
     async editClass(classId) {
         try {
+            // Fetch current admin to check permissions
+            let currentAdmin = null;
+            try { currentAdmin = await api.get('/auth/me'); } catch (e) { }
+
             const classes = await api.get('/admin/classes');
             const cls = classes.find(c => c.id === classId);
             if (!cls) return;
@@ -299,7 +413,32 @@ const AdminModule = {
             const d1Selected = (!cls.schedule_days || cls.schedule_days === 'Dushanba|Chorshanba|Juma') ? 'selected' : '';
             const d2Selected = (cls.schedule_days === 'Seshanba|Payshanba|Shanba') ? 'selected' : '';
 
+            // Branch Field Logic
+            let branchField = '';
+            if (currentAdmin && !currentAdmin.branch) {
+                // Super Admin can edit branch
+                const branches = ['Yunusobod', 'Gulzor', 'Beruniy'];
+                const branchOpts = branches.map(b => `<option value="${b}" ${cls.branch === b ? 'selected' : ''}>${b}</option>`).join('');
+                branchField = `
+                    <div class="input-group">
+                        <label class="input-label">Filial (Branch)</label>
+                        <select id="editClassBranch" class="form-control">
+                            <option value="">Main (No Branch)</option>
+                            ${branchOpts}
+                        </select>
+                    </div>
+                `;
+            } else {
+                branchField = `
+                    <div class="input-group">
+                        <label class="input-label">Filial</label>
+                        <input type="text" class="form-control" value="${cls.branch || 'None'}" disabled style="background:#f9f9f9;">
+                    </div>
+                `;
+            }
+
             const formContent = `
+                ${branchField}
                 <div class="input-group">
                     <label class="input-label">Group Name</label>
                     <input type="text" id="editClassName" class="form-control" value="${cls.name}">
@@ -330,13 +469,19 @@ const AdminModule = {
                 const scheduleDays = document.getElementById('editClassDays').value;
                 const scheduleTime = document.getElementById('editClassTime').value;
 
+                let updateData = {
+                    name,
+                    teacher_id: teacherId ? parseInt(teacherId) : undefined,
+                    schedule_days: scheduleDays,
+                    schedule_time: scheduleTime
+                };
+
+                if (document.getElementById('editClassBranch')) {
+                    updateData.branch = document.getElementById('editClassBranch').value;
+                }
+
                 try {
-                    await api.put(`/admin/classes/${classId}`, {
-                        name,
-                        teacher_id: teacherId ? parseInt(teacherId) : undefined,
-                        schedule_days: scheduleDays,
-                        schedule_time: scheduleTime
-                    });
+                    await api.put(`/admin/classes/${classId}`, updateData);
                     alert("Group updated successfully!");
                     this.initDashboard();
                 } catch (e) { alert("Error: " + e.message); }

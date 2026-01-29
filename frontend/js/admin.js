@@ -128,7 +128,7 @@ const AdminModule = {
                     <label class="input-label">Filial (Branch)</label>
                     <select id="newBranch" class="form-control">
                         <option value="">Main (No Branch)</option>
-                        <option value="Yunusobod">Yunusobod</option>
+                        <option value="muqimiy">muqimiy</option>
                         <option value="Gulzor">Gulzor</option>
                         <option value="Beruniy">Beruniy</option>
                     </select>

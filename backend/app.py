@@ -71,7 +71,7 @@ def create_app():
         
         # Seed Branch Admins (Auto-Run)
         branches = [
-            {"username": "niners-muqumiy", "password": "admin123", "branch": "Muqumiy", "full_name": "Admin Muqumiy"},
+            {"username": "niners-muqimiy", "password": "admin123", "branch": "Muqimiy", "full_name": "Admin Muqimiy"},
             {"username": "niners-gulzor", "password": "admin123", "branch": "Gulzor", "full_name": "Admin Gulzor"},
             {"username": "niners-beruniy", "password": "admin123", "branch": "Beruniy", "full_name": "Admin Beruniy"}
         ]

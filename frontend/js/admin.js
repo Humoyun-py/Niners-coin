@@ -248,7 +248,7 @@ const AdminModule = {
             let branchField = '';
             if (currentAdmin && !currentAdmin.branch) {
                 // Super Admin can edit branch
-                const branches = ['Yunusobod', 'Gulzor', 'Beruniy'];
+                const branches = ['Muqimiy', 'Gulzor', 'Beruniy'];
                 const options = branches.map(b => `<option value="${b}" ${user.branch === b ? 'selected' : ''}>${b}</option>`).join('');
                 branchField = `
                     <div class="input-group">
@@ -323,7 +323,7 @@ const AdminModule = {
             let branchField = '';
             if (currentAdmin && !currentAdmin.branch) {
                 // Super Admin can edit branch
-                const branches = ['Yunusobod', 'Gulzor', 'Beruniy'];
+                const branches = ['Muqimiy', 'Gulzor', 'Beruniy'];
                 const branchOpts = branches.map(b => `<option value="${b}">${b}</option>`).join('');
                 branchField = `
                     <div class="input-group">
@@ -417,7 +417,7 @@ const AdminModule = {
             let branchField = '';
             if (currentAdmin && !currentAdmin.branch) {
                 // Super Admin can edit branch
-                const branches = ['Yunusobod', 'Gulzor', 'Beruniy'];
+                const branches = ['Muqimiy', 'Gulzor', 'Beruniy'];
                 const branchOpts = branches.map(b => `<option value="${b}" ${cls.branch === b ? 'selected' : ''}>${b}</option>`).join('');
                 branchField = `
                     <div class="input-group">

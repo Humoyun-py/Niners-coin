@@ -15,7 +15,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     role = db.Column(db.String(20), nullable=False) 
     full_name = db.Column(db.String(100), nullable=False)
-    branch = db.Column(db.String(50), nullable=True) # New: Yunusobod, Gulzor, Beruniy
+    branch = db.Column(db.String(50), nullable=True) # New: Muqimiy, Gulzor, Beruniy
     is_active = db.Column(db.Boolean, default=True)
     block_reason = db.Column(db.String(255), nullable=True)
     debt_amount = db.Column(db.Float, default=0.0)

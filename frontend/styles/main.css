@@ -650,7 +650,7 @@ body {
         align-items: flex-start;
         gap: var(--space-xs);
     }
-    
+
     .dashboard-header button {
         width: 100%;
         min-width: 100%;

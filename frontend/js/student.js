@@ -184,8 +184,8 @@ const StudentModule = {
                          onerror="this.onerror=null; this.src='https://via.placeholder.com/150/cccccc/666666?text=Image+Error';">
                     <h4>${item.name}</h4>
                     <div class="item-price">${item.price} 🟡</div>
-                    <p style="font-size: 0.8rem; color: #666;">${item.stock === -1 ? this.t('unlimited') : item.stock + ' ' + this.t('stock_left')}</p>
-                    <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" 
+                    <p style="font-size: 0.75rem; color: #666;">${item.stock === -1 ? this.t('unlimited') : item.stock + ' ' + this.t('stock_left')}</p>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 8px; font-size: 0.85rem; padding: 6px 12px;" 
                         onclick="StudentModule.buyItem(${item.id}, '${item.name}', ${item.price})">${this.t('buy_action')}</button>
                 </div>
             `}).join('');

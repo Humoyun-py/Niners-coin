@@ -57,6 +57,34 @@ def upload_image():
         # Return the public URL path
         return jsonify({"url": f"/uploads/shop/{filename}"}), 200
 
+        return jsonify({"url": f"/uploads/shop/{filename}"}), 200
+
+@admin_bp.route('/unblock-all', methods=['POST'])
+@jwt_required()
+def unblock_all_students():
+    if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
+    
+    try:
+        # Fetch all students (joined with User to update user status)
+        students = Student.query.all()
+        count = 0
+        
+        for student in students:
+            if student.user:
+                student.user.is_active = True
+                student.user.block_reason = None
+                # Optional: Reset debt if needed, or just unblock
+                student.user.debt_amount = 0.0 
+                student.payment_status = 'paid'
+                count += 1
+        
+        db.session.commit()
+        log_event(get_jwt_identity(), f"Manually unblocked ALL students ({count} affected)", severity='warning')
+        return jsonify({"msg": f"Successfully unblocked {count} students."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": f"Error unblocking students: {str(e)}"}), 500
+
 @admin_bp.route('/debug/fix-homework-schema', methods=['GET'])
 def fix_homework_schema():
     # Public endpoint for one-time schema fix

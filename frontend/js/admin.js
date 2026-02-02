@@ -607,6 +607,16 @@ const AdminModule = {
         }
     },
 
+    async unblockAllStudents() {
+        this.createConfirm('Unblock All', 'Are you sure you want to UNBLOCK ALL students? This will reset their debt and set them to active.', async () => {
+            try {
+                const res = await api.post('/admin/unblock-all', {});
+                alert(res.msg);
+                if (typeof loadAllUsers === 'function') loadAllUsers(); // Reload table
+            } catch (e) { alert("Error: " + e.message); }
+        });
+    },
+
     async toggleUserStatus(userId) {
         try {
             const users = await api.get('/admin/users');

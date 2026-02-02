@@ -345,7 +345,7 @@ def create_app():
     def check_auto_block():
         from datetime import datetime
         now = datetime.now()
-        if now.day == 1:
+        if now.day == 5:
             lock_dir = os.path.join(os.path.dirname(__file__), 'instance')
             if not os.path.exists(lock_dir): os.makedirs(lock_dir)
             lock_file = os.path.join(lock_dir, f'auto_block_{now.month}_{now.year}.lock')

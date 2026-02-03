@@ -85,6 +85,32 @@ def unblock_all_students():
         db.session.rollback()
         return jsonify({"msg": f"Error unblocking students: {str(e)}"}), 500
 
+@admin_bp.route('/block-all', methods=['POST'])
+@jwt_required()
+def block_all_students():
+    if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
+    
+    try:
+        # Fetch all students (joined with User to update user status)
+        students = Student.query.all()
+        count = 0
+        
+        for student in students:
+            if student.user and student.user.is_active: # Only block active students
+                student.user.is_active = False
+                student.user.block_reason = "Manual Admin Block"
+                # Set default debt if manual block
+                student.user.debt_amount = 650000.0 
+                student.payment_status = 'pending'
+                count += 1
+        
+        db.session.commit()
+        log_event(get_jwt_identity(), f"Manually blocked ALL students ({count} affected)", severity='warning')
+        return jsonify({"msg": f"Successfully blocked {count} students."}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"msg": f"Error blocking students: {str(e)}"}), 500
+
 @admin_bp.route('/debug/fix-homework-schema', methods=['GET'])
 def fix_homework_schema():
     # Public endpoint for one-time schema fix

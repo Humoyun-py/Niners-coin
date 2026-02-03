@@ -617,6 +617,16 @@ const AdminModule = {
         });
     },
 
+    async blockAllStudents() {
+        this.createConfirm('BLOCK ALL', '⚠️ Are you sure you want to BLOCK ALL active students? This will set them to inactive and apply debt.', async () => {
+            try {
+                const res = await api.post('/admin/block-all', {});
+                alert(res.msg);
+                if (typeof loadAllUsers === 'function') loadAllUsers(); // Reload table
+            } catch (e) { alert("Error: " + e.message); }
+        });
+    },
+
     async toggleUserStatus(userId) {
         try {
             const users = await api.get('/admin/users');

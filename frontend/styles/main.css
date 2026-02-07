@@ -99,7 +99,25 @@ body {
   overflow-x: hidden;
   /* Prevent horizontal scroll */
   font-size: var(--font-md);
+  min-height: 100vh;
 }
+
+/* Dashboard Grid Layout */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  min-height: 100vh;
+  background-color: var(--bg-body);
+}
+
+/* Main Content Area */
+.main-content {
+  background-color: var(--bg-body);
+  padding: var(--space-l);
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
 
 @keyframes popIn {
   0% {

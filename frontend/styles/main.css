@@ -206,6 +206,7 @@ body {
 .dashboard-grid {
   position: relative;
   min-height: 100vh;
+  background-color: var(--bg-body);
 }
 
 /* Sidebar Logic - Desktop (Default) */
@@ -231,10 +232,13 @@ body {
   width: 100%;
   margin-left: var(--sidebar-width);
   /* Push content right */
+  background-color: var(--bg-body);
+  padding: var(--space-l);
   padding-bottom: var(--space-xl);
   transition: var(--transition);
   max-width: 1920px;
   /* Prevent infinite stretching on 4K */
+  min-height: 100vh;
 }
 
 /* === Global Responsive Grids === */

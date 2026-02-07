@@ -55,12 +55,25 @@
                     <h2>User Management</h2>
                     <p class="user-role-badge">Admin Panel</p>
                 </div>
-                <div class="filter-group flex-wrap-mobile" style="display: flex; gap: 8px;">
+                <div class="filter-group flex-wrap-mobile" style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <button class="filter-btn active" onclick="loadAllUsers('all', this)">All</button>
                     <button class="filter-btn" onclick="loadAllUsers('student', this)">Students</button>
                     <button class="filter-btn" onclick="loadAllUsers('teacher', this)">Teachers</button>
                     <button class="filter-btn" onclick="loadAllUsers('admin', this)">Admins</button>
                     <button class="filter-btn" onclick="loadAllUsers('director', this)">Directors</button>
+
+                    <div style="display: flex; gap: 8px; margin-left: auto; align-items: center;">
+                        <input type="text" id="searchInput" placeholder="Search name/username..." class="form-control"
+                            style="padding: 6px 12px; height: 36px; width: 200px;" onkeyup="applyFilters()">
+
+                        <select id="branchFilter" class="form-control"
+                            style="padding: 6px 12px; height: 36px; width: 140px;" onchange="applyFilters()">
+                            <option value="">All Branches</option>
+                            <option value="Muqimiy">Muqimiy</option>
+                            <option value="Gulzor">Gulzor</option>
+                            <option value="Beruniy">Beruniy</option>
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="flex-wrap-mobile" style="width: 60%; display: flex; gap: 12px; align-items: center;">
@@ -102,70 +115,38 @@
     <script src="/js/admin.js"></script>
     <script src="/js/sidebar-loader.js"></script>
     <script>
+        let allFetchedUsers = [];
+        let currentRole = 'all';
+
         async function loadAllUsers(role = 'all', btn = null) {
             LanguageModule.init();
+            currentRole = role;
 
             // Handle active button state
             if (btn) {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+            } else {
+                // If called without btn (initial load), set active class based on role default
+                if (role === 'all') {
+                    document.querySelector('.filter-btn.active')?.classList.remove('active');
+                    document.querySelector('.filter-btn:first-child')?.classList.add('active');
+                }
             }
+
+            const tbody = document.getElementById('fullUserTableBody');
+            tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:40px;">Loading users...</td></tr>`;
+
             try {
+                // Fetch users based on role (or all)
                 const users = await api.get(`/admin/users?role=${role}`);
-                const tbody = document.getElementById('fullUserTableBody');
-                tbody.innerHTML = users.map(u => `
-                    <tr style="border-bottom: 1px solid var(--border-light); transition: 0.2s;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
-                        <td data-label="Full Name" style="padding: 10px; font-weight: 700;">
-                            ${u.full_name}
-                            ${!u.is_active ? `
-                                <div style="font-size:0.7rem; color:#C62828; font-weight:400; margin-top:3px; background: #FFF0F0; padding: 3px 6px; border-radius: 4px; display: inline-block;">
-                                    ⚠️ ${u.block_reason || 'Blocked'} ${u.debt_amount ? '| ' + u.debt_amount.toLocaleString() + ' sum' : ''}
-                                </div>
-                            ` : ''}
-                        </td>
-                        <td data-label="Username" style="padding: 10px; color: var(--text-muted);">${u.username}</td>
-                        <td data-label="Role" style="padding: 10px;">
-                            <span style="background:${AdminModule.getRoleColor(u.role)}; color:white; padding:3px 8px; border-radius:5px; font-size:0.75rem; font-weight:700; text-transform:uppercase;">
-                                ${u.role}
-                            </span>
-                        </td>
-                        <td data-label="Filial" style="padding: 10px;">
-                            <span style="background:#E3F2FD; color:#1565C0; padding:3px 8px; border-radius:5px; font-size:0.75rem; font-weight:600;">
-                                ${u.branch || 'Main'}
-                            </span>
-                        </td>
-                        <td data-label="Coins" style="padding: 10px; font-weight: 700; color: #FFD700;">
-                            ${(u.coin_balance || 0).toFixed(1)} 🟡
-                        </td>
-                        <td data-label="Limit" style="padding: 10px; font-weight: 600; color: var(--primary);">
-                            ${u.role === 'teacher' ? (u.daily_limit || 500) + ' 🟡' : '-'}
-                        </td>
-                        <td data-label="Status" style="padding: 10px;">
-                            <span style="color:${u.is_active ? '#2E7D32' : '#C62828'}; font-weight:700; font-size:0.8rem;">
-                                ${u.is_active ? '● Active' : '● Blocked'}
-                            </span>
-                        </td>
-                        <td data-label="Actions" style="padding: 16px; display: flex; gap: 8px;">
-                            ${['admin', 'director'].includes(u.role) ? `
-                                <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Protected</span>
-                            ` : `
-                                <button onclick="AdminModule.toggleUserStatus(${u.id})" class="btn" style="padding: 6px 12px; font-size: 0.8rem; background: ${u.is_active ? '#FFF0F0' : '#E8F5E9'}; color: ${u.is_active ? '#C62828' : '#2E7D32'}; border: none;">
-                                    ${u.is_active ? 'Block' : 'Unblock'}
-                                </button>
-                                <button onclick="AdminModule.deleteUser(${u.id}, '${u.username}')" class="btn" style="padding: 6px 12px; font-size: 0.8rem; background: #FFEBEE; color: #D32F2F; border: none;">
-                                    Delete
-                                </button>
-                            `}
-                            <button onclick="AdminModule.editUser(${u.id})" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; border-color: #EEE;">Edit</button>
-                        </td>
-                    </tr>
-                `).join('');
+                allFetchedUsers = users;
+                applyFilters(); // Filter and Render
             } catch (e) {
                 console.error(e);
-                const tbody = document.getElementById('fullUserTableBody');
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" style="text-align:center; padding:40px; color: #D63031;">
+                        <td colspan="8" style="text-align:center; padding:40px; color: #D63031;">
                             <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px;"></i><br>
                             <strong>Failed to load users</strong><br>
                             <span style="font-size: 0.9rem; opacity: 0.8;">${e.message}</span>
@@ -174,6 +155,93 @@
                 `;
             }
         }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const branch = document.getElementById('branchFilter').value;
+
+            const filtered = allFetchedUsers.filter(u => {
+                const name = (u.full_name || '').toLowerCase();
+                const username = (u.username || '').toLowerCase();
+                const uBranch = u.branch || 'Muqimiy'; // Default to Muqimiy if null? Or treat null as Main? 
+                // Actually the system seems to use 'Muqimiy' as default or null as Main
+                // Let's match exactly if branch is selected. 
+                // If u.branch is null/empty and we select "Main", we should match? 
+                // The select has "Main" as empty value ""? No, the select below has value="" for ALL.
+
+                const nameMatch = name.includes(search) || username.includes(search);
+
+                let branchMatch = true;
+                if (branch !== "") {
+                    // Specific branch selected
+                    // Since some users might have null branch but belong to a specific one logic-wise...
+                    // Let's assume strict match for now. If u.branch is null, it might be Main or SuperAdmin
+                    branchMatch = (u.branch === branch);
+                }
+
+                return nameMatch && branchMatch;
+            });
+
+            renderUsers(filtered);
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('fullUserTableBody');
+
+            if (users.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:20px; color: #888;">No users found matching filters.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = users.map(u => `
+                <tr style="border-bottom: 1px solid var(--border-light); transition: 0.2s;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
+                    <td data-label="Full Name" style="padding: 10px; font-weight: 700;">
+                        ${u.full_name}
+                        ${!u.is_active ? `
+                            <div style="font-size:0.7rem; color:#C62828; font-weight:400; margin-top:3px; background: #FFF0F0; padding: 3px 6px; border-radius: 4px; display: inline-block;">
+                                ⚠️ ${u.block_reason || 'Blocked'} ${u.debt_amount ? '| ' + u.debt_amount.toLocaleString() + ' sum' : ''}
+                            </div>
+                        ` : ''}
+                    </td>
+                    <td data-label="Username" style="padding: 10px; color: var(--text-muted);">${u.username}</td>
+                    <td data-label="Role" style="padding: 10px;">
+                        <span style="background:${AdminModule.getRoleColor(u.role)}; color:white; padding:3px 8px; border-radius:5px; font-size:0.75rem; font-weight:700; text-transform:uppercase;">
+                            ${u.role}
+                        </span>
+                    </td>
+                    <td data-label="Filial" style="padding: 10px;">
+                        <span style="background:#E3F2FD; color:#1565C0; padding:3px 8px; border-radius:5px; font-size:0.75rem; font-weight:600;">
+                            ${u.branch || 'Main'}
+                        </span>
+                    </td>
+                    <td data-label="Coins" style="padding: 10px; font-weight: 700; color: #FFD700;">
+                        ${(u.coin_balance || 0).toFixed(1)} 🟡
+                    </td>
+                    <td data-label="Limit" style="padding: 10px; font-weight: 600; color: var(--primary);">
+                        ${u.role === 'teacher' ? (u.daily_limit || 500) + ' 🟡' : '-'}
+                    </td>
+                    <td data-label="Status" style="padding: 10px;">
+                        <span style="color:${u.is_active ? '#2E7D32' : '#C62828'}; font-weight:700; font-size:0.8rem;">
+                            ${u.is_active ? '● Active' : '● Blocked'}
+                        </span>
+                    </td>
+                    <td data-label="Actions" style="padding: 16px; display: flex; gap: 8px;">
+                        ${['admin', 'director'].includes(u.role) ? `
+                            <span style="font-size: 0.8rem; color: var(--text-muted); font-style: italic;">Protected</span>
+                        ` : `
+                            <button onclick="AdminModule.toggleUserStatus(${u.id})" class="btn" style="padding: 6px 12px; font-size: 0.8rem; background: ${u.is_active ? '#FFF0F0' : '#E8F5E9'}; color: ${u.is_active ? '#C62828' : '#2E7D32'}; border: none;">
+                                ${u.is_active ? 'Block' : 'Unblock'}
+                            </button>
+                            <button onclick="AdminModule.deleteUser(${u.id}, '${u.username}')" class="btn" style="padding: 6px 12px; font-size: 0.8rem; background: #FFEBEE; color: #D32F2F; border: none;">
+                                Delete
+                            </button>
+                        `}
+                        <button onclick="AdminModule.editUser(${u.id})" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem; border-color: #EEE;">Edit</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
         loadAllUsers();
     </script>
 

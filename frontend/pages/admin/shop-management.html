@@ -72,13 +72,13 @@
                     <p class="user-role-badge">Admin Panel</p>
                 </div>
             </div>
-            <button onclick="AdminModule.addShopItem()" class="btn btn-primary">+ Add New Item</button>
+            <button onclick="AdminModule.addShopItem()" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.9rem;">+ Add New Item</button>
         </header>
 
         <section class="shop-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-l);">
             <div>
                 <h3 style="margin-bottom: var(--space-m);">Inventory Items</h3>
-                <div id="inventoryContainer" class="mobile-stack">
+                <div id="inventoryContainer" class="mobile-stack" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px;">
                     <p class="text-muted">Loading items...</p>
                 </div>
             </div>
@@ -191,22 +191,22 @@
                         imgSrc = 'https://via.placeholder.com/100x100?text=No+Image';
                     }
                     return `
-                    <div class="item-card">
-                        <div class="item-info">
+                    <div class="item-card" style="padding: 12px; gap: 12px; border-radius: 12px; border: 1px solid #eee;">
+                        <div class="item-info" style="gap: 12px;">
                             <img src="${imgSrc}" 
                                  class="item-img" 
                                  alt="${i.name}" 
                                  onerror="this.onerror=null; this.src='https://via.placeholder.com/100x100/cccccc/666666?text=Image+Error';" 
-                                 style="width: 100px; height: 100px; object-fit: cover; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                                 style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                             <div>
-                                <h4 style="margin:0;">${i.name}</h4>
-                                <div style="color:var(--primary); font-weight:700;">${parseFloat(i.price).toFixed(2)} 🟡</div>
-                                <div style="font-size:0.8rem; color:#888;">Stock: ${i.stock === -1 ? '∞' : i.stock}</div>
+                                <h4 style="margin:0; font-size: 1rem;">${i.name}</h4>
+                                <div style="color:var(--primary); font-weight:700; font-size: 0.95rem;">${parseFloat(i.price).toFixed(2)} 🟡</div>
+                                <div style="font-size:0.75rem; color:#888;">Stock: ${i.stock === -1 ? '∞' : i.stock}</div>
                             </div>
                         </div>
-                        <div style="display:flex; gap:10px;">
+                        <div style="display:flex; gap:8px;">
                             <button onclick="AdminModule.editShopItem(${i.id})" class="btn btn-secondary" style="padding:6px 12px; font-size:0.8rem;">Edit</button>
-                            <button onclick="AdminModule.deleteShopItem(${i.id})" class="btn" style="padding:6px 12px; font-size:0.8rem; background:#FFE0E0; color:#DC3545; border:none;">Delete</button>
+                            <button onclick="AdminModule.deleteShopItem(${i.id})" class="btn" style="padding:6px 12px; font-size:0.8rem; background:#FFE0E0; color:#DC3545; border:none;">Del</button>
                         </div>
                     </div>
                 `}).join('') || '<p>No items in inventory.</p>';

@@ -775,7 +775,7 @@ body {
 
   .dashboard-header button {
     width: 100%;
-    min-width: 100%;
+    margin-top: 8px; /* Add spacing between stacked buttons */
   }
 }
 
@@ -1280,7 +1280,7 @@ body {
 
     .btn {
       padding: 10px 12px !important;
-      margin-bottom: 19rem !important;
+      margin-bottom: 1rem;
       font-size: 0.85rem !important;
     }
 
@@ -2542,4 +2542,28 @@ body.student-panel {
     border: 1px solid #ddd !important;
     page-break-inside: avoid !important;
   }
+}
+
+/* FIX: Ensure ultrawide screens (2560px+) don't have layout gaps */
+@media (min-width: 1400px) {
+    .dashboard-grid {
+        display: block !important;
+        max-width: none !important; /* Allow full width so sidebar is not detached */
+        margin: 0 !important;
+    }
+    
+    .main-content {
+        margin-left: 280px !important; /* Sidebar width from variable */
+        width: auto !important;
+        max-width: 100% !important; /* Allow content to fill remaining space */
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 280px !important;
+        position: fixed !important;
+        left: 0 !important;
+        top: 0 !important;
+        height: 100vh !important;
+    }
 }

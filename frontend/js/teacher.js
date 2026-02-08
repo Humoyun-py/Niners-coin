@@ -39,14 +39,14 @@ const TeacherModule = {
         }
 
         container.innerHTML = rewards.map(r => `
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #f0f0f0;">
-                <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-bottom: 1px solid #f0f0f0;">
+                <div style="font-size: 0.85rem;">
                     <span style="font-weight: 700;">${r.student_name}</span>
-                    <span style="font-size: 0.8rem; color: #888; margin-left: 10px;">${r.source}</span>
+                    <span style="font-size: 0.75rem; color: #888; margin-left: 8px;">${r.source}</span>
                 </div>
-                <div style="display: flex; align-items: center; gap: 10px;">
-                    <span style="color: var(--secondary); font-weight: 700;">+${r.amount} 🟡</span>
-                    <span style="font-size: 0.75rem; color: #aaa;">${r.date}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="color: var(--secondary); font-weight: 700; font-size: 0.85rem;">+${r.amount} 🟡</span>
+                    <span style="font-size: 0.7rem; color: #aaa;">${r.date}</span>
                 </div>
             </div>
         `).join('');
@@ -82,11 +82,11 @@ const TeacherModule = {
 
             return `
             <tr style="border-bottom: 1px solid var(--border-light);">
-                <td style="padding: 12px; font-weight: 600;">${c.name}</td>
-                <td style="padding: 12px;">${c.student_count} Students</td>
-                <td style="padding: 12px; color: var(--primary);">${scheduleText}</td>
-                <td style="padding: 12px;">
-                    <button class="btn btn-secondary" style="padding: 6px 16px; font-size: 0.8rem;" onclick="TeacherModule.manageClass(${c.id})">Boshqarish</button>
+                <td style="padding: 8px 10px; font-weight: 600;">${c.name}</td>
+                <td style="padding: 8px 10px;">${c.student_count} Students</td>
+                <td style="padding: 8px 10px; color: var(--primary);">${scheduleText}</td>
+                <td style="padding: 8px 10px; text-align: right;">
+                    <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem; height: 28px;" onclick="TeacherModule.manageClass(${c.id})">Boshqarish</button>
                 </td>
             </tr>
         `}).join('');
@@ -128,15 +128,22 @@ const TeacherModule = {
                 return;
             }
 
-            grid.innerHTML = data.students.map(s => `
-                <div class="card" style="padding: 16px; display: flex; align-items: center; justify-content: space-between;">
+            grid.innerHTML = data.students.map(s => {
+                const isBlocked = s.is_active === false;
+                return `
+                <div class="card" style="padding: 12px; display: flex; align-items: center; justify-content: space-between; border-left: 3px solid ${isBlocked ? '#ff4d4d' : '#ffd700'};">
                     <div>
-                        <div style="font-weight: 700;">${s.full_name}</div>
-                        <div style="font-size: 0.8rem; color: #666;">${parseFloat(s.balance).toFixed(2)} 🟡 | ${s.rank}</div>
+                        <div style="font-weight: 700; font-size: 0.9rem; color: ${isBlocked ? '#666' : 'inherit'};">
+                            ${s.full_name} ${isBlocked ? '<span style="color:#ff4d4d; font-size:0.7rem;">(BLOK)</span>' : ''}
+                        </div>
+                        <div style="font-size: 0.75rem; color: #666;">${parseFloat(s.balance).toFixed(2)} 🟡 | ${s.rank}</div>
                     </div>
-                    <button class="btn btn-sm btn-primary" onclick="TeacherModule.quickAward(${s.id}, '${s.full_name}')">${this.t('encourage_btn')}</button>
+                    <button class="btn btn-sm btn-primary" ${isBlocked ? 'disabled style="opacity:0.5; cursor:not-allowed; padding: 4px 8px; font-size: 0.75rem; height: 28px;"' : 'style="padding: 4px 8px; font-size: 0.75rem; height: 28px;"'} 
+                        onclick="TeacherModule.quickAward(${s.id}, '${s.full_name}')">
+                        ${this.t('encourage_btn')}
+                    </button>
                 </div>
-            `).join('');
+            `}).join('');
         } catch (e) {
             grid.innerHTML = '<p>Xatolik yuz berdi.</p>';
         }
@@ -221,9 +228,15 @@ const TeacherModule = {
             // Find student ID from datalist/cached data
             const option = document.querySelector(`#studentNamesList option[value="${searchVal}"]`);
             const studentId = option ? option.getAttribute('data-id') : null;
+            const isActive = option ? option.getAttribute('data-active') === 'true' : true;
 
             if (!studentId || !amount) {
                 alert("Iltimos, o'quvchini ro'yxatdan tanlang va miqdorni kiriting.");
+                return;
+            }
+
+            if (!isActive) {
+                alert("Xatolik: Bloklangan o'quvchiga coin berib bo'lmaydi.");
                 return;
             }
 
@@ -257,7 +270,10 @@ const TeacherModule = {
 
         try {
             const data = await api.get(`/teacher/classes/${classId}`);
-            datalist.innerHTML = data.students.map(s => `<option value="${s.full_name}" data-id="${s.id}">${s.username ? '@' + s.username : ''}</option>`).join('');
+            datalist.innerHTML = data.students.map(s => {
+                const name = s.full_name + (s.is_active === false ? ' (BLOK)' : '');
+                return `<option value="${name}" data-active="${s.is_active !== false}" data-id="${s.id}">${s.username ? '@' + s.username : ''}</option>`;
+            }).join('');
             searchInput.placeholder = 'O\'quvchi ismini tanlang';
         } catch (e) {
             searchInput.placeholder = 'Xatolik!';
@@ -284,6 +300,11 @@ const TeacherModule = {
         this.createModal('Rag\'batlantirish', formContent, async () => {
             const amount = document.getElementById('quickAmount').value;
             const reason = document.getElementById('quickReason').value;
+
+            if (!amount || parseFloat(amount) <= 0) {
+                alert("Iltimos, koin miqdorini kiriting.");
+                return;
+            }
 
             try {
                 const res = await api.post('/teacher/award-coins', {
@@ -424,70 +445,80 @@ const TeacherModule = {
             // Use fetched name if not provided
             const finalClassName = className || data.name || 'Guruh';
 
-            const rows = data.students.map(s => `
-                <div class="attendance-card" style="display: flex; flex-direction: column; gap: 20px; padding: 20px; min-height: 320px;">
+            const rows = data.students.map(s => {
+                const isBlocked = s.is_active === false;
+                return `
+                <div class="attendance-card" style="display: flex; flex-direction: column; gap: 12px; padding: 12px; min-height: auto; ${isBlocked ? 'background: #fffafa; border-color: #ffcccc;' : ''}">
                     <!-- Student Info (Top) -->
                     <div class="att-student-header" style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div class="att-student-info" style="display: flex; gap: 16px; align-items: center; flex: 1;">
-                            <div class="att-avatar" style="width: 50px; height: 50px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; flex-shrink: 0;">
+                        <div class="att-student-info" style="display: flex; gap: 12px; align-items: center; flex: 1;">
+                            <div class="att-avatar" style="width: 36px; height: 36px; background: ${isBlocked ? '#999' : 'var(--primary)'}; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0;">
                                 ${s.full_name[0]}
                             </div>
                             <div style="flex: 1;">
-                                <div class="att-name" style="font-weight: 700; font-size: 1.1rem; color: var(--text-dark); margin-bottom: 4px;">${s.full_name}</div>
-                                <div class="att-sub" style="font-size: 0.95rem; color: var(--text-muted);">${parseFloat(s.balance).toFixed(1)} 🟡</div>
+                                <div class="att-name" style="font-weight: 700; font-size: 0.95rem; color: ${isBlocked ? '#666' : 'var(--text-dark)'}; margin-bottom: 2px;">
+                                    ${s.full_name} ${isBlocked ? '<span style="color:#e74c3c; font-size:0.7rem;">(BLOK)</span>' : ''}
+                                </div>
+                                <div class="att-sub" style="font-size: 0.8rem; color: var(--text-muted);">${parseFloat(s.balance).toFixed(1)} 🟡</div>
                             </div>
                         </div>
-                        <div style="font-size: 0.8rem; color: var(--text-muted); background: #f3f4f6; padding: 4px 12px; border-radius: 6px; font-weight: 600;">#${s.id}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); background: #f3f4f6; padding: 2px 8px; border-radius: 4px; font-weight: 600;">#${s.id}</div>
                     </div>
                     
                     <!-- Controls Area (Bottom) -->
-                    <div class="att-controls" style="flex: 1; display: flex; flex-direction: column; gap: 16px;">
+                    <div class="att-controls" style="display: flex; flex-direction: column; gap: 10px;">
                         <!-- Status Toggles -->
-                        <div class="att-toggles" style="display: flex; gap: 16px; padding: 16px; background: #f9fafb; border-radius: 8px; justify-content: space-around;">
-                            <label class="att-toggle-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
-                                <input type="radio" name="att_${s.id}" value="present" checked style="accent-color: #2ecc71; cursor: pointer; width: 18px; height: 18px;"> 
-                                <span style="font-size: 0.95rem;">Bor</span>
+                        <div class="att-toggles" style="display: flex; gap: 12px; padding: 8px; background: #f9fafb; border-radius: 6px; justify-content: space-around;">
+                            <label class="att-toggle-label" style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500;">
+                                <input type="radio" name="att_${s.id}" value="present" checked style="accent-color: #2ecc71; cursor: pointer; width: 14px; height: 14px;" onchange="TeacherModule.toggleBonusInputs(${s.id}, this.value)"> 
+                                <span style="font-size: 0.85rem;">Bor</span>
                             </label>
-                            <label class="att-toggle-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
-                                <input type="radio" name="att_${s.id}" value="absent" style="accent-color: #e74c3c; cursor: pointer; width: 18px; height: 18px;"> 
-                                <span style="font-size: 0.95rem;">Yo'q</span>
+                            <label class="att-toggle-label" style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500;">
+                                <input type="radio" name="att_${s.id}" value="absent" style="accent-color: #e74c3c; cursor: pointer; width: 14px; height: 14px;" onchange="TeacherModule.toggleBonusInputs(${s.id}, this.value)"> 
+                                <span style="font-size: 0.85rem;">Yo'q</span>
                             </label>
-                            <label class="att-toggle-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
-                                <input type="radio" name="att_${s.id}" value="late" style="accent-color: #f1c40f; cursor: pointer; width: 18px; height: 18px;"> 
-                                <span style="font-size: 0.95rem;">Kech</span>
+                            <label class="att-toggle-label" style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 500;">
+                                <input type="radio" name="att_${s.id}" value="late" style="accent-color: #f1c40f; cursor: pointer; width: 14px; height: 14px;" onchange="TeacherModule.toggleBonusInputs(${s.id}, this.value)"> 
+                                <span style="font-size: 0.85rem;">Kech</span>
                             </label>
                         </div>
 
                         <!-- Extra Coins -->
-                        <div class="att-inputs" style="display: flex; flex-direction: column; gap: 12px;">
-                            <div style="display: flex; gap: 12px;">
-                                <input type="text" id="reason_${s.id}" class="form-control" placeholder="Sabab" style="font-size:0.9rem; padding:12px; border: 1px solid #d1d5db; border-radius: 6px; flex: 2;">
-                                <input type="number" id="coin_${s.id}" class="form-control" placeholder="0" min="0" step="1" style="font-size:0.95rem; padding:12px; text-align:center; border: 1px solid #d1d5db; border-radius: 6px; font-weight:700; color:var(--primary); flex: 1;">
-                            </div>
-                            <button class="btn btn-success" title="Yuborish" onclick="TeacherModule.sendIndividualCoins(this, ${s.id}, '${s.full_name.replace(/'/g, "\\'")}')" style="padding: 12px; height: auto; min-height: 44px; font-size: 0.95rem; width: 100%; border-radius: 6px; font-weight: 600;">
-                                📤 Coinlarni yuborish
-                            </button>
+                        <div class="att-inputs" style="display: flex; flex-direction: column; gap: 8px;">
+                            ${isBlocked ? `
+                                <div style="color:#e74c3c; font-size:0.75rem; text-align:center; padding:6px; border:1px solid #ffcccc; border-radius:4px; background:#fff;">
+                                    ⚠️ O'quvchi bloklangan.
+                                </div>
+                            ` : `
+                                <div id="bonus_container_${s.id}" style="display: flex; gap: 8px; transition: 0.3s;">
+                                    <input type="text" id="reason_${s.id}" class="form-control" placeholder="Sabab" style="font-size:0.8rem; padding:8px; border: 1px solid #d1d5db; border-radius: 4px; flex: 2; height: 32px;">
+                                    <input type="number" id="coin_${s.id}" class="form-control" placeholder="0" min="0" step="1" style="font-size:0.85rem; padding:8px; text-align:center; border: 1px solid #d1d5db; border-radius: 4px; font-weight:700; color:var(--primary); flex: 1; height: 32px;">
+                                </div>
+                                <button id="btn_send_${s.id}" class="btn btn-success" title="Yuborish" onclick="TeacherModule.sendIndividualCoins(this, ${s.id}, '${s.full_name.replace(/'/g, "\\'")}')" style="padding: 6px; height: 32px; font-size: 0.8rem; width: 100%; border-radius: 4px; font-weight: 600; transition: 0.3s;">
+                                    📤 Coin berish
+                                </button>
+                            `}
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `}).join('');
 
             container.innerHTML = `
-                <div style="margin-bottom: 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 15px;">
-                    <div style="display: flex; align-items: center; gap: 16px;">
+                <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 0 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
                         ${window.location.search.includes('classId') ?
-                    `<button onclick="window.location.href='attendance.html'" class="btn btn-secondary" style="padding: 8px 16px;">← Hamma guruhlar</button>` :
-                    `<button onclick="TeacherModule.initAttendancePage()" class="btn btn-secondary" style="padding: 8px 16px;">← Ortga</button>`
+                    `<button onclick="window.location.href='attendance.html'" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">← Guruhlar</button>` :
+                    `<button onclick="TeacherModule.initAttendancePage()" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;">← Ortga</button>`
                 }
                         <div>
-                            <h2 style="margin: 0; font-size: 1.3rem;">${finalClassName}</h2>
-                            <p style="margin: 0; color: var(--text-muted); font-size: 0.9rem;">Sana: ${new Date().toLocaleDateString()}</p>
+                            <h2 style="margin: 0; font-size: 1.1rem;">${finalClassName}</h2>
+                            <p style="margin: 0; color: var(--text-muted); font-size: 0.8rem;">${new Date().toLocaleDateString()}</p>
                         </div>
                     </div>
                     
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <input type="number" id="globalCoinInput" value="1" min="0" step="0.5" style="width: 50px; border: 1px solid #d1d5db; border-radius: 6px; padding: 4px; font-weight: 700; text-align: center; color: var(--primary);" title="Davomat uchun coin">
-                        <button class="btn btn-secondary" onclick="TeacherModule.manageTopics(${classId})" style="padding: 6px 12px; font-size: 0.85rem;">📚 Mavzular</button>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; background: #eef2ff; color: var(--primary); padding: 4px 10px; border-radius: 12px;">Davomat = 1 🟡</span>
+                        <button class="btn btn-secondary" onclick="TeacherModule.manageTopics(${classId})" style="padding: 6px 12px; font-size: 0.8rem;">📚 Mavzular</button>
                     </div>
                 </div>
 
@@ -511,7 +542,7 @@ const TeacherModule = {
 
     async saveAttendance(classId) {
         const selects = document.querySelectorAll('input[type="radio"]:checked');
-        const globalCoin = parseFloat(document.getElementById('globalCoinInput')?.value) || 0;
+        const globalCoin = 1.0; // Hardcoded to 1 coin as per request
 
         const records = Array.from(selects).map(radio => {
             const studentId = parseInt(radio.name.split('_')[1]);
@@ -524,7 +555,10 @@ const TeacherModule = {
             const bonusInput = document.getElementById(`coin_${studentId}`);
             const reasonInput = document.getElementById(`reason_${studentId}`);
 
-            const bonusAmount = parseFloat(bonusInput?.value) || 0;
+            let bonusAmount = parseFloat(bonusInput?.value) || 0;
+            // Force bonus to 0 if absent
+            if (status === 'absent') bonusAmount = 0;
+            
             const bonusReason = reasonInput?.value || 'Qo\'shimcha faollik';
 
             return {
@@ -565,6 +599,33 @@ const TeacherModule = {
                 this.initAttendancePage();
             }
         } catch (e) { alert("Xatolik: " + e.message); }
+    },
+
+    toggleBonusInputs(studentId, status) {
+        const container = document.getElementById(`bonus_container_${studentId}`);
+        const btn = document.getElementById(`btn_send_${studentId}`);
+        
+        if (!container || !btn) return;
+
+        if (status === 'absent') {
+            container.style.opacity = '0.4';
+            container.style.pointerEvents = 'none';
+            container.style.filter = 'grayscale(1)';
+            btn.style.opacity = '0.4';
+            btn.style.pointerEvents = 'none';
+            btn.style.filter = 'grayscale(1)';
+            
+            // Clear inputs if any
+            const coinInput = document.getElementById(`coin_${studentId}`);
+            if (coinInput) coinInput.value = '';
+        } else {
+            container.style.opacity = '1';
+            container.style.pointerEvents = 'auto';
+            container.style.filter = 'none';
+            btn.style.opacity = '1';
+            btn.style.pointerEvents = 'auto';
+            btn.style.filter = 'none';
+        }
     },
 
     async initHomeworkPage() {
@@ -749,6 +810,11 @@ const TeacherModule = {
     },
 
     async sendIndividualCoins(btn, studentId, studentName) {
+        const radio = document.querySelector(`input[name="att_${studentId}"]:checked`);
+        if (radio && radio.value === 'absent') {
+            return alert("Xatolik: Yo'q (absent) deb belgilangan o'quvchiga coin berib bo'lmaydi.");
+        }
+
         const input = document.getElementById(`coin_${studentId}`);
         const reasonInput = document.getElementById(`reason_${studentId}`);
         const amount = parseFloat(input.value) || 0;

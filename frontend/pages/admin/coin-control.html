@@ -148,8 +148,9 @@
                                 <button class="btn btn-secondary" onclick="document.getElementById('coinModal').remove()" style="padding: 10px 20px; border-radius: 6px; cursor: pointer;">Bekor qilish</button>
                             </div>
                             <div style="flex:1; display:flex; justify-content:flex-end; gap: 12px;">
-                                <button class="btn btn-primary" id="modalSaveBtn" style="padding: 10px 20px; border-radius: 6px; cursor: pointer; background: linear-gradient(135deg, #FFD700, #FFA500); border: none; color: #000; font-weight: 700;">Tasdiqlash</button>
+                                <button class="btn btn-primary" id="modalSaveBtn" ${!is_active ? 'disabled style="opacity:0.6; cursor:not-allowed; filter: grayscale(1);"' : ''} style="padding: 10px 20px; border-radius: 6px; cursor: pointer; background: linear-gradient(135deg, #FFD700, #FFA500); border: none; color: #000; font-weight: 700;">Tasdiqlash</button>
                             </div>
+                            ${!is_active ? '<div style="width:100%; color:#C62828; font-size:0.8rem; text-align:right; margin-top:5px;">⚠️ O\'quvchi bloklangan, coin qo\'shib bo\'lmaydi</div>' : ''}
                         </div>
                     </div>
                 </div>

@@ -10,6 +10,9 @@ def award_coins(student_id, amount, source, description=None, teacher_id=None):
     student = Student.query.get(student_id)
     if not student:
         return False, "Student not found"
+    
+    if student.user and not student.user.is_active:
+        return False, f"Coin berib bo'lmaydi: O'quvchi bloklangan ({student.user.block_reason or 'Sabab ko'rsatilmagan'})"
         
     try:
         # Update balance

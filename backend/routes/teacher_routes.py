@@ -104,7 +104,8 @@ def get_class_details(class_id):
             "full_name": s.user.full_name,
             "username": s.user.username,
             "balance": s.coin_balance,
-            "rank": s.rank
+            "rank": s.rank,
+            "is_active": s.user.is_active if s.user else True
         })
         
     return jsonify({
@@ -159,6 +160,10 @@ def mark_attendance():
         sid = rec.get('student_id')
         status = rec.get('status')
         
+        # Check student status for blocking coin awards
+        student = Student.query.get(sid)
+        can_award = student.user.is_active if student and student.user else True
+        
         # Check if attendance record already exists
         existing = Attendance.query.filter_by(student_id=sid, class_id=class_id, date=date_obj).first()
         
@@ -182,8 +187,11 @@ def mark_attendance():
             new_att = Attendance(student_id=sid, class_id=class_id, date=date_obj, status=status)
             db.session.add(new_att)
         
-        if coin_amount > 0:
+        if coin_amount > 0 and can_award:
             award_coins(sid, coin_amount, reason, teacher_id=teacher.id)
+        elif coin_amount > 0 and not can_award:
+            # Optionally log that coins were skipped for a blocked student
+            pass
         else:
             # Still check for attendance-based badges even if no coins were given
             from services.badge_engine import check_and_award_badges
@@ -193,7 +201,7 @@ def mark_attendance():
         bonus_amount = float(rec.get('bonus_amount', 0))
         bonus_reason = rec.get('bonus_reason', 'Qo\'shimcha faollik')
         
-        if bonus_amount > 0:
+        if bonus_amount > 0 and can_award:
             # Check limit again for bonus
             # Since we checked total_planned earlier, we need to ensure we included bonuses in total_planned calculation
             # But let's assume the earlier check covered it or we just proceed (soft limit for now or recalculate)

@@ -550,49 +550,109 @@ body {
   font-weight: 700;
 }
 
+/* === Filter Buttons (Chips Style) === */
+.filter-group {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: var(--space-xs) !important;
+  align-items: center;
+}
+
+.filter-btn {
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.filter-btn:hover {
+  background: #f8f9fa;
+  color: var(--text-dark);
+  border-color: var(--text-muted);
+}
+
+.filter-btn.active {
+  background: var(--text-dark);
+  color: white;
+  border-color: var(--text-dark);
+  box-shadow: var(--shadow-soft);
+}
+
+/* === Sidebar Footer & Logout === */
 .sidebar-footer {
   margin-top: auto;
-  padding-top: var(--space-l);
+  padding: var(--space-m);
+  border-top: 1px solid var(--border-light);
 }
 
 .logout-btn {
   width: 100%;
+  padding: 10px;
   background: #fff5f5 !important;
   color: #ff4d4d !important;
   border: 1px solid #ffe0e0 !important;
+  border-radius: var(--radius-md);
+  font-size: 0.9rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition);
 }
 
 .logout-btn:hover {
   background: #ffe0e0 !important;
-  transform: translateY(calc(-1 * var(--space-3xs)));
-}
-
-.main-content {
-  padding: clamp(var(--space-l), 5vw, var(--space-2xl));
-  background: #fafafa;
-  max-width: 100%;
-  overflow-x: hidden;
-}
-
-.coin-badge {
-  background: var(--primary-gradient);
-  padding: var(--space-2xs) var(--space-m);
-  border-radius: var(--radius-full);
-  font-weight: 800;
-  font-size: var(--font-sm);
-  color: var(--text-dark);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-soft);
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3xs);
 }
 
-.stat-card h3 {
-  font-size: var(--font-2xl);
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* === General Button Refinement === */
+.btn {
+  padding: 8px 16px; /* Slightly smaller padding */
+  font-size: 0.9rem;
+  min-height: 40px; /* Reduced from touch-min (44px) for desktop preference */
+}
+
+/* Mobile Specific Adjustments for Compactness */
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-m);
+  }
+  
+  .filter-group {
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    flex-wrap: nowrap !important; /* Horizontally scrollable on mobile */
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .filter-btn {
+    flex: 0 0 auto; /* Don't shrink */
+    padding: 8px 16px; /* Larger touch target */
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  /* Make action buttons side-by-side if possible */
+  .header-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-s);
+    width: 100%;
+  }
 }
 
 /* Modal Styles */

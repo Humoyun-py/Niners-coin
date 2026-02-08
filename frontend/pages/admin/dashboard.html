@@ -16,9 +16,13 @@
 
     <main class="main-content">
         <header class="dashboard-header flex-wrap-mobile">
-            <h1 id="userNameDisplay">Admin Management</h1>
-            <p class="user-role-badge" id="userRoleDescription">System Overview</p>
-            </div>
+            <div class="header-left">
+                <div class="user-profile">
+                    <div>
+                        <h1 id="userNameDisplay" style="font-size: 1.5rem; margin-bottom: 4px;">Admin Management</h1>
+                        <p class="user-role-badge" id="userRoleDescription">System Overview</p>
+                    </div>
+                </div>
             </div>
 
             <script>
@@ -32,11 +36,15 @@
                         } else {
                             document.getElementById('userRoleDescription').innerText = `Super Admin (All Branches)`;
                         }
-                    } catch (e) { console.error(e); }
+                    } catch (e) {
+                         // Fallback script if api fails or user not found
+                         document.getElementById('userRoleDescription').innerText = `Super Admin (All Branches)`;
+                         console.error(e); 
+                    }
                 });
             </script>
 
-            <button onclick="requestDirectorApproval()" class="btn btn-primary">
+            <button onclick="requestDirectorApproval()" class="btn btn-primary" style="padding: 8px 20px; font-size: 0.9rem;">
                 <i class="fas fa-paper-plane"></i> Approval
             </button>
         </header>

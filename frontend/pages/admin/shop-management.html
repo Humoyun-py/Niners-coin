@@ -72,20 +72,20 @@
                     <p class="user-role-badge">Admin Panel</p>
                 </div>
             </div>
-            <button onclick="AdminModule.addShopItem()" style="margin-right: 200px ;" class="btn btn-primary">+ Add New Item</button>
+            <button onclick="AdminModule.addShopItem()" class="btn btn-primary">+ Add New Item</button>
         </header>
 
-        <section style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 32px;">
+        <section class="shop-grid-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--space-l);">
             <div>
-                <h3 style="margin-bottom: 20px;">Inventory Items</h3>
+                <h3 style="margin-bottom: var(--space-m);">Inventory Items</h3>
                 <div id="inventoryContainer" class="mobile-stack">
                     <p class="text-muted">Loading items...</p>
                 </div>
             </div>
 
             <div>
-                <h3 style="margin-bottom: 20px; max-width:200px ;">Purchase History</h3>
-                <div id="historyContainer" class="card" style="padding: 20px; font-size: 0.9rem;">
+                <h3 style="margin-bottom: var(--space-m);">Purchase History</h3>
+                <div id="historyContainer" class="card" style="padding: var(--space-m); font-size: 0.9rem;">
                     <p class="text-muted">Loading history...</p>
                 </div>
             </div>

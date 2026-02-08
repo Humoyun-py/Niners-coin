@@ -50,38 +50,52 @@
         </style>
 
         <header class="dashboard-header flex-wrap-mobile">
-            <div class="header-left flex-wrap-mobile">
-                <div>
-                    <h2>User Management</h2>
-                    <p class="user-role-badge">Admin Panel</p>
+            <div class="header-left flex-wrap-mobile" style="width: 100%;">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px;">
+                    <div>
+                        <h2>User Management</h2>
+                        <p class="user-role-badge">Admin Panel</p>
+                    </div>
+                    <div class="header-actions hide-mobile" style="display: flex; gap: 8px;">
+                         <button onclick="AdminModule.unblockAllStudents()" class="btn"
+                            style="background: #2ecc71; color: white;">🔓 Unblock All</button>
+                        <button onclick="AdminModule.blockAllStudents()" class="btn"
+                            style="background: #e74c3c; color: white;">🔒 Block All</button>
+                    </div>
                 </div>
-                <div class="filter-group flex-wrap-mobile" style="display: flex; gap: 8px; flex-wrap: wrap;">
+
+                <div class="filter-group">
                     <button class="filter-btn active" onclick="loadAllUsers('all', this)">All</button>
                     <button class="filter-btn" onclick="loadAllUsers('student', this)">Students</button>
                     <button class="filter-btn" onclick="loadAllUsers('teacher', this)">Teachers</button>
                     <button class="filter-btn" onclick="loadAllUsers('admin', this)">Admins</button>
                     <button class="filter-btn" onclick="loadAllUsers('director', this)">Directors</button>
+                </div>
 
-                    <div style="display: flex; gap: 8px; margin-left: auto; align-items: center;">
-                        <input type="text" id="searchInput" placeholder="Search name/username..." class="form-control"
-                            style="padding: 6px 12px; height: 36px; width: 200px;" onkeyup="applyFilters()">
+                <div class="mt-mobile-m" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 12px; width: 100%;">
+                    <input type="text" id="searchInput" placeholder="Search..." class="form-control"
+                        style="padding: 6px 12px; height: 36px; flex: 1; min-width: 150px;" onkeyup="applyFilters()">
 
-                        <select id="branchFilter" class="form-control"
-                            style="padding: 6px 12px; height: 36px; width: 140px;" onchange="applyFilters()">
-                            <option value="">All Branches</option>
-                            <option value="Muqimiy">Muqimiy</option>
-                            <option value="Gulzor">Gulzor</option>
-                            <option value="Beruniy">Beruniy</option>
-                        </select>
-                    </div>
+                    <select id="branchFilter" class="form-control"
+                        style="padding: 6px 12px; height: 36px; width: 140px;" onchange="applyFilters()">
+                        <option value="">All Branches</option>
+                        <option value="Muqimiy">Muqimiy</option>
+                        <option value="Gulzor">Gulzor</option>
+                        <option value="Beruniy">Beruniy</option>
+                    </select>
+                </div>
+                
+                <!-- Mobile Actions (Shown only on mobile) -->
+                <div class="header-actions show-mobile mt-mobile-m" style="display: none; width: 100%; gap: 8px; margin-top: 12px;">
+                     <button onclick="AdminModule.unblockAllStudents()" class="btn"
+                        style="background: #2ecc71; color: white;">🔓 Unblock All</button>
+                    <button onclick="AdminModule.blockAllStudents()" class="btn"
+                        style="background: #e74c3c; color: white;">🔒 Block All</button>
                 </div>
             </div>
-            <div class="flex-wrap-mobile" style="width: 60%; display: flex; gap: 12px; align-items: center;">
-                <button onclick="AdminModule.unblockAllStudents()" class="btn"
-                    style="background: #2ecc71; color: white;">🔓 Unblock All</button>
-                <button onclick="AdminModule.blockAllStudents()" class="btn"
-                    style="background: #e74c3c; color: white;">🔒 Block All</button>
-                <button onclick="AdminModule.addUser('student')" class="btn btn-primary">+ New Student</button>
+            
+            <div class="header-actions mt-mobile-m" style="display: flex; gap: 8px; margin-top: 12px;">
+                 <button onclick="AdminModule.addUser('student')" class="btn btn-primary">+ New Student</button>
                 <button onclick="AdminModule.addUser('teacher')" class="btn btn-secondary">+ New Teacher</button>
             </div>
         </header>

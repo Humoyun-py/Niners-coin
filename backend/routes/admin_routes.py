@@ -65,21 +65,26 @@ def unblock_all_students():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     
     try:
-        # Fetch all students (joined with User to update user status)
-        students = Student.query.all()
+        current_admin = User.query.get(get_jwt_identity())
+        
+        # Unblock students based on branch or ALL if super admin
+        query = Student.query
+        if current_admin and current_admin.branch:
+            query = query.join(User).filter(func.lower(User.branch) == func.lower(current_admin.branch))
+            
+        students = query.all()
         count = 0
         
         for student in students:
             if student.user:
                 student.user.is_active = True
                 student.user.block_reason = None
-                # Optional: Reset debt if needed, or just unblock
                 student.user.debt_amount = 0.0 
                 student.payment_status = 'paid'
                 count += 1
         
         db.session.commit()
-        log_event(get_jwt_identity(), f"Manually unblocked ALL students ({count} affected)", severity='warning')
+        log_event(get_jwt_identity(), f"Manually unblocked students ({count} affected) for branch {current_admin.branch if current_admin.branch else 'All'}", severity='warning')
         return jsonify({"msg": f"Successfully unblocked {count} students."}), 200
     except Exception as e:
         db.session.rollback()
@@ -91,21 +96,26 @@ def block_all_students():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     
     try:
-        # Fetch all students (joined with User to update user status)
-        students = Student.query.all()
+        current_admin = User.query.get(get_jwt_identity())
+        
+        # Block students based on branch or ALL if super admin
+        query = Student.query
+        if current_admin and current_admin.branch:
+            query = query.join(User).filter(func.lower(User.branch) == func.lower(current_admin.branch))
+            
+        students = query.all()
         count = 0
         
         for student in students:
             if student.user and student.user.is_active: # Only block active students
                 student.user.is_active = False
                 student.user.block_reason = "Manual Admin Block"
-                # Set default debt if manual block
                 student.user.debt_amount = 650000.0 
                 student.payment_status = 'pending'
                 count += 1
         
         db.session.commit()
-        log_event(get_jwt_identity(), f"Manually blocked ALL students ({count} affected)", severity='warning')
+        log_event(get_jwt_identity(), f"Manually blocked students ({count} affected) for branch {current_admin.branch if current_admin.branch else 'All'}", severity='warning')
         return jsonify({"msg": f"Successfully blocked {count} students."}), 200
     except Exception as e:
         db.session.rollback()
@@ -200,16 +210,21 @@ def create_approval_request():
 def run_payment_check():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     
-    # Block ALL students
-    all_students = Student.query.all()
+    current_admin = User.query.get(get_jwt_identity())
+    
+    # Block students based on branch or ALL if super admin
+    query = Student.query
+    if current_admin and current_admin.branch:
+        query = query.join(User).filter(func.lower(User.branch) == func.lower(current_admin.branch))
+        
+    all_students = query.all()
     count = 0
     for s in all_students:
         if s.user and s.user.is_active:
             s.user.is_active = False
             s.user.block_reason = "To'lov qilingmagan"
             s.user.debt_amount = 650000.0
-            s.payment_status = 'pending'
-            log_event(None, f"Qo'lda hamma uchun blok: {s.user.username}", severity='danger')
+            log_event(None, f"Filial bo'yicha blok ({current_admin.branch if current_admin.branch else 'All'}): {s.user.username}", severity='danger')
             count += 1
     db.session.commit()
     return jsonify({"msg": f"{count} ta o'quvchi to'lov uchun bloklandi"}), 200
@@ -295,14 +310,19 @@ def debug_schema():
 def fix_students():
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     try:
-        # Unblock ALL students
-        students = Student.query.all()
+        current_admin = User.query.get(get_jwt_identity())
+        
+        # Unblock students based on branch or ALL if super admin
+        query = Student.query
+        if current_admin and current_admin.branch:
+            query = query.join(User).filter(func.lower(User.branch) == func.lower(current_admin.branch))
+            
+        students = query.all()
         count = 0
         for s in students:
             if s.user:
                 s.user.is_active = True
                 s.user.block_reason = None
-                # Optional: s.user.set_password(f"{s.user.username}09") # Force reset passwords if needed
                 count += 1
         
         db.session.commit()
@@ -379,6 +399,11 @@ def update_user(user_id):
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     data = request.get_json()
     user = User.query.get_or_404(user_id)
+    current_admin = User.query.get(get_jwt_identity())
+    
+    # Branch Isolation Check
+    if current_admin and current_admin.branch and user.branch != current_admin.branch:
+        return jsonify({"msg": "Siz faqat o'z filialingizdagi foydalanuvchilarni tahrirlay olasiz"}), 403
     
     user.full_name = data.get('full_name', user.full_name)
     user.email = data.get('email', user.email)
@@ -453,6 +478,15 @@ def remove_student_from_class(class_id, student_id):
 def toggle_block(user_id):
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     user = User.query.get_or_404(user_id)
+    current_admin = User.query.get(get_jwt_identity())
+    
+    # Branch Isolation Check
+    if current_admin and current_admin.branch:
+        admin_branch = (current_admin.branch or "").lower()
+        user_branch = (user.branch or "").lower()
+        if admin_branch != user_branch:
+             return jsonify({"msg": f"Siz faqat o'z filialingizdagm foydalanuvchilarni boshqarishingiz mumkin (Siz: {current_admin.branch}, Foydalanuvchi: {user.branch})"}), 403
+
     data = request.get_json() or {}
     
     # Check if we are trying to block an admin or director
@@ -478,6 +512,11 @@ def toggle_block(user_id):
 def delete_user(user_id):
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
     user = User.query.get_or_404(user_id)
+    current_admin = User.query.get(get_jwt_identity())
+    
+    # Branch Isolation Check
+    if current_admin and current_admin.branch and user.branch != current_admin.branch:
+        return jsonify({"msg": "Siz faqat o'z filialingizdagi foydalanuvchilarni o'chira olasiz"}), 403
     
     # Prevent deleting Admins or Directors
     if user.role in ['admin', 'director']:
@@ -752,6 +791,12 @@ def get_audit_logs():
 @jwt_required()
 def adjust_coins(user_id):
     if not check_admin(): return jsonify({"msg": "Forbidden"}), 403
+    current_admin = User.query.get(get_jwt_identity())
+    user = User.query.get_or_404(user_id)
+    
+    # Branch Isolation Check
+    if current_admin and current_admin.branch and user.branch != current_admin.branch:
+        return jsonify({"msg": "Siz faqat o'z filialingizdagi foydalanuvchilar balansini tahrirlay olasiz"}), 403
     data = request.get_json()
     try:
         amount = int(data.get('amount', 0)) # Ensure int
